@@ -1,15 +1,26 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"log"
+	"github.com/robfig/cron"
 )
 
+
 func main() {
-	// Create a new Gin router
-	router := gin.Default()
+	db, err := setupDB()
+	if err != nil {
+		// Handle error
+		log.Println("Error occurred:", err)
+		return
+	}
+	defer db.Close()
 
-	// Define your routes here
+	c := cron.New()
+	c.AddFunc("@every 15m", func() {
 
-	// Start the server
-	router.Run(":8080")
+	})
+	c.Start()
+
+	fetchFeeds(db)
 }
+
