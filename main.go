@@ -83,7 +83,7 @@ func main() {
 
 	router.GET("/analysis", func(c *gin.Context) {
 		var count int64
-		db.Model(&RSSItem{}).Where("DATE(published_date) = CURDATE()").Count(&count)
+		db.Model(&RSSItem{}).Where("DATE(published_date) = DATE('now')").Count(&count)
 		c.JSON(http.StatusOK, gin.H{
 			"count": count,
 		})
