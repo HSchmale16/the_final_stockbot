@@ -64,6 +64,12 @@
         version: master
       register: stockbot_git
 
+    # Create the service
+    - name: Create a systemd unit file
+      ansible.builtin.template:
+        src: final-stockbot.service.j2
+        dest: /etc/systemd/system/final-stockbot.service
+
     - name: Build my application
       block:
         - name: Build the go project
@@ -76,16 +82,13 @@
             src: /root/the_final_stockbot/the_final_stockbot
             dest: "/var/lib/{{ service_user_name }}/the_final_stockbot"
             mode: 0755
+          notify:
+            - Reload systemd
       when: stockbot_git.changed
 
 
-    # Create the service
-    - name: Create a systemd unit file
-      ansible.builtin.template:
-        src: final-stockbot.service.j2
-        dest: /etc/systemd/system/final-stockbot.service
-      notify:
-        - Reload systemd
+
+
 
   handlers:
     - name: Reload systemd
