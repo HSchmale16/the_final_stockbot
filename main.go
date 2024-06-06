@@ -16,6 +16,8 @@ func check(err error) {
 	}
 }
 
+const MODEL_PATH = "./DOWNLOAD_MODELS"
+
 func DoAnalysis() {
 	// start a new session. This looks for the onnxruntime.so library in its default path, e.g. /usr/lib/onnxruntime.so
 	//session, err := hugot.NewSession()
@@ -30,7 +32,8 @@ func DoAnalysis() {
 		check(err)
 	}(session)
 
-	modelPath, err := session.DownloadModel("KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english", "./", hugot.NewDownloadOptions())
+	// modelPath, err := session.DownloadModel("KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english", MODEL_PATH, hugot.NewDownloadOptions())
+	modelPath, err := session.DownloadModel("mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis", MODEL_PATH, hugot.NewDownloadOptions())
 	check(err)
 
 	// we now create the configuration for the text classification pipeline we want to create.
