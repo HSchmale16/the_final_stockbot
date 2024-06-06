@@ -44,6 +44,8 @@ func main() {
 	}
 	defer db.Close()
 
+	doStartupTasks(db)
+
 	c := cron.New()
 	c.AddFunc("@every 15m", func() {
 		fetchFeeds(db)
