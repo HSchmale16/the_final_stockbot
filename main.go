@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/knights-analytics/hugot"
@@ -80,14 +79,12 @@ func main() {
 	c.Start()
 
 	router := gin.Default()
-
-	router.GET("/checkLoadedStories", func(c *gin.Context) {
-		var count int64
-		db.Model(&RSSItem{}).Where("DATE(published_date) >= DATE('now', '-2 days')").Count(&count)
-		c.JSON(http.StatusOK, gin.H{
-			"count": count,
-		})
+	router.Use(func(c *gin.Context) {
+		c.Set("db", db)
+		c.Next()
 	})
+
+	router.GET("/checkLoadedStories", GetLoadedArticlesStatus)
 
 	router.Run(":8080")
 }
