@@ -6,7 +6,6 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/knights-analytics/hugot v0.1.2
 	github.com/mmcdole/gofeed v1.3.0
-	github.com/robfig/cron v1.2.0
 )
 
 require (

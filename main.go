@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/robfig/cron"
-
+	"github.com/jinzhu/gorm"
 	"github.com/knights-analytics/hugot"
 )
 
@@ -32,8 +31,8 @@ func DoAnalysis() {
 		check(err)
 	}(session)
 
-	// modelPath, err := session.DownloadModel("KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english", MODEL_PATH, hugot.NewDownloadOptions())
-	modelPath, err := session.DownloadModel("mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis", MODEL_PATH, hugot.NewDownloadOptions())
+	modelPath, err := session.DownloadModel("KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english", MODEL_PATH, hugot.NewDownloadOptions())
+	//modelPath, err := session.DownloadModel("nickmuchi/sec-bert-finetuned-finance-classification", MODEL_PATH, hugot.NewDownloadOptions())
 	check(err)
 
 	// we now create the configuration for the text classification pipeline we want to create.
@@ -48,7 +47,7 @@ func DoAnalysis() {
 	check(err)
 
 	// we can now use the pipeline for prediction on a batch of strings
-	batch := []string{"This movie is disgustingly good !", "The director tried too much"}
+	batch := []string{"This movie is disgustingly good!", "The director tried too much"}
 	batchResult, err := sentimentPipeline.RunPipeline(batch)
 	check(err)
 
@@ -56,6 +55,15 @@ func DoAnalysis() {
 	s, err := json.Marshal(batchResult)
 	check(err)
 	fmt.Println(string(s))
+}
+
+func getNewestRssItemWithoutArticleBody(db *gorm.DB) (*RSSItem, error) {
+	item := &RSSItem{}
+	err := db.Where("article_body IS NULL").Order("pub_date DESC").Limit(1).Find(item).Error
+	if err != nil {
+		return nil, err
+	}
+	return item, nil
 }
 
 func main() {
@@ -67,15 +75,18 @@ func main() {
 	}
 	defer db.Close()
 
-	c := cron.New()
-	c.AddFunc("@every 15m", func() {
-		fetchFeeds(db)
-	})
+	// c := cron.New()
+	// c.AddFunc("@every 15m", func() {
+	// 	fetchFeeds(db)
+	// })
 
-	log.Print("Started feed reader cron.")
-	c.Start()
+	// log.Print("Started feed reader cron.")
+	// c.Start()
+	fmt.Println("Hello")
+	// fetchFeeds(db)
+	// DoAnalysis()
 
-	DoAnalysis()
+	fetchFeeds(db)
 
-	select {}
+	// select {}
 }

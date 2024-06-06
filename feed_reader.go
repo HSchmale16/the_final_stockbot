@@ -3,8 +3,10 @@ package main
 import (
 	_ "fmt"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	"github.com/mmcdole/gofeed"
 )
@@ -45,7 +47,6 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 			FeedID:      feed.ID,
 		}
 
-		rssItem.PubDate = pubDate
 		// Check if the RSS item already exists in the database
 		var existingItem RSSItem
 		err = db.Where("guid = ?", rssItem.Guid).First(&existingItem).Error
@@ -57,6 +58,35 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 			// RSS item already exists, skip inserting
 			continue
 		}
+
+		// Download the link as HTML
+		log.Println("Getting HTML for", rssItem.Link)
+		resp, err := http.Get(rssItem.Link)
+		if err != nil {
+			log.Println("Failed to download HTML:", err)
+			continue
+		}
+		defer resp.Body.Close()
+
+		log.Println("Parsing HTML for", rssItem.Link)
+		// Parse the HTML document
+		doc, err := goquery.NewDocumentFromReader(resp.Body)
+		if err != nil {
+			log.Println("Failed to parse HTML:", err)
+			continue
+		}
+
+		// Extract the desired selector
+		selector := "body > main > div > article > article.press-release__content > section.press-release__body"
+		selectedContent := doc.Find(selector)
+
+		// Remove style nodes from the selected content
+		selectedContent.Find("style").Remove()
+
+		content := selectedContent.Text()
+
+		// Update the RSS item with the extracted content
+		rssItem.ArticleBody = &content
 
 		// Insert the feed item into the database
 		err = db.Create(rssItem).Error

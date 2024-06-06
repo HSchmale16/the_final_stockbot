@@ -21,11 +21,11 @@ func (RSSFeed) TableName() string {
 
 type RSSItem struct {
 	gorm.Model
-	Guid        string `gorm:"type:text"`
-	Title       string `gorm:"type:text"`
-	Description string `gorm:"type:text"`
-	Link        string `gorm:"type:text"`
-	ArticleBody string `gorm:"type:text"` // this is the article content
+	Guid        string  `gorm:"type:text"`
+	Title       string  `gorm:"type:text"`
+	Description string  `gorm:"type:text"`
+	Link        string  `gorm:"type:text"`
+	ArticleBody *string `gorm:"type:text"` // this is the article content
 	PubDate     time.Time
 	FeedID      uint
 	Feed        RSSFeed `gorm:"foreignkey:FeedID"`
@@ -72,6 +72,11 @@ func seedRSSFeeds(db *gorm.DB) error {
 			Title:       "Medical & Health PR.com",
 			Description: "Medical and health news",
 			Link:        "https://www.pr.com/rss/news-by-category/103.xml",
+		},
+		{
+			Title:       "Semiconductor Industry PR.com",
+			Description: "Semiconductor industry news",
+			Link:        "https://www.pr.com/rss/news-by-category/188.xml",
 		},
 		// Add more feeds as needed
 	}
