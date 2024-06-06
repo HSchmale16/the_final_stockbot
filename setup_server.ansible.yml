@@ -56,13 +56,15 @@
         shell: /bin/false
         home: "/var/lib/{{ service_user_name }}"
 
+    - name: Clone my stockbot repository
+      git:
+        repo: https://github.com/HSchmale16/the_final_stockbot
+        dest: /root/the_final_stockbot
+        version: master
+      register: stockbot_git
+
     - name: Build my application
       block:
-        - name: Clone my stockbot repository
-          git:
-            repo: https://github.com/HSchmale16/the_final_stockbot
-            dest: /root/the_final_stockbot
-            version: master
         - name: Build the go project
           command:
             cmd: go build
@@ -73,6 +75,7 @@
             src: /root/the_final_stockbot/the_final_stockbot
             dest: "/var/lib/{{ service_user_name }}/the_final_stockbot"
             mode: 0755
+      when: stockbot_git.changed
 
 
     # Create the service
