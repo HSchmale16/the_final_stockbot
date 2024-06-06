@@ -70,5 +70,7 @@ func main() {
 	})
 	c.Start()
 
+	DoAnalysis()
+
 	select {}
 }
