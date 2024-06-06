@@ -68,6 +68,8 @@ func main() {
 	c.AddFunc("@every 15m", func() {
 		fetchFeeds(db)
 	})
+
+	log.Print("Started feed reader cron.")
 	c.Start()
 
 	DoAnalysis()
