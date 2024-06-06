@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/knights-analytics/hugot"
 	"github.com/robfig/cron"
 )
@@ -73,8 +75,15 @@ func main() {
 
 	log.Print("Started feed reader cron.")
 	c.Start()
-	fmt.Println("Hello")
 
-	// Run Forever
-	select {}
+	router := gin.Default()
+
+	router.GET("/analysis", func(c *gin.Context) {
+		DoAnalysis()
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Analysis completed",
+		})
+	})
+
+	router.Run(":8080")
 }
