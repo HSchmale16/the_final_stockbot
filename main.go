@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jinzhu/gorm"
 	"github.com/knights-analytics/hugot"
 	"github.com/robfig/cron"
 )
@@ -58,15 +57,6 @@ func DoAnalysis() {
 	fmt.Println(string(s))
 }
 
-func getNewestRssItemWithoutArticleBody(db *gorm.DB) (*RSSItem, error) {
-	item := &RSSItem{}
-	err := db.Where("article_body IS NULL").Order("pub_date DESC").Limit(1).Find(item).Error
-	if err != nil {
-		return nil, err
-	}
-	return item, nil
-}
-
 func main() {
 	db, err := setupDB()
 	if err != nil {
@@ -77,8 +67,11 @@ func main() {
 	defer db.Close()
 
 	c := cron.New()
-	c.AddFunc("@every 15m", func() {
+	c.AddFunc("@every 10m", func() {
 		fetchFeeds(db)
+	})
+	c.AddFunc("@every 30s", func() {
+		fmt.Println("Wake Up")
 	})
 
 	log.Print("Started feed reader cron.")

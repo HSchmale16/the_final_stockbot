@@ -86,10 +86,6 @@
             - Reload systemd
       when: stockbot_git.changed
 
-
-
-
-
   handlers:
     - name: Reload systemd
       ansible.builtin.systemd:
