@@ -1,3 +1,4 @@
 the_final_stockbot
 *.db
 *.sqlite
+KnightsAnalytics_distilbert-base-uncased-finetuned-sst-2-english

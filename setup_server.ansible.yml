@@ -1,0 +1,40 @@
+---
+- name: Setup Server
+  hosts: all
+  remote_user: root
+  become: true
+  vars:
+    variable_name: variable_value
+
+  tasks:
+    - name: Install Packages
+      ansible.builtin.package:
+        name:
+          - golang
+          - rust-all
+          - libonnx-dev
+          - git
+        state: present
+        update_cache: true
+    - name: Check to build tokenizers
+      stat:
+        path: /usr/lib/libtokenizers.a
+      register: tokenizers_library_stat
+    - block:
+        - name: Clone tokenizers repository
+          git:
+            repo: https://github.com/Knights-Analytics/tokenizers
+            dest: /root/tokenizers
+            version: main
+        - name: Build project using cargo
+          command:
+            cmd: cargo build
+            chdir: /root/tokenizers
+        - name: Move Output Library
+          copy:
+            remote_src: true
+            src: /root/tokenizers/target/release/libtokenizers.a
+            dest: /usr/lib/libtokenizers.a
+            mode: 0755
+      when: 
+        - not tokenizers_library_stat.stat.exists
