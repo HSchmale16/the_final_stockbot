@@ -1,0 +1,12 @@
+[Unit]
+Description=Final Stockbot
+After=network.target
+
+[Service]
+User=your_username
+WorkingDirectory=/path/to/your/stockbot/directory
+ExecStart=/path/to/your/stockbot/executable
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

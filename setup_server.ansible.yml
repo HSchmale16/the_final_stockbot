@@ -7,6 +7,10 @@
     variable_name: variable_value
 
   tasks:
+    - name: Install Monitoring First
+      ansible.builtin.package:
+        name:
+          - htop
     - name: Install Packages
       ansible.builtin.package:
         name:
@@ -16,6 +20,8 @@
           - git
         state: present
         update_cache: true
+
+    # Grab Dependency for hugot which we use for sentiment analysis
     - name: Check to build tokenizers
       stat:
         path: /usr/lib/libtokenizers.a
@@ -28,7 +34,7 @@
             version: main
         - name: Build project using cargo
           command:
-            cmd: cargo build
+            cmd: cargo build --release
             chdir: /root/tokenizers
         - name: Move Output Library
           copy:
@@ -38,3 +44,28 @@
             mode: 0755
       when: 
         - not tokenizers_library_stat.stat.exists
+
+    # Add a user and group
+    - name: Add a service user
+      ansible.builtin.user:
+        name: final_stockbot
+        state: present
+        system: yes
+        shell: /bin/false
+        home: /var/lib/final_stockbot
+
+
+
+    # Create the service
+    - name: Create a systemd unit file
+      ansible.builtin.template:
+      src: final-stockbot.service.j2
+      dest: /etc/systemd/system/final-stockbot.service
+      notify:
+        - Reload systemd
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+      daemon_reload: yes
+      state: reloaded
