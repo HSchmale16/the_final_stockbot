@@ -37,9 +37,10 @@ func (RSSItem) TableName() string {
 
 type MarketSecurity struct {
 	gorm.Model
-	Symbol string `gorm:"unique_index"`
-	Name   string
-	IsEtf  bool
+	Symbol   string `gorm:"unique_index"`
+	Name     string
+	IsEtf    bool
+	Exchange string
 }
 
 func (MarketSecurity) TableName() string {
