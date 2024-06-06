@@ -6,22 +6,13 @@
   vars:
     variable_name: variable_value
     service_user_name: final_stockbot
-    models:
-      - name: dslim/bert-base-NER
-        url: https://huggingface.co/dslim/bert-base-NER
-      - name: KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english
-        url: https://huggingface.co/KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english
-      - name: nickmuchi/sec-bert-finetuned-finance-classification
-        url: https://huggingface.co/nickmuchi/sec-bert-finetuned-finance-classification
 
   tasks:
-    - name: Install Monitoring First
-      ansible.builtin.package:
-        name:
-          - htop
     - name: Install Packages
       ansible.builtin.package:
         name:
+          - htop
+          - rsync
           - go
           - rust
           - onnxruntime
@@ -33,27 +24,28 @@
 
     # Grab Dependency for hugot which we use for sentiment analysis
     - name: Check to build tokenizers
-      stat:
+      ansible.builtin.stat:
         path: /usr/lib/libtokenizers.a
       register: tokenizers_library_stat
-    - block:
+    - name: Install Tokenizers
+      when: not tokenizers_library_stat.stat.exists
+      block:
         - name: Clone tokenizers repository
-          git:
+          ansible.builtin.git:
             repo: https://github.com/Knights-Analytics/tokenizers
             dest: /root/tokenizers
             version: main
         - name: Build project using cargo
-          command:
+          changed_when: true
+          ansible.builtin.command:
             cmd: cargo build --release
             chdir: /root/tokenizers
         - name: Move Output Library
-          copy:
+          ansible.builtin.copy:
             remote_src: true
             src: /root/tokenizers/target/release/libtokenizers.a
             dest: /usr/lib/libtokenizers.a
-            mode: 0755
-      when: 
-        - not tokenizers_library_stat.stat.exists
+            mode: "0755"
 
 
     # Add a user and group
@@ -61,52 +53,41 @@
       ansible.builtin.user:
         name: "{{ service_user_name }}"
         state: present
-        system: yes
+        system: true
         shell: /bin/false
         home: "/var/lib/{{ service_user_name }}"
 
-    - name: Clone my stockbot repository
-      git:
-        repo: https://github.com/HSchmale16/the_final_stockbot
-        dest: /root/the_final_stockbot
-        version: master
-      register: stockbot_git
+    # - name: Clone my stockbot repository
+    #   git:
+    #     repo: https://github.com/HSchmale16/the_final_stockbot
+    #     dest: /root/the_final_stockbot
+    #     version: master
+    #   register: stockbot_git
+
+    - name: Sync the stockbot repository
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/root/the_final_stockbot/{{ item | basename }}"
+        mode: "0644"
+      loop: "{{ query('fileglob', '*go*') }}"
+      notify:
+        - Build my application
 
     # Create the service
     - name: Create a systemd unit file
       ansible.builtin.template:
         src: final-stockbot.service.j2
         dest: /etc/systemd/system/final-stockbot.service
+        mode: "0644"
 
-    - name: Build my application
-      block:
-        - name: Build the go project
-          command:
-            cmd: go build
-            chdir: /root/the_final_stockbot
-        - name: Move the binary
-          copy:
-            remote_src: true
-            src: /root/the_final_stockbot/the_final_stockbot
-            dest: "/var/lib/{{ service_user_name }}/the_final_stockbot"
-            mode: 0755
-          notify:
-            - Reload systemd
-      when: stockbot_git.changed
-
-    - name: "Download my models {{ model['name'] }}"
-      git:
-        repo: "{{ model['url'] }}"
-        dest: "/var/lib/{{ service_user_name }}/DOWNLOAD_MODELS/{{ model['name'] }}"
-        version: main
-      loop: "{{ models }}"
-      loop_control:
-        loop_var: model
 
   ##### Handlers #####
   handlers:
     - name: Reload systemd
       ansible.builtin.systemd:
-        daemon_reload: yes
+        daemon_reload: true
         name: final-stockbot
         state: restarted
+    - name: Build my application
+      ansible.builtin.include_tasks:
+        file: build-application.ansible.yml

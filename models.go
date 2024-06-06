@@ -47,6 +47,25 @@ func (MarketSecurity) TableName() string {
 	return "market_securities"
 }
 
+type ItemTag struct {
+	gorm.Model
+	Name     string     `gorm:"unique_index"`
+	RSSItems []*RSSItem `gorm:"many2many:item_tag_rss_items;"`
+}
+
+func (ItemTag) TableName() string {
+	return "item_tags"
+}
+
+type ItemTagRSSItem struct {
+	ItemTagID uint
+	RSSItemID uint
+}
+
+func (ItemTagRSSItem) TableName() string {
+	return "item_tag_rss_items"
+}
+
 func setupDB() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", "test.db")
 	if err != nil {
@@ -63,6 +82,14 @@ func setupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 	err = db.AutoMigrate(&MarketSecurity{}).Error
+	if err != nil {
+		return nil, err
+	}
+	err = db.AutoMigrate(&ItemTag{}).Error
+	if err != nil {
+		return nil, err
+	}
+	err = db.AutoMigrate(&ItemTagRSSItem{}).Error
 	if err != nil {
 		return nil, err
 	}

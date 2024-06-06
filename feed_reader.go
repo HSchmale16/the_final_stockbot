@@ -4,12 +4,28 @@ import (
 	_ "fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
 	"github.com/mmcdole/gofeed"
 )
+
+type DocumentGrabber func(*goquery.Document) string
+
+func getGrabMethod(link string) DocumentGrabber {
+	contentGrabMethods := map[string]DocumentGrabber{
+		"pr.com": processPR_com_HTML,
+	}
+
+	for domain, method := range contentGrabMethods {
+		if strings.Contains(link, domain) {
+			return method
+		}
+	}
+	return nil
+}
 
 func findUnfetchedFeeds(db *gorm.DB) ([]RSSFeed, error) {
 	var feeds []RSSFeed
@@ -21,6 +37,17 @@ func findUnfetchedFeeds(db *gorm.DB) ([]RSSFeed, error) {
 	return feeds, nil
 }
 
+func processPR_com_HTML(doc *goquery.Document) string {
+	// Extract the desired selector
+	selector := "body > main > div > article > article.press-release__content > section.press-release__body"
+	selectedContent := doc.Find(selector)
+
+	// Remove style nodes from the selected content
+	selectedContent.Find("style").Remove()
+
+	return selectedContent.Text()
+}
+
 func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 	// Use gofeed to fetch the url
 	fp := gofeed.NewParser()
@@ -28,6 +55,10 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 	log.Println(parsedFeed.Title)
 
 	newItems := []RSSItem{}
+
+	// Function pointer that maps a string to a specific function
+	grabMethod := getGrabMethod(feed.Link)
+
 	for _, item := range parsedFeed.Items {
 		// Process each feed item
 		// Example: log.Println(item.Title)
@@ -76,16 +107,7 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 			continue
 		}
 
-		// Extract the desired selector
-		selector := "body > main > div > article > article.press-release__content > section.press-release__body"
-		selectedContent := doc.Find(selector)
-
-		// Remove style nodes from the selected content
-		selectedContent.Find("style").Remove()
-
-		content := selectedContent.Text()
-
-		// Update the RSS item with the extracted content
+		content := grabMethod(doc)
 		rssItem.ArticleBody = &content
 
 		// Insert the feed item into the database
