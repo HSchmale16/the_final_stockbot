@@ -35,6 +35,17 @@ func (RSSItem) TableName() string {
 	return "rss_items"
 }
 
+type MarketSecurity struct {
+	gorm.Model
+	Symbol string `gorm:"unique_index"`
+	Name   string
+	IsEtf  bool
+}
+
+func (MarketSecurity) TableName() string {
+	return "market_securities"
+}
+
 func setupDB() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", "test.db")
 	if err != nil {
@@ -47,6 +58,10 @@ func setupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 	err = db.AutoMigrate(&RSSItem{}).Error
+	if err != nil {
+		return nil, err
+	}
+	err = db.AutoMigrate(&MarketSecurity{}).Error
 	if err != nil {
 		return nil, err
 	}

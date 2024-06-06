@@ -72,6 +72,7 @@ func main() {
 	c.AddFunc("@every 10m", func() {
 		fetchFeeds(db)
 	})
+	c.AddFunc("@daily", downloadNasdaqListed)
 
 	log.Print("Started feed reader cron.")
 	c.Start()
