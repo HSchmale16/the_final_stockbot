@@ -5,6 +5,7 @@
   become: true
   vars:
     variable_name: variable_value
+    service_user_name: final_stockbot
 
   tasks:
     - name: Install Monitoring First
@@ -14,9 +15,9 @@
     - name: Install Packages
       ansible.builtin.package:
         name:
-          - golang
-          - rust-all
-          - libonnx-dev
+          - go
+          - rust
+          - onnxruntime
           - git
         state: present
         update_cache: true
@@ -49,11 +50,11 @@
     # Add a user and group
     - name: Add a service user
       ansible.builtin.user:
-        name: final_stockbot
+        name: "{{ service_user_name }}"
         state: present
         system: yes
         shell: /bin/false
-        home: /var/lib/final_stockbot
+        home: "/var/lib/{{ service_user_name }}"
 
     - name: Build my application
       block:
@@ -66,10 +67,12 @@
           command:
             cmd: go build
             chdir: /root/the_final_stockbot
-
-
-
-
+        - name: Move the binary
+          copy:
+            remote_src: true
+            src: /root/the_final_stockbot/the_final_stockbot
+            dest: "/var/lib/{{ service_user_name }}/the_final_stockbot"
+            mode: 0755
 
 
     # Create the service
@@ -84,5 +87,5 @@
     - name: Reload systemd
       ansible.builtin.systemd:
         daemon_reload: yes
-        state: reloaded
-        
+        name: final-stockbot
+        state: restarted

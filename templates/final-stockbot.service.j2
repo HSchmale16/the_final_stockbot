@@ -3,9 +3,9 @@ Description=Final Stockbot
 After=network.target
 
 [Service]
-User=your_username
-WorkingDirectory=/path/to/your/stockbot/directory
-ExecStart=/path/to/your/stockbot/executable
+User={{ service_user_name }}
+WorkingDirectory=/var/lib/{{ service_user_name }}
+ExecStart=/var/lib/{{ service_user_name }}/the_final_stockbot
 Restart=always
 
 [Install]
