@@ -79,7 +79,6 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/analysis", func(c *gin.Context) {
-		DoAnalysis()
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Analysis completed",
 		})
