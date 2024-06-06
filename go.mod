@@ -3,14 +3,15 @@ module github.com/hschmale16/the_final_stockbot
 go 1.22.3
 
 require (
+	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/knights-analytics/hugot v0.1.2
 	github.com/mmcdole/gofeed v1.3.0
+	github.com/robfig/cron v1.2.0
 )
 
 require (
 	cloud.google.com/go/storage v1.41.0 // indirect
-	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/aws/aws-sdk-go v1.53.12 // indirect
 	github.com/bodaay/HuggingFaceModelDownloader v0.0.0-20240307153905-2f38356a6d6c // indirect
