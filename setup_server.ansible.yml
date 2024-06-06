@@ -6,6 +6,13 @@
   vars:
     variable_name: variable_value
     service_user_name: final_stockbot
+    models:
+      - name: dslim/bert-base-NER
+        url: https://huggingface.co/dslim/bert-base-NER
+      - name: KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english
+        url: https://huggingface.co/KnightsAnalytics/distilbert-base-uncased-finetuned-sst-2-english
+      - name: nickmuchi/sec-bert-finetuned-finance-classification
+        url: https://huggingface.co/nickmuchi/sec-bert-finetuned-finance-classification
 
   tasks:
     - name: Install Monitoring First
@@ -20,6 +27,7 @@
           - onnxruntime
           - git
           - openmpi
+          - git-lfs
         state: present
         update_cache: true
 
@@ -85,6 +93,16 @@
           notify:
             - Reload systemd
       when: stockbot_git.changed
+
+    - name: "Download my models {{ model['name'] }}"
+      git:
+        repo: "{{ model['url'] }}"
+        dest: "/var/lib/{{ service_user_name }}/DOWNLOAD_MODELS/{{ model['name'] }}"
+        version: main
+      loop: "{{ models }}"
+      loop_control:
+        loop_var: model
+
 
   handlers:
     - name: Reload systemd
