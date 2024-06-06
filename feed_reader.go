@@ -19,12 +19,13 @@ func findUnfetchedFeeds(db *gorm.DB) ([]RSSFeed, error) {
 	return feeds, nil
 }
 
-func loadFeed(db *gorm.DB, feed *RSSFeed) {
+func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 	// Use gofeed to fetch the url
 	fp := gofeed.NewParser()
 	parsedFeed, _ := fp.ParseURL(feed.Link) // Use the URL from the feed parameter
 	log.Println(parsedFeed.Title)
 
+	newItems := []RSSItem{}
 	for _, item := range parsedFeed.Items {
 		// Process each feed item
 		// Example: log.Println(item.Title)
@@ -63,11 +64,14 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) {
 			log.Println("Failed to insert feed item:", err)
 			continue
 		}
+		newItems = append(newItems, *rssItem)
 	}
 
 	// Update the feed with the current time
 	feed.LastFetched = time.Now()
 	db.Save(feed)
+
+	return newItems
 }
 
 func fetchFeeds(db *gorm.DB) {
@@ -76,6 +80,7 @@ func fetchFeeds(db *gorm.DB) {
 		return
 	}
 	for _, feed := range feeds {
-		loadFeed(db, &feed)
+		newItems := loadFeed(db, &feed)
+		log.Print("Fetched ", len(newItems), " new items from ", feed.Link)
 	}
 }
