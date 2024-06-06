@@ -21,7 +21,7 @@ func (RSSFeed) TableName() string {
 
 type RSSItem struct {
 	gorm.Model
-	Guid        string `type:text;unique_index`
+	Guid        string `gorm:"type:text"`
 	Title       string `gorm:"type:text"`
 	Description string `gorm:"type:text"`
 	Link        string `gorm:"type:text"`
