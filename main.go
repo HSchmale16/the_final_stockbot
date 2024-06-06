@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/knights-analytics/hugot"
+	"github.com/robfig/cron"
 )
 
 func check(err error) {
@@ -75,18 +76,15 @@ func main() {
 	}
 	defer db.Close()
 
-	// c := cron.New()
-	// c.AddFunc("@every 15m", func() {
-	// 	fetchFeeds(db)
-	// })
+	c := cron.New()
+	c.AddFunc("@every 15m", func() {
+		fetchFeeds(db)
+	})
 
-	// log.Print("Started feed reader cron.")
-	// c.Start()
+	log.Print("Started feed reader cron.")
+	c.Start()
 	fmt.Println("Hello")
-	// fetchFeeds(db)
-	// DoAnalysis()
 
-	fetchFeeds(db)
-
-	// select {}
+	// Run Forever
+	select {}
 }
