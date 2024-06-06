@@ -70,9 +70,6 @@ func main() {
 	c.AddFunc("@every 10m", func() {
 		fetchFeeds(db)
 	})
-	c.AddFunc("@every 30s", func() {
-		fmt.Println("Wake Up")
-	})
 
 	log.Print("Started feed reader cron.")
 	c.Start()
