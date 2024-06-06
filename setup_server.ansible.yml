@@ -19,6 +19,7 @@
           - rust
           - onnxruntime
           - git
+          - openmpi
         state: present
         update_cache: true
 

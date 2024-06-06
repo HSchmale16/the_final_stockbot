@@ -16,23 +16,7 @@ func check(err error) {
 	}
 }
 
-func main() {
-	db, err := setupDB()
-	if err != nil {
-		// Handle error
-		log.Println("Error occurred:", err)
-		return
-	}
-	defer db.Close()
-
-	c := cron.New()
-	c.AddFunc("@every 15m", func() {
-
-	})
-	c.Start()
-
-	fetchFeeds(db)
-
+func DoAnalysis() {
 	// start a new session. This looks for the onnxruntime.so library in its default path, e.g. /usr/lib/onnxruntime.so
 	//session, err := hugot.NewSession()
 	session, err := hugot.NewSession(hugot.WithOnnxLibraryPath("/usr/lib/libonnxruntime.so"))
@@ -69,4 +53,22 @@ func main() {
 	s, err := json.Marshal(batchResult)
 	check(err)
 	fmt.Println(string(s))
+}
+
+func main() {
+	db, err := setupDB()
+	if err != nil {
+		// Handle error
+		log.Println("Error occurred:", err)
+		return
+	}
+	defer db.Close()
+
+	c := cron.New()
+	c.AddFunc("@every 15m", func() {
+		fetchFeeds(db)
+	})
+	c.Start()
+
+	select {}
 }

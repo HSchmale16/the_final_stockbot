@@ -2,10 +2,11 @@ package main
 
 import (
 	_ "fmt"
-	"github.com/jinzhu/gorm"
-	"github.com/mmcdole/gofeed"
 	"log"
 	"time"
+
+	"github.com/jinzhu/gorm"
+	"github.com/mmcdole/gofeed"
 )
 
 func findUnfetchedFeeds(db *gorm.DB) ([]RSSFeed, error) {
@@ -35,7 +36,7 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) {
 		}
 
 		rssItem := &RSSItem{
-			GUID:        item.GUID,
+			Guid:        item.GUID,
 			Title:       item.Title,
 			Description: item.Description,
 			Link:        item.Link,
@@ -46,7 +47,7 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) {
 		rssItem.PubDate = pubDate
 		// Check if the RSS item already exists in the database
 		var existingItem RSSItem
-		err = db.Where("guid = ?", rssItem.GUID).First(&existingItem).Error
+		err = db.Where("guid = ?", rssItem.Guid).First(&existingItem).Error
 		if err != nil && !gorm.IsRecordNotFoundError(err) {
 			log.Println("Failed to check existing item:", err)
 			continue
