@@ -135,6 +135,16 @@ func seedRSSFeeds(db *gorm.DB) error {
 			Description: "Semiconductor industry news",
 			Link:        "https://www.pr.com/rss/news-by-category/188.xml",
 		},
+		{
+			Title:       "Deals Reuters",
+			Description: "Reuters deals news",
+			Link:        "https://www.reutersagency.com/feed/?best-topics=deals&post_type=best",
+		},
+		{
+			Title:       "Market Impact Reuters",
+			Description: "Reuters market impact news",
+			Link:        "https://www.reutersagency.com/feed/?best-customer-impacts=market-impact&post_type=best",
+		},
 		// Add more feeds as needed
 	}
 
