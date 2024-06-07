@@ -17,3 +17,22 @@ func GetLoadedArticlesStatus(c *gin.Context) {
 		"count": count,
 	})
 }
+
+func AnalyzeTagsForReferences(c *gin.Context) {
+	db, _ := c.MustGet("db").(*gorm.DB)
+
+	// Execute arbitrary SQL code
+	result := db.Exec("YOUR_SQL_CODE_HERE")
+
+	if result.Error != nil {
+		// Handle error
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Analyzed tags for references",
+	})
+}

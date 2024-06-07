@@ -35,6 +35,12 @@ func doStartupTasks(db *gorm.DB) {
 	}
 }
 
+func pickAnRssItemToScan(db *gorm.DB) RSSItem {
+	var firstItem RSSItem
+	db.Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items)").Order("pub_date desc").First(&firstItem)
+	return firstItem
+}
+
 func main() {
 	db, err := setupDB()
 	if err != nil {
@@ -51,9 +57,8 @@ func main() {
 		fetchFeeds(db)
 	})
 
-	c.AddFunc("@every 1m", func() {
-		var firstItem RSSItem
-		db.Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items)").Order("pub_date desc").First(&firstItem)
+	c.AddFunc("@every 45s", func() {
+		firstItem := pickAnRssItemToScan(db)
 
 		getRssItemTags(firstItem, db)
 	})

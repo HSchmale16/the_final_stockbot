@@ -15,9 +15,8 @@
           - rsync
           - go
           - rust
-          - onnxruntime
+          - ollama
           - git
-          - openmpi
           - git-lfs
         state: present
         update_cache: true
@@ -79,6 +78,17 @@
         src: final-stockbot.service.j2
         dest: /etc/systemd/system/final-stockbot.service
         mode: "0644"
+
+    - name: Ensure Ollama Service is Started
+      ansible.builtin.systemd:
+        name: ollama
+        enabled: true
+        state: started
+
+    - name: Pull Ollama Models Required For Work
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "ollama pull gemma:2b"
 
 
   ##### Handlers #####

@@ -41,6 +41,7 @@ type MarketSecurity struct {
 	Name     string
 	IsEtf    bool
 	Exchange string
+	RssItems []*RSSItem `gorm:"many2many:security_rss_items;"`
 }
 
 func (MarketSecurity) TableName() string {
@@ -64,6 +65,15 @@ type ItemTagRSSItem struct {
 
 func (ItemTagRSSItem) TableName() string {
 	return "item_tag_rss_items"
+}
+
+type SecurityRssItem struct {
+	SecurityID uint
+	RSSItemID  uint
+}
+
+func (SecurityRssItem) TableName() string {
+	return "security_rss_items"
 }
 
 func setupDB() (*gorm.DB, error) {
@@ -90,6 +100,10 @@ func setupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 	err = db.AutoMigrate(&ItemTagRSSItem{}).Error
+	if err != nil {
+		return nil, err
+	}
+	err = db.AutoMigrate(&SecurityRssItem{}).Error
 	if err != nil {
 		return nil, err
 	}
