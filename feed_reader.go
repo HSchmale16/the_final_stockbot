@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	_ "fmt"
 	"log"
 	"net/http"
@@ -8,8 +9,8 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/jinzhu/gorm"
 	"github.com/mmcdole/gofeed"
+	"gorm.io/gorm"
 )
 
 type DocumentGrabber func(*goquery.Document) string
@@ -81,7 +82,8 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 		// Check if the RSS item already exists in the database
 		var existingItem RSSItem
 		err = db.Where("guid = ?", rssItem.Guid).First(&existingItem).Error
-		if err != nil && !gorm.IsRecordNotFoundError(err) {
+
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Failed to check existing item:", err)
 			continue
 		}
@@ -90,25 +92,27 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 			continue
 		}
 
-		// Download the link as HTML
-		log.Println("Getting HTML for", rssItem.Link)
-		resp, err := http.Get(rssItem.Link)
-		if err != nil {
-			log.Println("Failed to download HTML:", err)
-			continue
-		}
-		defer resp.Body.Close()
+		if grabMethod != nil {
+			// Download the link as HTML
+			log.Println("Getting HTML for", rssItem.Link)
+			resp, err := http.Get(rssItem.Link)
+			if err != nil {
+				log.Println("Failed to download HTML:", err)
+				continue
+			}
+			defer resp.Body.Close()
 
-		log.Println("Parsing HTML for", rssItem.Link)
-		// Parse the HTML document
-		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		if err != nil {
-			log.Println("Failed to parse HTML:", err)
-			continue
-		}
+			log.Println("Parsing HTML for", rssItem.Link)
+			// Parse the HTML document
+			doc, err := goquery.NewDocumentFromReader(resp.Body)
+			if err != nil {
+				log.Println("Failed to parse HTML:", err)
+				continue
+			}
 
-		content := grabMethod(doc)
-		rssItem.ArticleBody = &content
+			content := grabMethod(doc)
+			rssItem.ArticleBody = &content
+		}
 
 		// Insert the feed item into the database
 		err = db.Create(rssItem).Error

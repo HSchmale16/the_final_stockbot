@@ -1,0 +1,124 @@
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.208ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="rss_feeds"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[6.533ms] [rows:0] CREATE TABLE `rss_feeds` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`title` text,`description` text,`link` text,`last_fetched` datetime)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[3.864ms] [rows:0] CREATE INDEX `idx_rss_feeds_deleted_at` ON `rss_feeds`(`deleted_at`)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.169ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="rss_items"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[3.042ms] [rows:0] CREATE TABLE `rss_items` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`guid` text,`title` text,`description` text,`link` text,`article_body` text,`pub_date` datetime,`feed_id` integer,CONSTRAINT `fk_rss_items_feed` FOREIGN KEY (`feed_id`) REFERENCES `rss_feeds`(`id`))
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[2.707ms] [rows:0] CREATE INDEX `idx_rss_items_deleted_at` ON `rss_items`(`deleted_at`)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.062ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="market_securities"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[2.805ms] [rows:0] CREATE TABLE `market_securities` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`symbol` text,`name` text,`is_etf` numeric,`exchange` text)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[2.951ms] [rows:0] CREATE INDEX `idx_market_securities_deleted_at` ON `market_securities`(`deleted_at`)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.118ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="security_rss_items"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[2.955ms] [rows:0] CREATE TABLE `security_rss_items` (`security_id` integer,`rss_item_id` integer,`model_id` integer)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.094ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="llm_models"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[3.607ms] [rows:0] CREATE TABLE `llm_models` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`model_name` text)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[4.572ms] [rows:0] CREATE INDEX `idx_llm_models_deleted_at` ON `llm_models`(`deleted_at`)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.127ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="item_tags"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[4.407ms] [rows:0] CREATE TABLE `item_tags` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`name` text)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[4.514ms] [rows:0] CREATE INDEX `idx_item_tags_deleted_at` ON `item_tags`(`deleted_at`)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[0.068ms] [rows:-] SELECT count(*) FROM sqlite_master WHERE type='table' AND name="item_tag_rss_items"
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[4.299ms] [rows:0] CREATE TABLE `item_tag_rss_items` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`item_tag_id` integer,`rss_item_id` integer,`model_id` integer,CONSTRAINT `fk_item_tag_rss_items_rss_item` FOREIGN KEY (`rss_item_id`) REFERENCES `rss_items`(`id`),CONSTRAINT `fk_item_tag_rss_items_llm` FOREIGN KEY (`model_id`) REFERENCES `llm_models`(`id`),CONSTRAINT `fk_item_tag_rss_items_item_tag` FOREIGN KEY (`item_tag_id`) REFERENCES `item_tags`(`id`))
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:112
+[4.577ms] [rows:0] CREATE INDEX `idx_item_tag_rss_items_deleted_at` ON `item_tag_rss_items`(`deleted_at`)
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.254ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Technology Feed PR.com" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[6.344ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.759","2024-06-07 12:50:52.759",NULL,"Technology Feed PR.com","This is the first feed","https://www.pr.com/rss/news-by-category/170.xml","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.276ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Science Feed PR.com" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[3.739ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.766","2024-06-07 12:50:52.766",NULL,"Science Feed PR.com","The science feed","https://www.pr.com/rss/news-by-category/141.xml","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.292ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Medical & Health PR.com" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[3.313ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.77","2024-06-07 12:50:52.77",NULL,"Medical & Health PR.com","Medical and health news","https://www.pr.com/rss/news-by-category/103.xml","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.164ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Semiconductor Industry PR.com" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[3.012ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.773","2024-06-07 12:50:52.773",NULL,"Semiconductor Industry PR.com","Semiconductor industry news","https://www.pr.com/rss/news-by-category/188.xml","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.595ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Deals Reuters" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[4.120ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.777","2024-06-07 12:50:52.777",NULL,"Deals Reuters","Reuters deals news","https://www.reutersagency.com/feed/?best-topics=deals&post_type=best","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.240ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Market Impact Reuters" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[3.303ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.782","2024-06-07 12:50:52.782",NULL,"Market Impact Reuters","Reuters market impact news","https://www.reutersagency.com/feed/?best-customer-impacts=market-impact&post_type=best","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:163 record not found
+[0.240ms] [rows:0] SELECT * FROM `rss_feeds` WHERE `rss_feeds`.`title` = "Reuters Health" AND `rss_feeds`.`deleted_at` IS NULL ORDER BY `rss_feeds`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:166
+[3.700ms] [rows:1] INSERT INTO `rss_feeds` (`created_at`,`updated_at`,`deleted_at`,`title`,`description`,`link`,`last_fetched`) VALUES ("2024-06-07 12:50:52.786","2024-06-07 12:50:52.786",NULL,"Reuters Health","Reuters health news","https://www.reutersagency.com/feed/?best-topics=health&post_type=best","0000-00-00 00:00:00") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:185 record not found
+[0.253ms] [rows:0] SELECT * FROM `llm_models` WHERE `llm_models`.`model_name` = "phi3" AND `llm_models`.`deleted_at` IS NULL ORDER BY `llm_models`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:188
+[3.662ms] [rows:1] INSERT INTO `llm_models` (`created_at`,`updated_at`,`deleted_at`,`model_name`) VALUES ("2024-06-07 12:50:52.79","2024-06-07 12:50:52.79",NULL,"phi3") RETURNING `id`
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:185 record not found
+[0.250ms] [rows:0] SELECT * FROM `llm_models` WHERE `llm_models`.`model_name` = "gemma:2.6b" AND `llm_models`.`deleted_at` IS NULL ORDER BY `llm_models`.`id` LIMIT 1
+
+2024/06/07 12:50:52 /home/hschmale/src/the_final_stockbot/models.go:188
+[4.439ms] [rows:1] INSERT INTO `llm_models` (`created_at`,`updated_at`,`deleted_at`,`model_name`) VALUES ("2024-06-07 12:50:52.794","2024-06-07 12:50:52.794",NULL,"gemma:2.6b") RETURNING `id`
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /checkLoadedStories       --> main.GetLoadedArticlesStatus (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080

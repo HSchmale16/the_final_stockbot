@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type ChatResponse struct {
@@ -31,10 +31,10 @@ type ChatResponse struct {
 	Done bool `json:"done"`
 }
 
-func completeChatMessage(chatMessage string) (string, error) {
+func completeChatMessage(chatMessage, model string) (string, error) {
 	// Define the request payload
 	payload := map[string]interface{}{
-		"model": "gemma:2b",
+		"model": model,
 		"messages": []map[string]string{
 			{
 				"role":    "user",
@@ -69,7 +69,6 @@ func completeChatMessage(chatMessage string) (string, error) {
 	scanner := bufio.NewScanner(resp.Body)
 	for scanner.Scan() {
 		line := scanner.Text()
-		fmt.Println(line)
 
 		var response ChatResponse
 		err := json.Unmarshal([]byte(line), &response)
@@ -79,8 +78,6 @@ func completeChatMessage(chatMessage string) (string, error) {
 		}
 
 		responseBody.WriteString(response.Message.Content)
-
-		fmt.Println(responseBody.String())
 
 		if response.Done {
 			break
@@ -96,15 +93,10 @@ func completeChatMessage(chatMessage string) (string, error) {
 
 	// Return the response body as a string
 	return responseBody.String(), nil
-
 }
 
-func getRssItemTags(item RSSItem, db *gorm.DB) {
-	fmt.Println("Waiting for it to go through")
-	response, err := completeChatMessage("List the topics in this article. Each point should be prefixed with a hyphen (-): " + item.Title + " " + item.Description)
-	check(err)
-
-	// Split the response into individual tags
+func parseResponse(response string) []string {
+	response_tags := make([]string, 0, 20)
 	tags := strings.Split(response, "\n")
 	for _, tag := range tags {
 		if !strings.HasPrefix(tag, "-") {
@@ -113,19 +105,40 @@ func getRssItemTags(item RSSItem, db *gorm.DB) {
 		tag = strings.Trim(tag, "-")
 		tag = strings.TrimSpace(tag)
 		if tag != "" {
-			fmt.Println("Tag:", tag)
-			// Check if the tag already exists in the database
-			var itemTag ItemTag
-			db.Where("name = ?", tag).First(&itemTag)
-			if itemTag.ID == 0 {
-				// If the tag does not exist, create a new one
-				itemTag = ItemTag{Name: tag}
-				db.Create(&itemTag)
-			}
-
-			// Associate the tag with the RSS item
-			db.Model(&itemTag).Association("RSSItems").Append(&item)
-			db.Save(&itemTag)
+			response_tags = append(response_tags, tag)
 		}
 	}
+	return response_tags
+}
+
+func CreateTagRelationsForModel(db *gorm.DB, item RSSItem, model LLMModel, tags []string) {
+	for _, tag := range tags {
+		var itemTag ItemTag
+		db.Where("name = ?", tag).First(&itemTag)
+		if itemTag.ID == 0 {
+			// If the tag does not exist, create a new one
+			itemTag = ItemTag{Name: tag}
+			db.Create(&itemTag)
+		}
+
+		ItemTagRSSItem := ItemTagRSSItem{
+			ItemTagID: itemTag.ID,
+			RSSItemID: item.ID,
+			ModelID:   model.ID,
+		}
+
+		db.Create(&ItemTagRSSItem)
+	}
+}
+
+func getRssItemTags(item RSSItem, db *gorm.DB) {
+	fmt.Println("Waiting for it to go through")
+	response, err := completeChatMessage("List the topics in this article. Topics include but are not limited to the company, the industry, the sector, and anything else you think might be relevant. Limit the topic to 3 words. Each point should be prefixed with a hyphen (-): "+item.Title+" "+item.Description, "phi3")
+	check(err)
+
+	tagsPhi := parseResponse(response)
+	var model LLMModel
+	db.Where("name = ?", "phi3").First(&model)
+
+	CreateTagRelationsForModel(db, item, model, tagsPhi)
 }

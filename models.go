@@ -1,10 +1,14 @@
 package main
 
 import (
+	"log"
+	"os"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/pkg/errors"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type RSSFeed struct {
@@ -58,9 +62,19 @@ func (ItemTag) TableName() string {
 	return "item_tags"
 }
 
+type LLMModel struct {
+	gorm.Model
+	ModelName string
+}
+
 type ItemTagRSSItem struct {
+	gorm.Model
 	ItemTagID uint
 	RSSItemID uint
+	ModelID   uint
+	LLM       LLMModel `gorm:"foreignkey:ModelID"`
+	ItemTag   ItemTag  `gorm:"foreignkey:ItemTagID"`
+	RSSItem   RSSItem  `gorm:"foreignkey:RSSItemID"`
 }
 
 func (ItemTagRSSItem) TableName() string {
@@ -70,6 +84,7 @@ func (ItemTagRSSItem) TableName() string {
 type SecurityRssItem struct {
 	SecurityID uint
 	RSSItemID  uint
+	ModelID    uint
 }
 
 func (SecurityRssItem) TableName() string {
@@ -77,34 +92,24 @@ func (SecurityRssItem) TableName() string {
 }
 
 func setupDB() (*gorm.DB, error) {
-	db, err := gorm.Open("sqlite3", "test.db")
+
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			LogLevel: logger.Info, // Log level Info will output everything
+		},
+	)
+
+	// Globally mode
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+		Logger: newLogger,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	// Auto migrate models
-	err = db.AutoMigrate(&RSSFeed{}).Error
-	if err != nil {
-		return nil, err
-	}
-	err = db.AutoMigrate(&RSSItem{}).Error
-	if err != nil {
-		return nil, err
-	}
-	err = db.AutoMigrate(&MarketSecurity{}).Error
-	if err != nil {
-		return nil, err
-	}
-	err = db.AutoMigrate(&ItemTag{}).Error
-	if err != nil {
-		return nil, err
-	}
-	err = db.AutoMigrate(&ItemTagRSSItem{}).Error
-	if err != nil {
-		return nil, err
-	}
-	err = db.AutoMigrate(&SecurityRssItem{}).Error
-	if err != nil {
+	if err := db.AutoMigrate(&RSSFeed{}, &RSSItem{}, &MarketSecurity{}, &SecurityRssItem{}, &LLMModel{}, &ItemTag{}, &ItemTagRSSItem{}); err != nil {
 		return nil, err
 	}
 
@@ -145,18 +150,81 @@ func seedRSSFeeds(db *gorm.DB) error {
 			Description: "Reuters market impact news",
 			Link:        "https://www.reutersagency.com/feed/?best-customer-impacts=market-impact&post_type=best",
 		},
+		{
+			Title:       "Reuters Health",
+			Description: "Reuters health news",
+			Link:        "https://www.reutersagency.com/feed/?best-topics=health&post_type=best",
+		},
+		{
+			Title:       "Aljazeera",
+			Description: "Middle eastern news source",
+			Link:        "https://www.aljazeera.com/xml/rss/all.xml",
+		},
+		{
+			Title:       "Cipher Brief",
+			Description: "Some random blog about Global Security",
+			Link:        "https://www.thecipherbrief.com/feed",
+		},
+		{
+			Title:       "United Nations Top Stories",
+			Description: "Who gives a fuck",
+			Link:        "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+		},
+		{
+			Title:       "US State Dept Direct Line to American Business",
+			Description: "US State Department News",
+			Link:        "https://www.state.gov/rss-feed/direct-line-to-american-business/feed/",
+		},
+		{
+			Title:       "US State Dept Europe and Eurasisa",
+			Description: "Who cares",
+			Link:        "https://www.state.gov/rss-feed/europe-and-eurasia/feed/",
+		},
+		{
+			Title:       "Economic, Energy, Agricultural and Trade Issues &#8211; United States Department of State",
+			Description: "Economic, Energy, Agricultural and Trade Issues &#8211; United States Department of State",
+			Link:        "https://www.state.gov/rss-feed/economic-energy-agricultural-and-trade-issues/feed/",
+		},
 		// Add more feeds as needed
 	}
 
 	for _, feed := range feeds {
 		var existingFeed RSSFeed
 		if err := db.Where(&RSSFeed{Title: feed.Title}).First(&existingFeed).Error; err != nil {
-			if gorm.IsRecordNotFoundError(err) {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
 				// Feed does not exist, create it
 				if err := db.Create(&feed).Error; err != nil {
 					return err
 				}
 			} else {
+				return err
+			}
+		}
+	}
+
+	models := []LLMModel{
+		{
+			ModelName: "phi3",
+		},
+		{
+			ModelName: "gemma:2.6b",
+		},
+	}
+	for _, model := range models {
+		var existingModel LLMModel
+		if err := db.Where(&LLMModel{ModelName: model.ModelName}).First(&existingModel).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// Model does not exist, create it
+				if err := db.Create(&model).Error; err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
+		} else {
+			// Model already exists, update it
+			existingModel.ModelName = model.ModelName
+			if err := db.Save(&existingModel).Error; err != nil {
 				return err
 			}
 		}

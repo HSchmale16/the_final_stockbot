@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/robfig/cron"
+	"gorm.io/gorm"
 )
 
 func check(err error) {
@@ -23,10 +24,11 @@ var (
 func init() {
 	flag.BoolVar(&fetchFeedsFlag, "fetchFeeds", false, "Enable fetching feeds task")
 	flag.BoolVar(&downloadSymbolsFlag, "downloadSymbols", false, "Enable downloading securities task")
-	flag.Parse()
 }
 
 func doStartupTasks(db *gorm.DB) {
+	flag.Parse()
+
 	if fetchFeedsFlag {
 		fetchFeeds(db)
 	}
@@ -48,19 +50,25 @@ func main() {
 		log.Println("Error occurred:", err)
 		return
 	}
-	defer db.Close()
 
 	doStartupTasks(db)
 
 	c := cron.New()
-	c.AddFunc("@every 15m", func() {
+	c.AddFunc("@every 6m", func() {
 		fetchFeeds(db)
 	})
 
-	c.AddFunc("@every 45s", func() {
-		firstItem := pickAnRssItemToScan(db)
+	c.AddFunc("@every 38s", func() {
+		// Count RSS Items that have not been tagged and print it
+		var count int64
+		db.Model(&RSSItem{}).Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items)").Count(&count)
+		fmt.Println("RSS Items to tag:", count)
 
-		getRssItemTags(firstItem, db)
+		if count != 0 {
+			firstItem := pickAnRssItemToScan(db)
+
+			getRssItemTags(firstItem, db)
+		}
 	})
 
 	c.AddFunc("0 0 * * *", func() {
