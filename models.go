@@ -189,6 +189,11 @@ func seedRSSFeeds(db *gorm.DB) error {
 			Description: "Economic, Energy, Agricultural and Trade Issues &#8211; United States Department of State",
 			Link:        "https://www.state.gov/rss-feed/economic-energy-agricultural-and-trade-issues/feed/",
 		},
+		{
+			Title:       "Investing.com Most Popular",
+			Description: "Some buillshit articles",
+			Link:        "https://www.investing.com/rss/news_285.rss",
+		},
 		// Add more feeds as needed
 	}
 
