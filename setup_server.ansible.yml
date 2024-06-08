@@ -6,7 +6,7 @@
   vars:
     variable_name: variable_value
     service_user_name: final_stockbot
-    do_litestream: true
+    do_litestream: false
 
   tasks:
     - name: Install Packages
