@@ -12,6 +12,7 @@
     - name: Install Packages
       ansible.builtin.package:
         name:
+          - bash-completion
           - htop
           - rsync
           - go
@@ -102,7 +103,7 @@
         file: build-application.ansible.yml
     - name: Install Litestream
       ansible.builtin.include_tasks:
-        file: Install-litestream.ansible.yml
+        file: install-litestream.ansible.yml
     - name: Start and Reload Litestream via Systemd
       ansible.builtin.systemd:
         name: litestream

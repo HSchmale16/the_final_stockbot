@@ -11,6 +11,7 @@
     mode: "0755"
 - name: Move Systemd Service File
   ansible.builtin.copy:
+    remote_src: true
     src: /root/litestream/etc/litestream.service
     dest: /etc/systemd/system/litestream.service
     mode: "0644"
