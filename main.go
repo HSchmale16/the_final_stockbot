@@ -62,7 +62,7 @@ func main() {
 	c.AddFunc("@every 38s", func() {
 		// Count RSS Items that have not been tagged and print it
 		var count int64
-		db.Model(&RSSItem{}).Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items)").Count(&count)
+		db.Model(&RSSItem{}).Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ?)", 3).Count(&count)
 		fmt.Println("RSS Items to tag:", count)
 
 		if count != 0 {
