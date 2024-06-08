@@ -56,21 +56,23 @@
         shell: /bin/false
         home: "/var/lib/{{ service_user_name }}"
 
-    # - name: Clone my stockbot repository
-    #   git:
-    #     repo: https://github.com/HSchmale16/the_final_stockbot
-    #     dest: /root/the_final_stockbot
-    #     version: master
-    #   register: stockbot_git
-
-    - name: Sync the stockbot repository
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: "/root/the_final_stockbot/{{ item | basename }}"
-        mode: "0644"
-      loop: "{{ query('fileglob', '*go*') }}"
+    - name: Clone my stockbot repository
+      git:
+        repo: https://github.com/HSchmale16/the_final_stockbot
+        dest: /root/the_final_stockbot
+        version: master
+      register: stockbot_git
       notify:
         - Build my application
+
+    # - name: Sync the stockbot repository
+    #   ansible.builtin.copy:
+    #     src: "{{ item }}"
+    #     dest: "/root/the_final_stockbot/{{ item | basename }}"
+    #     mode: "0644"
+    #   loop: "{{ query('fileglob', '*go*') }}"
+    #   notify:
+    #     - Build my application
 
     # Create the service
     - name: Create a systemd unit file
