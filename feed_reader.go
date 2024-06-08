@@ -52,7 +52,12 @@ func processPR_com_HTML(doc *goquery.Document) string {
 func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 	// Use gofeed to fetch the url
 	fp := gofeed.NewParser()
-	parsedFeed, _ := fp.ParseURL(feed.Link) // Use the URL from the feed parameter
+	parsedFeed, err := fp.ParseURL(feed.Link) // Use the URL from the feed parameter
+	if err != nil {
+		log.Println("Failed to parse feed ", feed.Link, " -> ", err)
+		// TODO: Fix the entire feed parsing pipeline
+		return []RSSItem{}
+	}
 	log.Println("Reading feed", feed.Title)
 
 	newItems := []RSSItem{}
