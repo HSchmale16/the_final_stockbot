@@ -30,7 +30,7 @@ func getGrabMethod(link string) DocumentGrabber {
 
 func findUnfetchedFeeds(db *gorm.DB) ([]RSSFeed, error) {
 	var feeds []RSSFeed
-	err := db.Where("last_fetched < ?", time.Now().Add(-15*time.Minute)).Find(&feeds).Error
+	err := db.Where("last_fetched < ?", time.Now().Add(-20*time.Minute)).Find(&feeds).Error
 	if err != nil {
 		log.Println("Failed to find unfetched feeds:", err)
 		return nil, err
