@@ -1,0 +1,16 @@
+- name: Build the go project
+  changed_when: true
+  ansible.builtin.command:
+    cmd: go install ./cmd/litestream
+    chdir: /root/litestream
+- name: Move the binary
+  ansible.builtin.copy:
+    remote_src: true
+    src: /root/go/bin/litestream
+    dest: "/usr/bin/litestream"
+    mode: "0755"
+- name: Move Systemd Service File
+  ansible.builtin.copy:
+    src: /root/litestream/etc/litestream.service
+    dest: /etc/systemd/system/litestream.service
+    mode: "0644"

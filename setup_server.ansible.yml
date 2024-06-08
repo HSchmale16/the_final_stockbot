@@ -6,6 +6,7 @@
   vars:
     variable_name: variable_value
     service_user_name: final_stockbot
+    do_litestream: true
 
   tasks:
     - name: Install Packages
@@ -20,6 +21,26 @@
           - git-lfs
         state: present
         update_cache: true
+
+    - name: Install and Setup do_litestream
+      when: do_litestream
+      block:
+        - name: Clone Litestream To Build From Source
+          ansible.builtin.git:
+            repo: https://github.com/benbjohnson/litestream
+            dest: /root/litestream
+            version: main
+          notify:
+            - Install Litestream
+        - name: Conditionally load the secrets for litestream
+          ansible.builtin.include_vars: secrets.vault.yml
+        - name: Template the litestream file
+          ansible.builtin.template:
+            src: litestream.yml.j2
+            dest: /etc/litestream.yml
+            mode: "0644"
+          notify:
+            - Start and Reload Litestream via Systemd
 
     # Add a user and group
     - name: Add a service user
@@ -79,3 +100,11 @@
     - name: Build my application
       ansible.builtin.include_tasks:
         file: build-application.ansible.yml
+    - name: Install Litestream
+      ansible.builtin.include_tasks:
+        file: Install-litestream.ansible.yml
+    - name: Start and Reload Litestream via Systemd
+      ansible.builtin.systemd:
+        name: litestream
+        state: restarted
+        enabled: true

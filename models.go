@@ -216,7 +216,7 @@ func seedRSSFeeds(db *gorm.DB) error {
 			ModelName: "phi3",
 		},
 		{
-			ModelName: "gemma:2.6b",
+			ModelName: "gemma:2b",
 		},
 	}
 	for _, model := range models {

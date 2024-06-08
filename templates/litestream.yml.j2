@@ -1,0 +1,8 @@
+access-key-id:     {{ LITESTREAM_ACCESS_KEY }}
+secret-access-key: {{ LITESTREAM_SECRET_KEY }}
+dbs:
+  - path: /var/lib/{{ service_user_name }}/test.db
+    replicas:
+      - url: s3://mtg-ai-litestream/{{ service_user_name }}.sqlite
+        sync-interval: 5s
+        validation-interval: 8h
