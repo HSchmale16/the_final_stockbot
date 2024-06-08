@@ -53,7 +53,7 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 	// Use gofeed to fetch the url
 	fp := gofeed.NewParser()
 	parsedFeed, _ := fp.ParseURL(feed.Link) // Use the URL from the feed parameter
-	log.Println(parsedFeed.Title)
+	log.Println("Reading feed", feed.Title)
 
 	newItems := []RSSItem{}
 
