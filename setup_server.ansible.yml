@@ -21,32 +21,6 @@
         state: present
         update_cache: true
 
-    # Grab Dependency for hugot which we use for sentiment analysis
-    - name: Check to build tokenizers
-      ansible.builtin.stat:
-        path: /usr/lib/libtokenizers.a
-      register: tokenizers_library_stat
-    - name: Install Tokenizers
-      when: not tokenizers_library_stat.stat.exists
-      block:
-        - name: Clone tokenizers repository
-          ansible.builtin.git:
-            repo: https://github.com/Knights-Analytics/tokenizers
-            dest: /root/tokenizers
-            version: main
-        - name: Build project using cargo
-          changed_when: true
-          ansible.builtin.command:
-            cmd: cargo build --release
-            chdir: /root/tokenizers
-        - name: Move Output Library
-          ansible.builtin.copy:
-            remote_src: true
-            src: /root/tokenizers/target/release/libtokenizers.a
-            dest: /usr/lib/libtokenizers.a
-            mode: "0755"
-
-
     # Add a user and group
     - name: Add a service user
       ansible.builtin.user:
@@ -57,7 +31,7 @@
         home: "/var/lib/{{ service_user_name }}"
 
     - name: Clone my stockbot repository
-      git:
+      ansible.builtin.git:
         repo: https://github.com/HSchmale16/the_final_stockbot
         dest: /root/the_final_stockbot
         version: master
