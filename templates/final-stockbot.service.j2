@@ -5,8 +5,10 @@ After=network.target
 [Service]
 User={{ service_user_name }}
 WorkingDirectory=/var/lib/{{ service_user_name }}
-ExecStart=/var/lib/{{ service_user_name }}/the_final_stockbot
+ExecStart=var/lib/{{ service_user_name }}/the_final_stockbot
 Restart=always
+Environment=VAR1=value1
+Environment=VAR2=value2
 
 [Install]
 WantedBy=multi-user.target

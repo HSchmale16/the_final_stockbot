@@ -78,6 +78,8 @@
         src: final-stockbot.service.j2
         dest: /etc/systemd/system/final-stockbot.service
         mode: "0644"
+      notify:
+        - Reload systemd
 
     - name: Ensure Ollama Service is Started
       ansible.builtin.systemd:
