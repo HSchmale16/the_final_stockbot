@@ -39,7 +39,7 @@ func doStartupTasks(db *gorm.DB) {
 
 func pickAnRssItemToScan(db *gorm.DB) RSSItem {
 	var firstItem RSSItem
-	db.Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items AND model_id = 2)").Order("pub_date desc").First(&firstItem)
+	db.Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = 2)").Order("pub_date desc").First(&firstItem)
 	return firstItem
 }
 
