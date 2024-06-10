@@ -77,7 +77,9 @@ func main() {
 	})
 
 	log.Print("Started feed reader cron.")
-	c.Start()
+	// c.Start()
+
+	fmt.Println("THE DB", db)
 
 	router := gin.Default()
 	router.Use(func(c *gin.Context) {
@@ -85,7 +87,10 @@ func main() {
 		c.Next()
 	})
 
+	router.GET("/test", GetToProcess)
+
 	router.GET("/checkLoadedStories", GetLoadedArticlesStatus)
+	router.GET("/getTopicsForTimePeriod", GetTopicsForTimePeriod)
 
 	router.Run(":8080")
 }

@@ -55,6 +55,10 @@ func loadFeed(db *gorm.DB, feed *RSSFeed) []RSSItem {
 	parsedFeed, err := fp.ParseURL(feed.Link) // Use the URL from the feed parameter
 	if err != nil {
 		log.Println("Failed to parse feed ", feed.Link, " -> ", err)
+		db.Create(&RssScrapeHistory{
+			FeedID:   feed.ID,
+			Metadata: err.Error(),
+		})
 		// TODO: Fix the entire feed parsing pipeline
 		return []RSSItem{}
 	}

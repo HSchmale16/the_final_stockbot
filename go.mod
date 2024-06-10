@@ -5,7 +5,6 @@ go 1.22.3
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/gin-gonic/gin v1.10.0
-	github.com/jinzhu/gorm v1.9.16
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron v1.2.0

@@ -23,6 +23,17 @@ func (RSSFeed) TableName() string {
 	return "rss_feeds"
 }
 
+type RssScrapeHistory struct {
+	gorm.Model
+	Metadata string `gorm:"type:text"`
+	FeedID   uint
+	Feed     RSSFeed `gorm:"foreignkey:FeedID"`
+}
+
+func (RssScrapeHistory) TableName() string {
+	return "rss_scrape_history"
+}
+
 type RSSItem struct {
 	gorm.Model
 	Guid        string  `gorm:"type:text"`
@@ -113,7 +124,7 @@ func setupDB() (*gorm.DB, error) {
 	}
 
 	// Auto migrate models
-	if err := db.AutoMigrate(&RSSFeed{}, &RSSItem{}, &MarketSecurity{}, &SecurityRssItem{}, &LLMModel{}, &ItemTag{}, &ItemTagRSSItem{}); err != nil {
+	if err := db.AutoMigrate(&RSSFeed{}, &RSSItem{}, &MarketSecurity{}, &SecurityRssItem{}, &LLMModel{}, &ItemTag{}, &ItemTagRSSItem{}, &RssScrapeHistory{}); err != nil {
 		return nil, err
 	}
 
@@ -158,6 +169,16 @@ func seedRSSFeeds(db *gorm.DB) error {
 			Title:       "Reuters Health",
 			Description: "Reuters health news",
 			Link:        "https://www.reutersagency.com/feed/?best-topics=health&post_type=best",
+		},
+		{
+			Link:        "https://www.reutersagency.com/feed/?best-topics=political-general&post_type=best",
+			Title:       "Reuters Politics",
+			Description: "Reuters politics news",
+		},
+		{
+			Link:        "https://www.reutersagency.com/feed/?best-regions=europe&post_type=best",
+			Title:       "Reuters Europe",
+			Description: "Reuters Europe news",
 		},
 		{
 			Title:       "Aljazeera",

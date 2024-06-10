@@ -52,23 +52,23 @@
         shell: /bin/false
         home: "/var/lib/{{ service_user_name }}"
 
-    - name: Clone my stockbot repository
-      ansible.builtin.git:
-        repo: https://github.com/HSchmale16/the_final_stockbot
-        dest: /root/the_final_stockbot
-        version: master
-      register: stockbot_git
-      notify:
-        - Build my application
-
-    # - name: Sync the stockbot repository
-    #   ansible.builtin.copy:
-    #     src: "{{ item }}"
-    #     dest: "/root/the_final_stockbot/{{ item | basename }}"
-    #     mode: "0644"
-    #   loop: "{{ query('fileglob', '*go*') }}"
+    # - name: Clone my stockbot repository
+    #   ansible.builtin.git:
+    #     repo: https://github.com/HSchmale16/the_final_stockbot
+    #     dest: /root/the_final_stockbot
+    #     version: master
+    #   register: stockbot_git
     #   notify:
     #     - Build my application
+
+    - name: Sync the stockbot repository
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/root/the_final_stockbot/{{ item | basename }}"
+        mode: "0644"
+      loop: "{{ query('fileglob', '*go*') }}"
+      notify:
+        - Build my application
 
     # Create the service
     - name: Create a systemd unit file
@@ -87,9 +87,24 @@
 
     - name: Pull Ollama Models Required For Work
       changed_when: false
-      ansible.builtin.command:
-        cmd: "ollama pull gemma:2b"
+      ansible.builtin.command: ollama list
+      register: ollama_list_output
 
+    - name: Filter Installed Models
+      ansible.builtin.set_fact:
+        installed_models: "{{ ollama_list_output.stdout_lines | map('regex_replace', '^\\s*(\\S+).*$', '\\1') | list }}"
+
+    - ansible.builtin.debug:
+        var: installed_models
+
+    - name: Pull Ollama Models
+      changed_when: true
+      ansible.builtin.command:
+        cmd: ollama pull "{{ item }}"
+      loop:
+        - "phi3:3.8b"
+        - "gemma:2b"
+      when: item not in installed_models
 
   ##### Handlers #####
   handlers:
