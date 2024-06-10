@@ -26,6 +26,10 @@ func init() {
 	flag.BoolVar(&downloadSymbolsFlag, "downloadSymbols", false, "Enable downloading securities task")
 }
 
+/**
+ * This function is called when the application starts up. It checks the command line flags
+ * and performs the necessary tasks.
+ */
 func doStartupTasks(db *gorm.DB) {
 	flag.Parse()
 
@@ -37,11 +41,14 @@ func doStartupTasks(db *gorm.DB) {
 	}
 }
 
-func pickAnRssItemToScan(db *gorm.DB) RSSItem {
+func PickAnRssItemForTagging(db *gorm.DB) (RSSItem, int64) {
 	modelID := 3
+	var count int64
 	var firstItem RSSItem
-	db.Debug().Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ?)", modelID).Order("pub_date desc").First(&firstItem)
-	return firstItem
+	x := db.Debug().Model(&RSSItem{}).Where("(SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ? AND rss_item_id = rss_items.id) < ?", modelID, 7).Order("RANDOM() DESC")
+	x.First(&firstItem)
+	x.Count(&count)
+	return firstItem, count
 }
 
 func main() {
@@ -62,12 +69,11 @@ func main() {
 	c.AddFunc("@every 38s", func() {
 		// Count RSS Items that have not been tagged and print it
 		var count int64
-		db.Model(&RSSItem{}).Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ?)", 3).Count(&count)
+
+		firstItem, count := PickAnRssItemForTagging(db)
 		fmt.Println("RSS Items to tag:", count)
 
-		if count != 0 {
-			firstItem := pickAnRssItemToScan(db)
-
+		if count > 0 {
 			getRssItemTags(firstItem, db)
 		}
 	})
@@ -77,7 +83,7 @@ func main() {
 	})
 
 	log.Print("Started feed reader cron.")
-	// c.Start()
+	c.Start()
 
 	fmt.Println("THE DB", db)
 

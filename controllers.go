@@ -11,7 +11,7 @@ func GetToProcess(c *gin.Context) {
 	db, _ := c.MustGet("db").(*gorm.DB)
 
 	var count int64
-	db.Debug().Model(&RSSItem{}).Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ?)", 3).Count(&count)
+	db.Debug().Model(&RSSItem{}).Where("id NOT IN (SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ?)", 3).Order("RANDOM() DESC").Count(&count)
 
 	c.JSON(200, gin.H{
 		"count": count,
@@ -58,8 +58,8 @@ func GetTopicsForTimePeriod(c *gin.Context) {
 		TagName string
 		Count   int
 	}
-	startDate := c.Query("start_date")
-	endDate := c.Query("end_date")
+	startDate := c.Query("s")
+	endDate := c.Query("e")
 
 	db.Debug().Model(&ItemTagRSSItem{}).
 		Select("item_tags.name as TagName, count(*) as Count").

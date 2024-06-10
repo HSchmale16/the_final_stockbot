@@ -134,7 +134,7 @@ func CreateTagRelationsForModel(db *gorm.DB, item RSSItem, model LLMModel, tags 
 func getRssItemTags(item RSSItem, db *gorm.DB) {
 	model_name := "gemma:2b"
 	fmt.Println("Waiting for it to go through")
-	response, err := completeChatMessage("List the topics in this article. Topics include but are not limited to the company, the industry, the sector, and anything else you think might be relevant. Limit the topic to 3 words. Each point MUST be prefixed with a hyphen (-): "+item.Title+" "+item.Description, model_name)
+	response, err := completeChatMessage("List the topics in this article. Topics include but are not limited to the company, industry, or sector. Limit the topic to between three and five words. Each point MUST be prefixed with a hyphen (-):\n\n "+item.Title+" "+item.Description+" "+*item.ArticleBody, model_name)
 	check(err)
 
 	tagsPhi := parseResponse(response)
