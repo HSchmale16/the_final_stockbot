@@ -45,7 +45,7 @@ func PickAnRssItemForTagging(db *gorm.DB) (RSSItem, int64) {
 	modelID := 3
 	var count int64
 	var firstItem RSSItem
-	x := db.Debug().Model(&RSSItem{}).Where("(SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ? AND rss_item_id = rss_items.id) < ?", modelID, 7).Order("RANDOM() DESC")
+	x := db.Debug().Model(&RSSItem{}).Where("(SELECT rss_item_id FROM item_tag_rss_items WHERE model_id = ? AND rss_item_id = rss_items.id) < ?", modelID, 5).Order("RANDOM() DESC")
 	x.First(&firstItem)
 	x.Count(&count)
 	return firstItem, count
@@ -66,7 +66,7 @@ func main() {
 		fetchFeeds(db)
 	})
 
-	c.AddFunc("@every 38s", func() {
+	c.AddFunc("@every 1m", func() {
 		// Count RSS Items that have not been tagged and print it
 		var count int64
 
