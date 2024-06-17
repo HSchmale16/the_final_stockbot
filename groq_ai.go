@@ -76,7 +76,7 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 		"model": model,
 		"messages": []map[string]string{
 			{
-				"role":    "system",
+				"role":    "user",
 				"content": systemPrompt,
 			},
 			{
@@ -115,6 +115,12 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
+		// Handle Rate Limit
+		if resp.StatusCode == http.StatusTooManyRequests {
+			fmt.Println("Rate limit exceeded. Please wait and try again later.")
+			return chatCompletion, generateRateLimitErrorMessage(resp)
+		}
+
 		fmt.Println("Received non-OK status code:", resp.StatusCode)
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -125,6 +131,7 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 		return chatCompletion, fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
 	}
 
+	// Verify the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Failed to read response body:", err)
@@ -132,38 +139,109 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 	}
 	fmt.Println("Response Body:", string(body))
 
-	// // Read the response body line by line
-	// var responseBody bytes.Buffer
-	// scanner := bufio.NewScanner(resp.Body)
-	// for scanner.Scan() {
-	// 	line := scanner.Text()
+	err = json.Unmarshal(body, &chatCompletion)
+	if err != nil {
+		fmt.Println("Failed to unmarshal response:", err)
+		return chatCompletion, err
+	}
 
-	// 	// fmt.Print(line)
-	// 	if line == "" {
-	// 		continue
-	// 	}
+	return chatCompletion, nil
+}
 
-	// 	if strings.Contains(line, "[DONE]") {
-	// 		break
-	// 	}
+/*
+*
 
-	// 	data := []byte(line)[5:]
+Header	Value	Notes
+retry-after	2	In seconds
+x-ratelimit-limit-requests	14400	Always refers to Requests Per Day (RPD)
+x-ratelimit-limit-tokens	18000	Always refers to Tokens Per Minute (TPM)
+x-ratelimit-remaining-requests	14370	Always refers to Requests Per Day (RPD)
+x-ratelimit-remaining-tokens	17997	Always refers to Tokens Per Minute (TPM)
+x-ratelimit-reset-requests	2m59.56s	Always refers to Requests Per Day (RPD)
+x-ratelimit-reset-tokens	7.66s	Always refers to Tokens Per Minute (TPM)
+*/
+func generateRateLimitErrorMessage(resp *http.Response) error {
+	// Parse the rate limit headers
+	retryAfter := resp.Header.Get("retry-after")
+	rateLimitLimitRequests := resp.Header.Get("x-ratelimit-limit-requests")
+	rateLimitLimitTokens := resp.Header.Get("x-ratelimit-limit-tokens")
+	rateLimitRemainingRequests := resp.Header.Get("x-ratelimit-remaining-requests")
+	rateLimitRemainingTokens := resp.Header.Get("x-ratelimit-remaining-tokens")
+	rateLimitResetRequests := resp.Header.Get("x-ratelimit-reset-requests")
+	rateLimitResetTokens := resp.Header.Get("x-ratelimit-reset-tokens")
 
-	// 	var response ChatResponse
-	// 	err := json.Unmarshal(data, &response)
-	// 	if err != nil {
-	// 		fmt.Println("Failed to unmarshal response:", err)
-	// 		return "", err
-	// 	}
+	fmt.Println("Rate limit details", retryAfter, rateLimitLimitRequests, rateLimitLimitTokens, rateLimitRemainingRequests, rateLimitRemainingTokens, rateLimitResetRequests, rateLimitResetTokens)
+	return fmt.Errorf("unknown rate limit error")
+}
 
-	// 	responseBody.WriteString(response.Choices[0].Delta.Content)
+func CallGroqTools(model Model, systemPrompt, userData string) (GroqChatCompletion, error) {
+	url := "https://api.groq.com/openai/v1/chat/completions"
+	payload := map[string]interface{}{
+		"model": model,
+		"messages": []map[string]string{
+			{
+				"role":    "user",
+				"content": systemPrompt,
+			},
+			{
+				"role":    "user",
+				"content": userData,
+			},
+		},
+		"response_format": map[string]interface{}{
+			"type": "json_object",
+		},
+	}
 
-	// }
+	var chatCompletion GroqChatCompletion
 
-	// if err := scanner.Err(); err != nil {
-	// 	fmt.Println("Failed to read response body:", err)
-	// 	return "", err
-	// }
+	// Convert the payload to JSON
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		fmt.Println("Failed to marshal JSON payload:", err)
+		return chatCompletion, err
+	}
+
+	// Send the HTTP POST request
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		fmt.Println("Failed to send HTTP request:", err)
+		return chatCompletion, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer ")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println("Failed to send HTTP request:", err)
+		return chatCompletion, err
+	}
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		// Handle Rate Limit
+		if resp.StatusCode == http.StatusTooManyRequests {
+			fmt.Println("Rate limit exceeded. Please wait and try again later.")
+			return chatCompletion, generateRateLimitErrorMessage(resp)
+		}
+
+		fmt.Println("Received non-OK status code:", resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("Failed to read response body:", err)
+			return chatCompletion, err
+		}
+		fmt.Println("Response Body:", string(body))
+		return chatCompletion, fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
+	}
+
+	// Verify the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Failed to read response body:", err)
+		return chatCompletion, err
+	}
+	fmt.Println("Response Body:", string(body))
 
 	err = json.Unmarshal(body, &chatCompletion)
 	if err != nil {

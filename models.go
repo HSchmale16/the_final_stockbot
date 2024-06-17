@@ -15,7 +15,7 @@ type GovtRssItem struct {
 	DescriptiveMetaUrl string
 	FullTextUrl        string
 	Title              string
-	Link               string `gorm:"unique_index"`
+	Link               string `gorm:"uniqueIndex"`
 	PubDate            time.Time
 	ProcessedOn        time.Time
 }
@@ -41,8 +41,9 @@ func (GovtLawText) TableName() string {
 
 /** Tag is a simple tag for categorizing items */
 type Tag struct {
-	gorm.Model
-	Name string `gorm:"unique"`
+	ID        uint
+	CreatedAt time.Time
+	Name      string `gorm:"uniqueIndex"`
 }
 
 func (Tag) TableName() string {

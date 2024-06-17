@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mmcdole/gofeed"
+	"gorm.io/gorm"
 )
 
 var rssLinks = []string{
@@ -25,7 +27,33 @@ type LawRssItem struct {
 
 type LawRssItemChannel chan LawRssItem
 
+func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssItem) {
+	newItem := GovtRssItem{
+		DescriptiveMetaUrl: item.DescriptiveMetaUrl,
+		FullTextUrl:        item.FullTextUrl,
+		Title:              item.Title,
+		Link:               item.Link,
+		PubDate:            item.PubDate,
+	}
+
+	// Search by link
+	var count int64
+	db.Model(&GovtRssItem{}).Where("link = ?", item.Link).Count(&count)
+
+	log.Println("Count:", count, "Link:", item.Link)
+	if count == 0 {
+		db.Create(&newItem)
+		return true, newItem
+	}
+
+	return false, newItem
+}
+
 func main() {
+
+}
+
+func DoBigApp() {
 	db, err := setupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
@@ -38,15 +66,11 @@ func main() {
 	for item := range ch {
 		fmt.Println(item)
 
-		item := GovtRssItem{
-			DescriptiveMetaUrl: item.DescriptiveMetaUrl,
-			FullTextUrl:        item.FullTextUrl,
-			Title:              item.Title,
-			Link:               item.Link,
-			PubDate:            item.PubDate,
+		created, item := CreateDatabaseItemFromRssItem(item, db)
+		if !created {
+			fmt.Println("Item already exists in database")
+			continue
 		}
-
-		db.Create(&item)
 
 		text := downloadLawFullText(item.FullTextUrl)
 
@@ -55,18 +79,15 @@ func main() {
 			Text:          text,
 		})
 
-		for _, chunk := range ChunkTextIntoTokenBlocks(text, 2000, 100) {
-
-			response, err := CallGroqChatApi(Llama3_8B, GetPrompt().PromptText, chunk)
+		for _, chunk := range ChunkTextIntoTokenBlocks(text, 1500, 500) {
+			response, err := CallGroqChatApi(Mixtral_8x7b, GetPrompt().PromptText, chunk)
 			if err != nil {
 				fmt.Println("Error:", err)
 				return
 			}
 
-			fmt.Println(response.Choices[0].Message.Content)
-
 			var tagData struct {
-				Tags []string `json:"tags"`
+				Topics []string `json:"topics"`
 			}
 
 			err = json.Unmarshal([]byte(response.Choices[0].Message.Content), &tagData)
@@ -75,14 +96,17 @@ func main() {
 				return
 			}
 
-			for _, tagName := range tagData.Tags {
+			for _, tagName := range tagData.Topics {
 				tag := Tag{Name: tagName}
 				db.FirstOrCreate(&tag, tag)
-				db.Create(&GovtRssItemTag{
+
+				tagRel := GovtRssItemTag{
 					GovtRssItemId: item.ID,
 					TagId:         tag.ID,
-				})
-				fmt.Println("ADDED TAG", tagName)
+				}
+
+				db.Create(&tagRel)
+				fmt.Println("ADDED TAG", tagName, "---> ", tagRel.ID, tagRel.GovtRssItemId, tagRel.TagId)
 			}
 
 			fmt.Println("Tokens Consumed", response.Usage.TotalTokens, response.Usage.PromptTokens, response.Usage.CompletionTokens)

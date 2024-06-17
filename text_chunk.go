@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/pkoukk/tiktoken-go"
 )
@@ -16,19 +17,31 @@ func ChunkTextIntoTokenBlocks(fullText string, maxTokens, overlap int) []string 
 	}
 
 	tokens := tkm.Encode(fullText, nil, nil)
-	if len(tokens) > maxTokens {
+	log.Println("Tokens:", len(tokens))
+	if len(tokens) >= maxTokens {
 		// Chunk it
-		chunks := make([]string, 10)
+		chunks := make([]string, 0, 10)
 		for i := 0; i < len(tokens); i += maxTokens - overlap {
 			end := i + maxTokens
 			if end > len(tokens) {
 				end = len(tokens)
 			}
+			log.Println("Chunking from", i, "to", end)
 			chunk := tkm.Decode(tokens[i:end])
 			chunks = append(chunks, chunk)
 		}
+
+		log.Println("Chunks:", GetStringLengths(chunks))
 		return chunks
 	}
 
 	return []string{fullText}
+}
+
+func GetStringLengths(str []string) []int {
+	lengths := make([]int, len(str))
+	for i, s := range str {
+		lengths[i] = len(s)
+	}
+	return lengths
 }
