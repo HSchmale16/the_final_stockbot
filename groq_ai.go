@@ -16,6 +16,7 @@ const (
 	Mixtral_8x7b Model = "mixtral-8x7b-32768"
 	Gemma_7b     Model = "gemma-7b-it"
 	// Add more models here
+	GROQ_TOKEN string = ""
 )
 
 type GroqStreamingResponse struct {
@@ -105,7 +106,7 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 		return chatCompletion, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer ")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", GROQ_TOKEN))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -174,26 +175,64 @@ func generateRateLimitErrorMessage(resp *http.Response) error {
 	return fmt.Errorf("unknown rate limit error")
 }
 
-func CallGroqTools(model Model, systemPrompt, userData string) (GroqChatCompletion, error) {
+type LlmTool struct {
+	Type     string          `json:"type"`
+	Function LlmToolFunction `json:"function"`
+}
+
+type ToolParameter struct {
+	Type        string `json:"type"`
+	Description string `json:"description"`
+}
+
+type ParameterMap struct {
+	Type       string                   `json:"type"`
+	Properties map[string]ToolParameter `json:"properties"`
+	Required   []string                 `json:"required"`
+}
+
+type LlmToolFunction struct {
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Parameters  ParameterMap `json:"parameters"`
+}
+
+func CallGroqTools(model Model, systemPrompt, userData string) (string, error) {
 	url := "https://api.groq.com/openai/v1/chat/completions"
 	payload := map[string]interface{}{
 		"model": model,
 		"messages": []map[string]string{
 			{
-				"role":    "user",
-				"content": systemPrompt,
+				"role":    "system",
+				"content": "You are a function calling LLM that uses the get_mtg_card tool to look up magic the gathering cards and analyze interactions between them",
 			},
 			{
 				"role":    "user",
 				"content": userData,
 			},
 		},
-		"response_format": map[string]interface{}{
-			"type": "json_object",
+		"tool_choice": "auto",
+		"tools": []LlmTool{
+			{
+				Type: "function",
+				Function: LlmToolFunction{
+					Name:        "get_mtg_card",
+					Description: "Get a Magic: The Gathering card by name",
+					Parameters: ParameterMap{
+						Type: "object",
+						Properties: map[string]ToolParameter{
+							"card_name": {
+								Type:        "string",
+								Description: "The name of the Magic: The Gathering card",
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 
-	var chatCompletion GroqChatCompletion
+	var chatCompletion string = ""
 
 	// Convert the payload to JSON
 	jsonPayload, err := json.Marshal(payload)
@@ -209,7 +248,7 @@ func CallGroqTools(model Model, systemPrompt, userData string) (GroqChatCompleti
 		return chatCompletion, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer ")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", GROQ_TOKEN))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -232,22 +271,16 @@ func CallGroqTools(model Model, systemPrompt, userData string) (GroqChatCompleti
 			return chatCompletion, err
 		}
 		fmt.Println("Response Body:", string(body))
-		return chatCompletion, fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
+		return string(body), fmt.Errorf("received non-OK status code: %d", resp.StatusCode)
 	}
 
 	// Verify the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Failed to read response body:", err)
-		return chatCompletion, err
+		return "", err
 	}
 	fmt.Println("Response Body:", string(body))
 
-	err = json.Unmarshal(body, &chatCompletion)
-	if err != nil {
-		fmt.Println("Failed to unmarshal response:", err)
-		return chatCompletion, err
-	}
-
-	return chatCompletion, nil
+	return string(body), nil
 }

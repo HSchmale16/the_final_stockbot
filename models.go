@@ -18,6 +18,9 @@ type GovtRssItem struct {
 	Link               string `gorm:"uniqueIndex"`
 	PubDate            time.Time
 	ProcessedOn        time.Time
+
+	// many to many relationship of tags through GovtRssItemTag
+	Tags []Tag `gorm:"many2many:govt_rss_item_tag;"`
 }
 
 func (GovtRssItem) TableName() string {
@@ -69,6 +72,18 @@ func (GovtRssItemTag) TableName() string {
 	return "govt_rss_item_tag"
 }
 
+type GenerationError struct {
+	ID            uint
+	CreatedAt     time.Time
+	ErrorMessage  string `gorm:"type:text"`
+	AttemptedText string `gorm:"type:text"`
+	Model         string
+}
+
+func (GenerationError) TableName() string {
+	return "generation_error"
+}
+
 /**
  * Sets up the stupid database
  */
@@ -94,7 +109,7 @@ func setupDB() (*gorm.DB, error) {
 	}
 
 	// Auto migrate models
-	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}); err != nil {
+	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}); err != nil {
 		return nil, err
 	}
 

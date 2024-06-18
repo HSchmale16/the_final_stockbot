@@ -15,6 +15,7 @@ import (
 
 var rssLinks = []string{
 	"https://www.govinfo.gov/rss/bills.xml",
+	"https://www.govinfo.gov/rss/plaw.xml",
 }
 
 type LawRssItem struct {
@@ -49,10 +50,6 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 	return false, newItem
 }
 
-func main() {
-
-}
-
 func DoBigApp() {
 	db, err := setupDB()
 	if err != nil {
@@ -61,7 +58,7 @@ func DoBigApp() {
 	}
 
 	ch := make(LawRssItemChannel)
-	go handleLawRss(rssLinks[0], ch)
+	go handleLawRss(rssLinks[1], ch)
 
 	for item := range ch {
 		fmt.Println(item)
@@ -80,10 +77,21 @@ func DoBigApp() {
 		})
 
 		for _, chunk := range ChunkTextIntoTokenBlocks(text, 1500, 500) {
-			response, err := CallGroqChatApi(Mixtral_8x7b, GetPrompt().PromptText, chunk)
-			if err != nil {
+			var response GroqChatCompletion
+			for {
+				model := Llama3_8B
+				response, err = CallGroqChatApi(model, GetPrompt().PromptText, chunk)
+				if err == nil {
+					break
+				}
 				fmt.Println("Error:", err)
-				return
+				db.Create(&GenerationError{
+					Model:         string(model),
+					ErrorMessage:  err.Error(),
+					AttemptedText: chunk,
+				})
+
+				time.Sleep(3 * time.Second)
 			}
 
 			var tagData struct {
