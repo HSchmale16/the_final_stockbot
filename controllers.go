@@ -34,9 +34,9 @@ func SetupServer() {
 	}
 
 	r.SetFuncMap(funcMap)
+	r.LoadHTMLFiles("html_templates/index.html", "html_templates/tag_index.html", "html_templates/tag_search.html", "html_templates/base.html")
 
 	// Load the HTML templates
-	r.LoadHTMLGlob("html_templates/*")
 
 	// Setup the database
 	r.Use(func(c *gin.Context) {
@@ -60,7 +60,7 @@ func Index(c *gin.Context) {
 	db.Debug().Model(&GovtRssItemTag{}).Count(&count)
 
 	c.HTML(200, "index.html", gin.H{
-		"TotalTags": count,
+		"TagCount": count,
 	})
 }
 

@@ -1,17 +1,20 @@
-{% extends "base.html" %}
-        <h1>Tag Index - {{ .Tag.Name }}</h1>
+{{ template "base.html" }}
 
-        <ul>
-            {{ range .Items }}
-            <li>
-                {{ .Title | unescape }}
+{{ define "title" }}Congress Tag Index - {{ .Tag.Name }}{{ end }}
 
-                {{ range .Tags }}
-                    <span class="tag"><a href="/tag/{{ .ID }}">{{.Name}}</a></span>
-                {{ end }}
-            </li>
+{{ define "content"}}
+    {{ . }}
+    <h1>Tag Index - {{ .Tag.Name }}</h1>
+
+    <ul>
+        {{ range .Items }}
+        <li>
+            {{ .Title | unescape }}
+
+            {{ range .Tags }}
+                <span class="tag"><a href="/tag/{{ .ID }}">{{.Name}}</a></span>
             {{ end }}
-        </ul>
-
-    </div>
-
+        </li>
+        {{ end }}
+    </ul>
+{{ end }}
