@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,8 +19,8 @@ func SetupServer() {
 		panic(err)
 	}
 
-	engine := handlebars.New("./html_templates", ".hbs")
-
+	//engine := handlebars.New("./html_templates", ".hbs")
+	engine := handlebars.NewFileSystem(http.Dir("./html_templates"), ".hbs")
 	// Setup the gin server
 	app := fiber.New(fiber.Config{
 		Views: engine,

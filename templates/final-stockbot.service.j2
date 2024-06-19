@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User={{ service_user_name }}
-WorkingDirectory=/var/lib/{{ service_user_name }}/the_final_stockbot
+WorkingDirectory=/var/lib/{{ service_user_name }}
 ExecStart=/var/lib/{{ service_user_name }}/the_final_stockbot/the_final_stockbot
 Restart=always
 Environment=VAR1=value1
