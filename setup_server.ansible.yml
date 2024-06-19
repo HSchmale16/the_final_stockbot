@@ -23,6 +23,13 @@
           - git-lfs
         state: present
         update_cache: true
+    - name: Configure Firewall
+      become: true
+      community.general.ufw:
+        rule: allow
+        port: "80"
+        comment: "Allow HTTP traffic"
+        state: enabled
 
     - name: Install and Setup do_litestream
       when: do_litestream
