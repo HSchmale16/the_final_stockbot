@@ -4,6 +4,7 @@
     cmd: go build -buildvcs=false
     chdir: /home/linuxuser/the_final_stockbot
 - name: Move the binary
+  become: true
   ansible.builtin.copy:
     remote_src: true
     src: /home/linuxuser/the_final_stockbot/the_final_stockbot
