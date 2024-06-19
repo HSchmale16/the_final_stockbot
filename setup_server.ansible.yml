@@ -63,7 +63,7 @@
     - name: Clone my stockbot repository
       ansible.builtin.git:
         repo: https://github.com/HSchmale16/the_final_stockbot
-        dest: /home/linuxuser/the_final_stockbot
+        dest: ~{{ service_user_name }}/the_final_stockbot
         version: master
       register: stockbot_git
       notify:
