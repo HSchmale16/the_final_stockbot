@@ -43,6 +43,7 @@
       when: do_litestream
       block:
         - name: Clone Litestream To Build From Source
+          become: true
           ansible.builtin.git:
             repo: https://github.com/benbjohnson/litestream
             dest: /root/litestream
@@ -52,6 +53,7 @@
         - name: Conditionally load the secrets for litestream
           ansible.builtin.include_vars: secrets.vault.yml
         - name: Template the litestream file
+          become: true
           ansible.builtin.template:
             src: litestream.yml.j2
             dest: /etc/litestream.yml
@@ -92,6 +94,15 @@
         src: /etc/nginx/sites-available/govt-stocks-site
         dest: /etc/nginx/sites-enabled/govt-stocks-site
         state: link
+
+    - name: Copy the Database File
+      become: true
+      ansible.builtin.copy:
+        src: test.db
+        dest: "/var/lib/{{ service_user_name }}/test.db"
+        mode: "0644"
+        owner: "{{ service_user_name }}"
+        group: "{{ service_user_name }}"
 
 
     # - name: Sync the stockbot repository
@@ -161,6 +172,7 @@
       ansible.builtin.include_tasks:
         file: install-litestream.ansible.yml
     - name: Start and Reload Litestream via Systemd
+      become: true
       ansible.builtin.systemd:
         name: litestream
         state: restarted

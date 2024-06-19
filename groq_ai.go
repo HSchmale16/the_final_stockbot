@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 type Model string
@@ -15,9 +16,17 @@ const (
 	Llama3_8B    Model = "llama3-8b-8192"
 	Mixtral_8x7b Model = "mixtral-8x7b-32768"
 	Gemma_7b     Model = "gemma-7b-it"
+
+	// Begin Vultr Models
+	Mistral_7b_Q5  Model = "mistral-7b-Q5_K_M.gguf"
+	Zephyr_7b_beta Model = "zephyr-7b-beta-f16.gguf"
+
 	// Add more models here
-	GROQ_TOKEN string = ""
+	ENDPOINT string = "https://api.groq.com/openai/v1/chat/completions"
+	// ENDPOINT   string = "https://api.vultrinference.com/v1/chat/completions"
 )
+
+var GROQ_TOKEN string = os.Getenv("GROQ_TOKEN")
 
 type GroqStreamingResponse struct {
 	ID                string `json:"id"`
@@ -72,12 +81,12 @@ type Message struct {
 }
 
 func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatCompletion, error) {
-	url := "https://api.groq.com/openai/v1/chat/completions"
+	url := ENDPOINT
 	payload := map[string]interface{}{
 		"model": model,
 		"messages": []map[string]string{
 			{
-				"role":    "user",
+				"role":    "system",
 				"content": systemPrompt,
 			},
 			{
@@ -85,9 +94,10 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 				"content": userData,
 			},
 		},
-		"response_format": map[string]interface{}{
-			"type": "json_object",
-		},
+		"max_tokens": 2048,
+		// "response_format": map[string]interface{}{
+		// 	"type": "json_object",
+		// },
 	}
 
 	var chatCompletion GroqChatCompletion
@@ -142,6 +152,7 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 
 	err = json.Unmarshal(body, &chatCompletion)
 	if err != nil {
+
 		fmt.Println("Failed to unmarshal response:", err)
 		return chatCompletion, err
 	}
@@ -172,7 +183,7 @@ func generateRateLimitErrorMessage(resp *http.Response) error {
 	rateLimitResetTokens := resp.Header.Get("x-ratelimit-reset-tokens")
 
 	fmt.Println("Rate limit details", retryAfter, rateLimitLimitRequests, rateLimitLimitTokens, rateLimitRemainingRequests, rateLimitRemainingTokens, rateLimitResetRequests, rateLimitResetTokens)
-	return fmt.Errorf("unknown rate limit error")
+	return fmt.Errorf("rate limit exceeded. Try again after: %s", retryAfter)
 }
 
 type LlmTool struct {

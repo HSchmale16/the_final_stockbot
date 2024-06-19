@@ -7,7 +7,7 @@ User={{ service_user_name }}
 WorkingDirectory=/var/lib/{{ service_user_name }}
 ExecStart=/var/lib/{{ service_user_name }}/the_final_stockbot/the_final_stockbot
 Restart=always
-Environment=VAR1=value1
+Environment=GROQ_TOKEN={{ GROQ_API_KEY }}
 Environment=VAR2=value2
 
 [Install]
