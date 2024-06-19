@@ -1,12 +1,11 @@
 
-{{ define "title" }}Congress Bullshit 2{{ end }}
 
-{{ define "content" }}
+
 <div class="container">
     <h1>Congress Bullshit</h1>
     <p>Find out the most important topics in your federal Law and who is mentioned the most</p>
     <h3>
-        Search Tags ({{ .TotalTags }}) --- {{ . }}
+        Search Tags 
         <span class="htmx-indicator">
             <img src="/img/bars.svg" /> Searching...
         </span>
@@ -17,6 +16,3 @@
 
     <div id="search-results"></div>
 </div>
-{{ end }}
-
-{{ template "base.html" }}

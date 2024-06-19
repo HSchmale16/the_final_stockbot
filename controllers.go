@@ -1,12 +1,12 @@
 package main
 
 import (
-	"html"
-	"html/template"
-	"net/url"
+	"fmt"
 	"strings"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/template/handlebars/v2"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -16,59 +16,52 @@ func SetupServer() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(db)
+
+	engine := handlebars.New("./html_templates", ".hbs")
 
 	// Setup the gin server
-	r := gin.Default()
-
-	funcMap := template.FuncMap{
-		"uri_decode": func(s string) string {
-			res, err := url.QueryUnescape(s)
-			if err != nil {
-				return s
-			}
-			return res
-		},
-		"unescape": func(s string) string {
-			return html.UnescapeString(s)
-		},
-	}
-
-	r.SetFuncMap(funcMap)
-	r.LoadHTMLFiles("html_templates/index.html", "html_templates/tag_index.html", "html_templates/tag_search.html", "html_templates/base.html")
-
-	// Load the HTML templates
-
-	// Setup the database
-	r.Use(func(c *gin.Context) {
-		c.Set("db", db)
-		c.Next()
+	app := fiber.New(fiber.Config{
+		Views: engine,
 	})
 
-	r.Static("/static", "./static")
+	// Middleware to pass db instance
+	app.Use(func(c fiber.Ctx) error {
+		c.Locals("db", db)
+		return c.Next()
+	})
+
+	app.Static("/static", "./static")
 
 	// Setup the Routes
-	r.GET("/", Index)
-	r.GET("/tag/:tag_id", TagIndex)
-	r.POST("/search", Search)
-	r.Run(":8080")
+	app.Get("/", Index)
+	app.Get("/tag/:tag_id", TagIndex)
+	app.Post("/search", Search)
+
+	app.Listen(":8080")
 }
 
-func Index(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+func Index(c fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
 
 	var count int64
 	db.Debug().Model(&GovtRssItemTag{}).Count(&count)
 
-	c.HTML(200, "index.html", gin.H{
+	// c.HTML(200, "index.html", gin.H{
+	// 	"TagCount": count,
+	// })
+
+	return c.Render("index", fiber.Map{
+		"Title":    "Hello, World!",
 		"TagCount": count,
-	})
+	}, "layouts/main")
 }
 
-func TagIndex(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+func TagIndex(c fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
 
 	var tag Tag
-	db.Debug().First(&tag, c.Param("tag_id"))
+	db.Debug().First(&tag, c.Params("tag_id"))
 
 	var items []GovtRssItem
 	db.Debug().Model(&GovtRssItem{}).
@@ -79,14 +72,14 @@ func TagIndex(c *gin.Context) {
 		Preload(clause.Associations).
 		Find(&items)
 
-	c.HTML(200, "tag_index.html", gin.H{
+	return c.Render("tag_index.html", fiber.Map{
 		"Tag":   tag,
 		"Items": items,
 	})
 }
 
-func Search(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+func Search(c fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
 
 	var results []struct {
 		TagId int64
@@ -98,7 +91,7 @@ func Search(c *gin.Context) {
 		Select("tag_id, Name, COUNT(*) as count").
 		Joins("JOIN tag ON tag.id = tag_id").
 		Joins("Join govt_rss_item ON govt_rss_item.id = govt_rss_item_id").
-		Where("LOWER(tag.name) LIKE LOWER(?)", "%"+strings.ToLower(c.PostForm("search"))+"%").
+		Where("LOWER(tag.name) LIKE LOWER(?)", "%"+strings.ToLower(c.FormValue("search"))+"%").
 		Where("govt_rss_item.pub_date > ?", "2023").
 		Group("tag_id").
 		Order("COUNT(*) DESC").
@@ -119,7 +112,13 @@ func Search(c *gin.Context) {
 		}
 	}
 
-	c.HTML(200, "tag_search.html", gin.H{
+	// c.HTML(200, "tag_search.html", gin.H{
+	// 	"Tags":     results,
+	// 	"MinCount": minCount,
+	// 	"MaxCount": maxCount,
+	// })
+
+	return c.Render("tag_search.html", fiber.Map{
 		"Tags":     results,
 		"MinCount": minCount,
 		"MaxCount": maxCount,
