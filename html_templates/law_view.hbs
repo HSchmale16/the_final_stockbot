@@ -2,13 +2,21 @@
     <h1>{{{ Law.Title }}}</h1>
 
     <table>
+        <thead>
+            <tr>
+                <th>Document Metadata</th>
+            </tr>
+        </thead>
         <tbody>
             <tr>
                 <th>Pub Date</th>
                 <td>{{ Law.PubDate }}</td>
             </tr>
+            <tr>
+                <th>Total Tags</th>
+                <td>{{ Law.Tags.length }}</td>
+            </tr>
         </tbody>
-
     </table>
     
     <pre>{{ LawText }}</pre>
