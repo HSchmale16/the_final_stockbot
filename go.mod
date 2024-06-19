@@ -2,8 +2,6 @@ module github.com/hschmale16/the_final_stockbot
 
 go 1.21
 
-toolchain go1.22.3
-
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/gofiber/fiber/v2 v2.52.2
