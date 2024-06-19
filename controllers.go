@@ -165,7 +165,7 @@ func LawView(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var law GovtRssItem
-	db.Find(&law, c.Params("law_id"))
+	db.Preload(clause.Associations).Find(&law, c.Params("law_id"))
 
 	var lawText GovtLawText
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
