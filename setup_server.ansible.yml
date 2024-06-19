@@ -6,7 +6,7 @@
     variable_name: variable_value
     service_user_name: final_stockbot
     do_litestream: false
-    static_root: /var/lib/final_stockbot/static
+    static_root: /var/lib/final_stockbot/the_final_stockbot/static/
     server_name: govt.henryschmale.org
 
   tasks:
@@ -79,12 +79,20 @@
         - Build my application
 
     - name: Create nginx configuration
+      become: true
       ansible.builtin.template:
         src: govt-stocks-site.nginx.j2
-        dest: /etc/nginx/sites-enabled/govt-stocks-site
+        dest: /etc/nginx/sites-available/govt-stocks-site
         mode: "0644"
       notify:
         - Reload nginx
+    - name: Enable Nginx Site
+      become: true
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/govt-stocks-site
+        dest: /etc/nginx/sites-enabled/govt-stocks-site
+        state: link
+      
 
     # - name: Sync the stockbot repository
     #   ansible.builtin.copy:
