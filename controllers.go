@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/template/handlebars/v2"
@@ -18,6 +19,9 @@ import (
 
 //go:embed html_templates/*
 var templates embed.FS
+
+//go:embed all:static
+var embedDirStatic embed.FS
 
 func SetupServer() {
 	db, err := setupDB()
@@ -46,6 +50,12 @@ func SetupServer() {
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
 		Format: "${pid} ${latency} ${locals:requestid} ${status} - ${method} ${path}\n",
+	}))
+
+	app.Use("/static", filesystem.New(filesystem.Config{
+		Root:       http.FS(embedDirStatic),
+		PathPrefix: "static",
+		Browse:     true,
 	}))
 
 	// Middleware to pass db instance

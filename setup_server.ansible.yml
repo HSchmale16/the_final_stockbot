@@ -31,6 +31,14 @@
         comment: "Allow HTTP traffic"
         state: enabled
 
+    - name: Configure Firewall
+      become: true
+      community.general.ufw:
+        rule: allow
+        port: "8080"
+        comment: "Allow Proxy HTTP traffic"
+        state: enabled
+
     - name: Install and Setup do_litestream
       when: do_litestream
       block:
