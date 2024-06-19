@@ -112,7 +112,7 @@ func ProcessRule(text, itemType string, db *gorm.DB) {
 			tag := GetTag(db, tagName)
 			item.Tags = append(item.Tags, tag)
 		}
-		db.Debug().Save(&item)
+		db.Save(&item)
 
 		fmt.Println("Tokens Consumed", response.Usage.TotalTokens, response.Usage.PromptTokens, response.Usage.CompletionTokens)
 	}

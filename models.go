@@ -159,7 +159,7 @@ func setupDB() (*gorm.DB, error) {
 func GetTag(db *gorm.DB, tagName string) Tag {
 	tag := Tag{Name: cases.Title(language.Und).String(tagName)}
 
-	db.Debug().FirstOrCreate(&tag, tag)
+	db.FirstOrCreate(&tag, tag)
 	fmt.Println("Tag:", tagName, " --> ", tag)
 
 	return tag

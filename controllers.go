@@ -123,7 +123,7 @@ func Search(c *fiber.Ctx) error {
 		Count int64
 	}
 
-	db.Debug().Model(&GovtRssItemTag{}).
+	db.Model(&GovtRssItemTag{}).
 		Select("tag_id, Name, COUNT(*) as count").
 		Joins("JOIN tag ON tag.id = tag_id").
 		Joins("Join govt_rss_item ON govt_rss_item.id = govt_rss_item_id").
