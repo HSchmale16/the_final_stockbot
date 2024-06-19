@@ -78,7 +78,7 @@ func DoBigApp() {
 
 		for _, chunk := range ChunkTextIntoTokenBlocks(text, 1500, 500) {
 			var response GroqChatCompletion
-			for {
+			for i := 0; i < 3; i++ {
 				model := Llama3_8B
 				response, err = CallGroqChatApi(model, GetPrompt().PromptText, chunk)
 				if err == nil {
@@ -91,17 +91,24 @@ func DoBigApp() {
 					AttemptedText: chunk,
 				})
 
-				time.Sleep(3 * time.Second)
+				time.Sleep(10 * time.Second)
 			}
 
 			var tagData struct {
 				Topics []string `json:"topics"`
 			}
 
-			err = json.Unmarshal([]byte(response.Choices[0].Message.Content), &tagData)
+			body := []byte(response.Choices[0].Message.Content)
+			err = json.Unmarshal(body, &tagData)
 			if err != nil {
-				fmt.Println("Failed to unmarshal tag data:", err)
-				return
+				// Try to reparse if the response ends in a single ] character
+				if string(body[len(body)-1]) == "]" {
+					body = append(body, byte('}'))
+					err = json.Unmarshal(body, &tagData)
+					if err != nil {
+						fmt.Println("Failed to unmarshal fixed repsonse", err)
+					}
+				}
 			}
 
 			for _, tagName := range tagData.Topics {

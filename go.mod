@@ -1,6 +1,6 @@
 module github.com/hschmale16/the_final_stockbot
 
-go 1.22.3
+go 1.19
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0

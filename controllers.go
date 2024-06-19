@@ -29,7 +29,7 @@ func SetupServer() {
 	app.Use(requestid.New())
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
-		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
+		Format: "${pid} ${latency} ${locals:requestid} ${status} - ${method} ${path}​\n",
 	}))
 
 	// Middleware to pass db instance
@@ -68,10 +68,10 @@ func TagIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var tag Tag
-	db.Debug().First(&tag, c.Params("tag_id"))
+	db.First(&tag, c.Params("tag_id"))
 
 	var items []GovtRssItem
-	db.Debug().Model(&GovtRssItem{}).
+	db.Model(&GovtRssItem{}).
 		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").
 		Where("govt_rss_item_tag.tag_id = ?", tag.ID).
 		Order("pub_date DESC").
@@ -82,7 +82,7 @@ func TagIndex(c *fiber.Ctx) error {
 	return c.Render("tag_index", fiber.Map{
 		"Tag":   tag,
 		"Items": items,
-	})
+	}, "layouts/main")
 }
 
 func Search(c *fiber.Ctx) error {

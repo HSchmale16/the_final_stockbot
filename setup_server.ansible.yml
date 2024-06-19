@@ -1,23 +1,24 @@
 ---
 - name: Setup Server
   hosts: all
-  remote_user: root
-  become: true
+  remote_user: linuxuser
   vars:
     variable_name: variable_value
     service_user_name: final_stockbot
     do_litestream: false
+    static_root: /var/lib/final_stockbot/static
+    server_name: govt.henryschmale.org
 
   tasks:
     - name: Install Packages
+      become: true
       ansible.builtin.package:
         name:
           - bash-completion
           - htop
           - rsync
-          - go
-          - rust
-          - ollama
+          - golang
+          - nginx
           - git
           - git-lfs
         state: present
@@ -52,23 +53,31 @@
         shell: /bin/false
         home: "/var/lib/{{ service_user_name }}"
 
-    # - name: Clone my stockbot repository
-    #   ansible.builtin.git:
-    #     repo: https://github.com/HSchmale16/the_final_stockbot
-    #     dest: /root/the_final_stockbot
-    #     version: master
-    #   register: stockbot_git
-    #   notify:
-    #     - Build my application
-
-    - name: Sync the stockbot repository
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: "/root/the_final_stockbot/{{ item | basename }}"
-        mode: "0644"
-      loop: "{{ query('fileglob', '*go*') }}"
+    - name: Clone my stockbot repository
+      ansible.builtin.git:
+        repo: https://github.com/HSchmale16/the_final_stockbot
+        dest: /home/linuxuser/the_final_stockbot
+        version: master
+      register: stockbot_git
       notify:
         - Build my application
+
+    - name: Create nginx configuration
+      ansible.builtin.template:
+        src: govt-stocks-site.nginx.j2
+        dest: /etc/nginx/sites-enabled/govt-stocks-site
+        mode: "0644"
+      notify:
+        - Reload nginx
+
+    # - name: Sync the stockbot repository
+    #   ansible.builtin.copy:
+    #     src: "{{ item }}"
+    #     dest: "/root/the_final_stockbot/{{ item | basename }}"
+    #     mode: "0644"
+    #   loop: "{{ query('fileglob', '*go*') }}"
+    #   notify:
+    #     - Build my application
 
     # Create the service
     - name: Create a systemd unit file
@@ -79,35 +88,40 @@
       notify:
         - Reload systemd
 
-    - name: Ensure Ollama Service is Started
-      ansible.builtin.systemd:
-        name: ollama
-        enabled: true
-        state: started
+    # - name: Ensure Ollama Service is Started
+    #   ansible.builtin.systemd:
+    #     name: ollama
+    #     enabled: true
+    #     state: started
 
-    - name: Pull Ollama Models Required For Work
-      changed_when: false
-      ansible.builtin.command: ollama list
-      register: ollama_list_output
+    # - name: Pull Ollama Models Required For Work
+    #   changed_when: false
+    #   ansible.builtin.command: ollama list
+    #   register: ollama_list_output
 
-    - name: Filter Installed Models
-      ansible.builtin.set_fact:
-        installed_models: "{{ ollama_list_output.stdout_lines | map('regex_replace', '^\\s*(\\S+).*$', '\\1') | list }}"
+    # - name: Filter Installed Models
+    #   ansible.builtin.set_fact:
+    #     installed_models: "{{ ollama_list_output.stdout_lines | map('regex_replace', '^\\s*(\\S+).*$', '\\1') | list }}"
 
-    - ansible.builtin.debug:
-        var: installed_models
+    # - ansible.builtin.debug:
+    #     var: installed_models
 
-    - name: Pull Ollama Models
-      changed_when: true
-      ansible.builtin.command:
-        cmd: ollama pull "{{ item }}"
-      loop:
-        - "phi3:3.8b"
-        - "gemma:2b"
-      when: item not in installed_models
+    # - name: Pull Ollama Models
+    #   changed_when: true
+    #   ansible.builtin.command:
+    #     cmd: ollama pull "{{ item }}"
+    #   loop:
+    #     - "phi3:3.8b"
+    #     - "gemma:2b"
+    #   when: item not in installed_models
 
   ##### Handlers #####
   handlers:
+    - name: Reload nginx
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: nginx
+        state: restarted
     - name: Reload systemd
       ansible.builtin.systemd:
         daemon_reload: true

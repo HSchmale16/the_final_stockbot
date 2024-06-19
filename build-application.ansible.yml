@@ -2,11 +2,11 @@
   changed_when: true
   ansible.builtin.command:
     cmd: go build -buildvcs=false
-    chdir: /root/the_final_stockbot
+    chdir: /home/linuxuser/the_final_stockbot
 - name: Move the binary
   ansible.builtin.copy:
     remote_src: true
-    src: /root/the_final_stockbot/the_final_stockbot
+    src: /home/linuxuser/the_final_stockbot/the_final_stockbot
     dest: "/var/lib/{{ service_user_name }}/the_final_stockbot"
     mode: "0755"
   notify:
