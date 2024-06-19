@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -156,7 +157,7 @@ func setupDB() (*gorm.DB, error) {
 }
 
 func GetTag(db *gorm.DB, tagName string) Tag {
-	tag := Tag{Name: strings.ToLower(tagName)}
+	tag := Tag{Name: cases.Title(language.Und).String(tagName)}
 
 	db.Debug().FirstOrCreate(&tag, tag)
 	fmt.Println("Tag:", tagName, " --> ", tag)
