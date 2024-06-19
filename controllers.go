@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/template/handlebars/v2"
 
 	"gorm.io/gorm"
@@ -16,7 +17,6 @@ func SetupServer() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(db)
 
 	engine := handlebars.New("./html_templates", ".hbs")
 
@@ -25,8 +25,15 @@ func SetupServer() {
 		Views: engine,
 	})
 
+	// Logging Request ID
+	app.Use(requestid.New())
+	app.Use(logger.New(logger.Config{
+		// For more options, see the Config section
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
+	}))
+
 	// Middleware to pass db instance
-	app.Use(func(c fiber.Ctx) error {
+	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("db", db)
 		return c.Next()
 	})
@@ -41,7 +48,7 @@ func SetupServer() {
 	app.Listen(":8080")
 }
 
-func Index(c fiber.Ctx) error {
+func Index(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var count int64
@@ -57,7 +64,7 @@ func Index(c fiber.Ctx) error {
 	}, "layouts/main")
 }
 
-func TagIndex(c fiber.Ctx) error {
+func TagIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var tag Tag
@@ -72,13 +79,13 @@ func TagIndex(c fiber.Ctx) error {
 		Preload(clause.Associations).
 		Find(&items)
 
-	return c.Render("tag_index.html", fiber.Map{
+	return c.Render("tag_index", fiber.Map{
 		"Tag":   tag,
 		"Items": items,
 	})
 }
 
-func Search(c fiber.Ctx) error {
+func Search(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var results []struct {
@@ -118,7 +125,7 @@ func Search(c fiber.Ctx) error {
 	// 	"MaxCount": maxCount,
 	// })
 
-	return c.Render("tag_search.html", fiber.Map{
+	return c.Render("tag_search", fiber.Map{
 		"Tags":     results,
 		"MinCount": minCount,
 		"MaxCount": maxCount,
