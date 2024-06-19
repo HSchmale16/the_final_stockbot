@@ -1,5 +1,6 @@
 - name: Build the go project
   changed_when: true
+  become_user: true
   ansible.builtin.command:
     cmd: go build -buildvcs=false
     chdir: ~{{ service_user_name }}/the_final_stockbot
