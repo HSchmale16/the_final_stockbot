@@ -95,14 +95,14 @@
         dest: /etc/nginx/sites-enabled/govt-stocks-site
         state: link
 
-    - name: Copy the Database File
-      become: true
-      ansible.builtin.copy:
-        src: test.db
-        dest: "/var/lib/{{ service_user_name }}/test.db"
-        mode: "0644"
-        owner: "{{ service_user_name }}"
-        group: "{{ service_user_name }}"
+    # - name: Copy the Database File
+    #   become: true
+    #   ansible.builtin.copy:
+    #     src: test.db
+    #     dest: "/var/lib/{{ service_user_name }}/test.db"
+    #     mode: "0644"
+    #     owner: "{{ service_user_name }}"
+    #     group: "{{ service_user_name }}"
 
 
     # - name: Sync the stockbot repository
@@ -114,15 +114,15 @@
     #   notify:
     #     - Build my application
 
-    # Create the service
-    - name: Create a systemd unit file
-      become: true
-      ansible.builtin.template:
-        src: final-stockbot.service.j2
-        dest: /etc/systemd/system/final-stockbot.service
-        mode: "0644"
-      notify:
-        - Reload systemd
+    # # Create the service
+    # - name: Create a systemd unit file
+    #   become: true
+    #   ansible.builtin.template:
+    #     src: final-stockbot.service.j2
+    #     dest: /etc/systemd/system/final-stockbot.service
+    #     mode: "0644"
+    #   notify:
+    #     - Reload systemd
 
     # - name: Ensure Ollama Service is Started
     #   ansible.builtin.systemd:
