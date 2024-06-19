@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"net/http"
 	"strings"
 
@@ -13,6 +14,9 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+// go:embed html_templates/*
+var templates embed.FS
+
 func SetupServer() {
 	db, err := setupDB()
 	if err != nil {
@@ -20,7 +24,7 @@ func SetupServer() {
 	}
 
 	//engine := handlebars.New("./html_templates", ".hbs")
-	engine := handlebars.NewFileSystem(http.Dir("./html_templates"), ".hbs")
+	engine := handlebars.NewFileSystem(http.FS(templates), ".hbs")
 	// Setup the gin server
 	app := fiber.New(fiber.Config{
 		Views: engine,
