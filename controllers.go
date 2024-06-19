@@ -167,9 +167,13 @@ func LawView(c *fiber.Ctx) error {
 	var law GovtRssItem
 	db.Find(&law, c.Params("law_id"))
 
+	var lawText GovtLawText
+	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
+
 	return c.Render("law_view", fiber.Map{
-		"Title": html.UnescapeString(law.Title),
-		"Law":   law,
+		"Title":   html.UnescapeString(law.Title),
+		"Law":     law,
+		"LawText": lawText,
 	}, "layouts/main")
 }
 
