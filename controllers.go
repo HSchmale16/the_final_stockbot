@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"html"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -77,16 +78,18 @@ func SetupServer() {
 func Index(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var count int64
-	db.Debug().Model(&GovtRssItemTag{}).Count(&count)
+	var articleTags, totalTags int64
+	db.Model(&GovtRssItemTag{}).Count(&articleTags)
+	db.Model(&Tag{}).Count(&totalTags)
 
 	// c.HTML(200, "index.html", gin.H{
 	// 	"TagCount": count,
 	// })
 
 	return c.Render("index", fiber.Map{
-		"Title":    "Hello, World!",
-		"TagCount": count,
+		"Title":       "Hello, World!",
+		"TotalTopics": articleTags,
+		"TotalTags":   totalTags,
 	}, "layouts/main")
 }
 
@@ -165,7 +168,8 @@ func LawView(c *fiber.Ctx) error {
 	db.Find(&law, c.Params("law_id"))
 
 	return c.Render("law_view", fiber.Map{
-		"Law": law,
+		"Title": html.UnescapeString(law.Title),
+		"Law":   law,
 	}, "layouts/main")
 }
 
