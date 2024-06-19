@@ -70,6 +70,7 @@ func SetupServer() {
 	app.Get("/", Index)
 	app.Get("/tag/:tag_id", TagIndex)
 	app.Post("/search", Search)
+	app.Get("/law/:law_id", LawView)
 
 	app.Listen(":8080")
 }
@@ -156,6 +157,10 @@ func Search(c *fiber.Ctx) error {
 		"MinCount": minCount,
 		"MaxCount": maxCount,
 	})
+}
+
+func LawView(c *fiber.Ctx) error {
+	return c.Render("law_view", fiber.Map{}, "layouts/main")
 }
 
 func main() {
