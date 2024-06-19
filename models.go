@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -20,11 +21,43 @@ type GovtRssItem struct {
 	ProcessedOn        time.Time
 
 	// many to many relationship of tags through GovtRssItemTag
-	Tags []Tag `gorm:"many2many:govt_rss_item_tag;"`
+	Tags       []Tag `gorm:"many2many:govt_rss_item_tag;"`
+	Categories []Tag `gorm:"many2many:rss_category"`
 }
 
 func (GovtRssItem) TableName() string {
 	return "govt_rss_item"
+}
+
+type FederalRegisterItem struct {
+	gorm.Model
+	GovtRssItemId uint
+	Type          string
+	FullText      string
+
+	// many to many relationship of tags through FederalRegisterTag
+	Tags []Tag `gorm:"many2many:federal_register_tag;"`
+}
+
+func (FederalRegisterItem) TableName() string {
+	return "federal_register_item"
+}
+
+type FederalRegisterTag struct {
+	FederalRegisterItemId uint `gorm:"index:,unique,composite:myname"`
+	TagId                 uint `gorm:"index:,unique,composite:myname"`
+}
+
+func (FederalRegisterTag) TableName() string {
+	return "federal_register_tag"
+}
+
+/**
+ * Create a 2nd relationship to cover built in categories
+ */
+type RssCategory struct {
+	GovtRssItemId uint `gorm:"index:,unique,composite:unique_per_item"`
+	TagId         uint `gorm:"index:,unique,composite:unique_per_item"`
 }
 
 /**
@@ -78,6 +111,7 @@ type GenerationError struct {
 	ErrorMessage  string `gorm:"type:text"`
 	AttemptedText string `gorm:"type:text"`
 	Model         string
+	Source        string
 }
 
 func (GenerationError) TableName() string {
@@ -109,9 +143,22 @@ func setupDB() (*gorm.DB, error) {
 	}
 
 	// Auto migrate models
-	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}); err != nil {
+	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}); err != nil {
+		return nil, err
+	}
+
+	if err := db.AutoMigrate(&FederalRegisterItem{}); err != nil {
 		return nil, err
 	}
 
 	return db, nil
+}
+
+func GetTag(db *gorm.DB, tagName string) Tag {
+	tag := Tag{Name: tagName}
+
+	db.Debug().FirstOrCreate(&tag, tag)
+	fmt.Println("Tag:", tagName, " --> ", tag)
+
+	return tag
 }

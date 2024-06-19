@@ -1,3 +1,12 @@
+govt_feed_urls:
+- url: "https://www.govinfo.gov/rss/bills.xml"
+  description: Bills
+- url: "https://www.govinfo.gov/rss/plaw.xml"
+  description: Public and Private Laws
+- url: https://www.govinfo.gov/rss/fr.xml
+  description: Federal Register
+
+prompts:
 - name: IdentifyTags
   prompt_text: >
     You are the world's best political analyst. You must identify the topics within the following text. Topics should be focused on specific people. Do not use single word topics.
@@ -20,5 +29,4 @@
     {"topics": ["House of Representivies", "Abortion", "Supreme Court"]}
 
 
-# For example, if the text is "The cat and the dog are friends." you would output {"topics": ["cat", "dog"]}.
 

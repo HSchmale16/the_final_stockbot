@@ -18,11 +18,14 @@ var rssLinks = []string{
 	"https://www.govinfo.gov/rss/plaw.xml",
 }
 
+var FederalRegisterFeed = "https://www.govinfo.gov/rss/fr.xml"
+
 type LawRssItem struct {
 	FullTextUrl        string
 	DescriptiveMetaUrl string
 	Title              string
 	Link               string
+	Category           []string
 	PubDate            time.Time
 }
 
@@ -43,7 +46,13 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 
 	log.Println("Count:", count, "Link:", item.Link)
 	if count == 0 {
+		for _, tagName := range item.Category {
+			tag := GetTag(db, tagName)
+			newItem.Categories = append(newItem.Categories, tag)
+		}
+
 		db.Create(&newItem)
+
 		return true, newItem
 	}
 
@@ -112,8 +121,7 @@ func DoBigApp() {
 			}
 
 			for _, tagName := range tagData.Topics {
-				tag := Tag{Name: tagName}
-				db.FirstOrCreate(&tag, tag)
+				tag := GetTag(db, tagName)
 
 				tagRel := GovtRssItemTag{
 					GovtRssItemId: item.ID,
@@ -170,6 +178,11 @@ func handleLawRss(rssLink string, ch LawRssItemChannel) {
 
 		// Find the HTML a tag with the text "TEXT"
 		FullTextUrl := findHTMLTagWithText(item.Description, "TEXT")
+		// If the string is empty find the XML URL For Federal Register Stuff
+		if len(FullTextUrl) == 0 {
+			FullTextUrl = findHTMLTagWithText(item.Description, "XML")
+		}
+
 		DescriptiveUrl := findHTMLTagWithText(item.Description, "Descriptive Metadata (MODS)")
 
 		// Download the file associated with the HTML a tag
@@ -192,6 +205,7 @@ func handleLawRss(rssLink string, ch LawRssItemChannel) {
 			Title:              item.Title,
 			Link:               item.Link,
 			PubDate:            datetime,
+			Category:           item.Categories,
 		}
 	}
 
