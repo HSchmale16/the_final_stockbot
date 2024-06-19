@@ -37,7 +37,7 @@ func SetupServer() {
 	}
 	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
 
-	for k, _ := range engine.Templates {
+	for k := range engine.Templates {
 		fmt.Println(k)
 	}
 

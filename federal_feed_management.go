@@ -67,7 +67,7 @@ func DoBigApp() {
 	}
 
 	ch := make(LawRssItemChannel)
-	go handleLawRss(rssLinks[1], ch)
+	go handleLawRss(rssLinks[0], ch)
 
 	for item := range ch {
 		fmt.Println(item)
