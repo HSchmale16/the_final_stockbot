@@ -26,6 +26,14 @@
 */
 
 
+/* Color Variables */
+:root {
+  --primary-color: #1EAEDB;
+  --secondary-color: #33C3F0;
+  --text-color: #222;
+  --background-color: #fff;
+}
+
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {

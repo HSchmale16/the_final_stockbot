@@ -92,7 +92,7 @@
         src: /etc/nginx/sites-available/govt-stocks-site
         dest: /etc/nginx/sites-enabled/govt-stocks-site
         state: link
-      
+
 
     # - name: Sync the stockbot repository
     #   ansible.builtin.copy:

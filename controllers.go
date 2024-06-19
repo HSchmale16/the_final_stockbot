@@ -35,7 +35,6 @@ func SetupServer() {
 		panic(err)
 	}
 	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
-	engine.Load()
 
 	for k, _ := range engine.Templates {
 		fmt.Println(k)
@@ -160,7 +159,14 @@ func Search(c *fiber.Ctx) error {
 }
 
 func LawView(c *fiber.Ctx) error {
-	return c.Render("law_view", fiber.Map{}, "layouts/main")
+	db := c.Locals("db").(*gorm.DB)
+
+	var law GovtRssItem
+	db.Find(&law, c.Params("law_id"))
+
+	return c.Render("law_view", fiber.Map{
+		"Law": law,
+	}, "layouts/main")
 }
 
 func main() {

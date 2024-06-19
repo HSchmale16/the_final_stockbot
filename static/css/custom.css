@@ -5,3 +5,36 @@
     background-color: #eaeaea;
     color: #333;
 }
+
+
+.header {
+    background-color: #f2f2f2;
+    padding: 10px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+
+.navbar-nav {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-item {
+    margin-right: 10px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+}
