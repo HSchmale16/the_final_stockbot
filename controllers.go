@@ -98,7 +98,9 @@ func LawIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var laws []GovtRssItem
-	db.Preload(clause.Associations).Order("pub_date DESC").Limit(20).First(&laws)
+	db.Order("pub_date DESC").Limit(20).Preload(clause.Associations).Find(&laws)
+
+	fmt.Println(laws)
 
 	return c.Render("law_index", fiber.Map{
 		"Title": "Most Recent Laws",
@@ -192,6 +194,6 @@ func LawView(c *fiber.Ctx) error {
 
 func main() {
 	//FederalRegisterParser()
-	go DoBigApp()
+	//go DoBigApp()
 	SetupServer()
 }
