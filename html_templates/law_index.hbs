@@ -1,1 +1,14 @@
-<h1>{{ Title }}</h1>
+<div class="container">
+    <h1>{{ Title }}</h1>
+
+    {{#each Law }}
+    <div class="law">
+        <h2><a href="/law/{{ ID }}">{{ Title }}</a></h2>
+        <div class="tags">
+            {{#each Tags}}
+            <span class="tag"><a href="/tag/{{ ID }}">{{ Name }}</a></span>
+            {{/each}}
+        </div>
+    </div>
+    {{/each}}
+</div>
