@@ -100,7 +100,7 @@ func DoBigApp() {
 					AttemptedText: chunk,
 				})
 
-				time.Sleep(120 * time.Second)
+				time.Sleep(15 * time.Second)
 			}
 
 			var tagData struct {
