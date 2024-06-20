@@ -18,7 +18,7 @@
         </span>
     </h3>
     <input class="form-control" type="search" name="search" placeholder="Begin Typing To Search Users..."
-        hx-post="/search" hx-trigger="input changed delay:500ms, search" hx-target="#search-results"
+        hx-get="/htmx/topic-search" hx-trigger="input changed delay:500ms, search" hx-target="#search-results"
         hx-indicator=".htmx-indicator">
 
     <div id="search-results"></div>

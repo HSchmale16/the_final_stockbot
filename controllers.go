@@ -69,8 +69,9 @@ func SetupServer() {
 	// Setup the Routes
 	app.Get("/", Index)
 	app.Get("/tag/:tag_id", TagIndex)
-	app.Post("/search", Search)
+	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/law/:law_id", LawView)
+	app.Get("/laws", LawIndex)
 
 	app.Listen(":8080")
 }
@@ -90,6 +91,18 @@ func Index(c *fiber.Ctx) error {
 		"Title":       "Hello, World!",
 		"TotalTopics": articleTags,
 		"TotalTags":   totalTags,
+	}, "layouts/main")
+}
+
+func LawIndex(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var laws []GovtRssItem
+	db.Order("pub_date DESC").Limit(10).First(&laws)
+
+	return c.Render("law_index", fiber.Map{
+		"Title": "Most Recent Laws",
+		"Laws":  laws,
 	}, "layouts/main")
 }
 
@@ -114,7 +127,7 @@ func TagIndex(c *fiber.Ctx) error {
 	}, "layouts/main")
 }
 
-func Search(c *fiber.Ctx) error {
+func TopicSearch(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var results []struct {

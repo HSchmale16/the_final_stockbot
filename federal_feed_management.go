@@ -67,7 +67,7 @@ func DoBigApp() {
 	}
 
 	ch := make(LawRssItemChannel)
-	go handleLawRss(rssLinks[0], ch)
+	go handleLawRss(rssLinks[1], ch)
 
 	for item := range ch {
 		fmt.Println(item)
@@ -100,7 +100,7 @@ func DoBigApp() {
 					AttemptedText: chunk,
 				})
 
-				time.Sleep(10 * time.Second)
+				time.Sleep(120 * time.Second)
 			}
 
 			var tagData struct {
