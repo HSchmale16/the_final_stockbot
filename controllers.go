@@ -36,6 +36,7 @@ func SetupServer() {
 		panic(err)
 	}
 	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
+	engine.Debug(true)
 
 	for k := range engine.Templates {
 		fmt.Println(k)
@@ -68,12 +69,24 @@ func SetupServer() {
 
 	// Setup the Routes
 	app.Get("/", Index)
+	app.Get("/tags", TagList)
 	app.Get("/tag/:tag_id", TagIndex)
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/law/:law_id", LawView)
 	app.Get("/laws", LawIndex)
 
 	app.Listen(":8080")
+}
+
+func TagList(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var tags []Tag
+	db.Raw("SELECT tag.id, tag.name, COUNT(*) as count FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id GROUP BY tag.id ORDER BY count DESC").Limit(200).Scan(&tags)
+
+	return c.Render("tag_list", fiber.Map{
+		"Tags": tags,
+	}, "layouts/main")
 }
 
 func Index(c *fiber.Ctx) error {
@@ -83,12 +96,8 @@ func Index(c *fiber.Ctx) error {
 	db.Model(&GovtRssItemTag{}).Count(&articleTags)
 	db.Model(&Tag{}).Count(&totalTags)
 
-	// c.HTML(200, "index.html", gin.H{
-	// 	"TagCount": count,
-	// })
-
 	return c.Render("index", fiber.Map{
-		"Title":       "Hello, World!",
+		"Title":       "Congress Magnifying Glass",
 		"TotalTopics": articleTags,
 		"TotalTags":   totalTags,
 	}, "layouts/main")
@@ -98,9 +107,7 @@ func LawIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var laws []GovtRssItem
-	db.Order("pub_date DESC").Limit(20).Preload(clause.Associations).Find(&laws)
-
-	fmt.Println(laws)
+	db.Order("pub_date DESC").Limit(100).Preload(clause.Associations).Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
 		"Title": "Most Recent Laws",
