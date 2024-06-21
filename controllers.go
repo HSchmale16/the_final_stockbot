@@ -201,6 +201,6 @@ func LawView(c *fiber.Ctx) error {
 
 func main() {
 	//FederalRegisterParser()
-	//go DoBigApp()
+	go DoBigApp()
 	SetupServer()
 }
