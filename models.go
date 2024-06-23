@@ -71,6 +71,7 @@ type GovtLawText struct {
 	GovtRssItemId uint
 	GovtRssItem   GovtRssItem
 	Text          string
+	ModsXML       string
 }
 
 func (GovtLawText) TableName() string {
@@ -96,7 +97,7 @@ type GovtRssItemTag struct {
 
 	GovtRssItemId uint `gorm:"index:,unique,composite:myname"`
 	TagId         uint `gorm:"index:,unique,composite:myname"`
-	Metadata      string
+	LawTextOffset uint `gorm:"index:,unique,composite:myname"`
 
 	GovtRssItem GovtRssItem
 	Tag         Tag
@@ -137,7 +138,7 @@ func setupDB() (*gorm.DB, error) {
 	)
 
 	// Globally mode
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open("congress.sqlite"), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {

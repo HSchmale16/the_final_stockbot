@@ -59,7 +59,7 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 	return false, newItem
 }
 
-func DoBigApp() {
+func RunFetcherService() {
 	db, err := setupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
@@ -67,7 +67,10 @@ func DoBigApp() {
 	}
 
 	ch := make(LawRssItemChannel)
-	go handleLawRss(rssLinks[1], ch)
+
+	for _, rssLink := range rssLinks {
+		go handleLawRss(rssLink, ch)
+	}
 
 	for item := range ch {
 		fmt.Println(item)
@@ -79,63 +82,81 @@ func DoBigApp() {
 		}
 
 		text := downloadLawFullText(item.FullTextUrl)
+		mods := downloadLawFullText(item.DescriptiveMetaUrl)
 
 		db.Create(&GovtLawText{
 			GovtRssItemId: item.ID,
 			Text:          text,
+			ModsXML:       mods,
 		})
 
-		for _, chunk := range ChunkTextIntoTokenBlocks(text, 1500, 500) {
-			var response GroqChatCompletion
-			for i := 0; i < 3; i++ {
-				model := Llama3_8B
-				response, err = CallGroqChatApi(model, GetPrompt().PromptText, chunk)
-				if err == nil {
-					break
-				}
-				fmt.Println("Error:", err)
-				db.Create(&GenerationError{
-					Model:         string(model),
-					ErrorMessage:  err.Error(),
-					AttemptedText: chunk,
-				})
-
-				time.Sleep(15 * time.Second)
-			}
-
-			var tagData struct {
-				Topics []string `json:"topics"`
-			}
-
-			body := []byte(response.Choices[0].Message.Content)
-			err = json.Unmarshal(body, &tagData)
-			if err != nil {
-				// Try to reparse if the response ends in a single ] character
-				if string(body[len(body)-1]) == "]" {
-					body = append(body, byte('}'))
-					err = json.Unmarshal(body, &tagData)
-					if err != nil {
-						fmt.Println("Failed to unmarshal fixed repsonse", err)
-					}
-				}
-			}
-
-			for _, tagName := range tagData.Topics {
-				tag := GetTag(db, tagName)
-
-				tagRel := GovtRssItemTag{
-					GovtRssItemId: item.ID,
-					TagId:         tag.ID,
-				}
-
-				db.Create(&tagRel)
-				fmt.Println("ADDED TAG", tagName, "---> ", tagRel.ID, tagRel.GovtRssItemId, tagRel.TagId)
-			}
-
-			fmt.Println("Tokens Consumed", response.Usage.TotalTokens, response.Usage.PromptTokens, response.Usage.CompletionTokens)
-		}
+		ProcessLawTextForTags(item, db)
 	}
+}
 
+func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
+
+	var item GovtLawText
+	db.First(&item, "govt_rss_item_id = ?", src.ID)
+
+	var count int64
+	db.Model(&GovtRssItemTag{}).Where("govt_rss_item_id = ?", src.ID).Count(&count)
+
+	fmt.Println("Target item already has tags:", count)
+
+	textOffset := 0
+	for _, chunk := range ChunkTextIntoTokenBlocks(item.Text, 1000, 500) {
+		var response GroqChatCompletion
+		var err error
+		for i := 0; i < 3; i++ {
+			model := Llama3_8B
+			response, err = CallGroqChatApi(model, GetPrompt().PromptText, chunk)
+			if err == nil {
+				break
+			}
+			fmt.Println("Error:", err)
+			db.Create(&GenerationError{
+				Model:         string(model),
+				ErrorMessage:  err.Error(),
+				AttemptedText: chunk,
+			})
+
+			time.Sleep(15 * time.Second)
+		}
+
+		var tagData struct {
+			Topics []string `json:"topics"`
+		}
+
+		body := []byte(response.Choices[0].Message.Content)
+		err = json.Unmarshal(body, &tagData)
+		if err != nil {
+			// Try to reparse if the response ends in a single ] character
+			if string(body[len(body)-1]) == "]" {
+				body = append(body, byte('}'))
+				err = json.Unmarshal(body, &tagData)
+				if err != nil {
+					fmt.Println("Failed to unmarshal fixed repsonse", err)
+				}
+			}
+		}
+
+		for _, tagName := range tagData.Topics {
+			tag := GetTag(db, tagName)
+
+			tagRel := GovtRssItemTag{
+				GovtRssItemId: item.ID,
+				TagId:         tag.ID,
+				LawTextOffset: uint(textOffset),
+			}
+
+			db.Create(&tagRel)
+			fmt.Println("ADDED TAG", tagName, "---> ", tagRel.ID, tagRel.GovtRssItemId, tagRel.TagId)
+		}
+
+		fmt.Println("Tokens Consumed", response.Usage.TotalTokens, response.Usage.PromptTokens, response.Usage.CompletionTokens)
+		textOffset += len(chunk)
+	}
 }
 
 func downloadLawFullText(url string) string {

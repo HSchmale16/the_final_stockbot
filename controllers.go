@@ -198,9 +198,3 @@ func LawView(c *fiber.Ctx) error {
 		"LawText": lawText,
 	}, "layouts/main")
 }
-
-func main() {
-	//FederalRegisterParser()
-	go DoBigApp()
-	SetupServer()
-}
