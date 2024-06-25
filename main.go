@@ -30,7 +30,11 @@ func main() {
 		var item GovtRssItem
 		db.First(&item, reprocessId)
 
-		ProcessLawTextForTags(item, db)
+		var item2 GovtLawText
+		db.First(&item2, "govt_rss_item_id = ?", item.ID)
+
+		//ProcessLawTextForTags(item, db)
+		processModsXML(item2.ModsXML)
 	}
 
 	if !disableFetcherService {

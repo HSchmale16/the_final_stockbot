@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
@@ -24,6 +25,32 @@ var templates embed.FS
 //go:embed all:static
 var embedDirStatic embed.FS
 
+func GetTemplateEngine() fiber.Views {
+	subFS, err := fs.Sub(templates, "html_templates")
+	if err != nil {
+		panic(err)
+	}
+	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
+	engine.Debug(true)
+	engine.AddFunc("formatDate", func(date string) string {
+		// parse the date from isoformat 2023-11-08 00:22:00 +0000 UTC to Jan 2, 2006
+		date = date[:10]
+		layout := "2006-01-02"
+		t, err := time.Parse(layout, date)
+		if err != nil {
+			fmt.Println(err)
+			return "FUCK!"
+		}
+		return t.Format("Jan 2, 2006")
+	})
+
+	for k := range engine.Templates {
+		fmt.Println(k)
+	}
+
+	return engine
+}
+
 func SetupServer() {
 	db, err := setupDB()
 	if err != nil {
@@ -31,19 +58,9 @@ func SetupServer() {
 	}
 
 	//engine := handlebars.New("./html_templates", ".hbs")
-	subFS, err := fs.Sub(templates, "html_templates")
-	if err != nil {
-		panic(err)
-	}
-	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
-	engine.Debug(true)
-
-	for k := range engine.Templates {
-		fmt.Println(k)
-	}
 
 	app := fiber.New(fiber.Config{
-		Views: engine,
+		Views: GetTemplateEngine(),
 	})
 
 	// Logging Request ID
@@ -74,6 +91,9 @@ func SetupServer() {
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/law/:law_id", LawView)
 	app.Get("/laws", LawIndex)
+	app.Get("/help", func(c *fiber.Ctx) error {
+		return c.Render("help", fiber.Map{}, "layouts/main")
+	})
 
 	app.Listen(":8080")
 }
@@ -153,7 +173,7 @@ func TopicSearch(c *fiber.Ctx) error {
 		Where("govt_rss_item.pub_date > ?", "2023").
 		Group("tag_id").
 		Order("COUNT(*) DESC").
-		Limit(300).
+		Limit(500).
 		Scan(&results)
 
 	var minCount, maxCount int64
@@ -170,11 +190,10 @@ func TopicSearch(c *fiber.Ctx) error {
 		}
 	}
 
-	// c.HTML(200, "tag_search.html", gin.H{
-	// 	"Tags":     results,
-	// 	"MinCount": minCount,
-	// 	"MaxCount": maxCount,
-	// })
+	db.Create(&SearchQuery{
+		Query:      c.FormValue("search"),
+		NumResults: len(results),
+	})
 
 	return c.Render("tag_search", fiber.Map{
 		"Tags":     results,

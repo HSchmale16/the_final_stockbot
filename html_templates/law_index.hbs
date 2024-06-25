@@ -3,12 +3,10 @@
 
     {{#each Laws }}
     <div class="law">
-        <h2>{{ PubDate }}<a href="/law/{{ ID }}">{{{ Title }}}</a></h2>
-        {{!-- <div class="tags">
-            {{#each Tags}}
-            <span class="tag"><a href="/tag/{{ ID }}">{{ Name }}</a></span>
-            {{/each}}
-        </div> --}}
+        <h2>{{{ Title }}}</h2>
+        <small>Published on {{formatDate PubDate }}</small>
+        <p>{{ Description }}</p>
+        <a href="/law/{{ ID }}">Read more</a>
     </div>
     {{/each}}
 </div>

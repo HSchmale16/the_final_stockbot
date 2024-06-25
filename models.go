@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -97,10 +96,17 @@ type GovtRssItemTag struct {
 
 	GovtRssItemId uint `gorm:"index:,unique,composite:myname"`
 	TagId         uint `gorm:"index:,unique,composite:myname"`
-	LawTextOffset uint `gorm:"index:,unique,composite:myname"`
 
 	GovtRssItem GovtRssItem
 	Tag         Tag
+	LawOffsets  []LawOffset
+}
+
+type LawOffset struct {
+	ID               uint
+	GovtRssItemTagId uint
+	CreatedAt        time.Time
+	Offset           int
 }
 
 // Add a compound unique index on GovtRssItemId and TagId
@@ -121,6 +127,17 @@ func (GenerationError) TableName() string {
 	return "generation_error"
 }
 
+type SearchQuery struct {
+	ID         uint
+	CreatedAt  time.Time
+	Query      string
+	NumResults int
+}
+
+func (SearchQuery) TableName() string {
+	return "search_query"
+}
+
 /**
  * Sets up the stupid database
  */
@@ -129,11 +146,11 @@ func setupDB() (*gorm.DB, error) {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
-			SlowThreshold:             time.Second,   // Slow SQL threshold
-			LogLevel:                  logger.Silent, // Log level
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-			ParameterizedQueries:      true,          // Don't include params in the SQL log
-			Colorful:                  false,         // Disable color
+			SlowThreshold:             100 * time.Millisecond, // Slow SQL threshold
+			LogLevel:                  logger.Silent,          // Log level
+			IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      true,                   // Don't include params in the SQL log
+			Colorful:                  false,                  // Disable color
 		},
 	)
 
@@ -146,11 +163,15 @@ func setupDB() (*gorm.DB, error) {
 	}
 
 	// Auto migrate models
-	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}); err != nil {
+	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}, &LawOffset{}); err != nil {
 		return nil, err
 	}
 
 	if err := db.AutoMigrate(&FederalRegisterItem{}); err != nil {
+		return nil, err
+	}
+
+	if err := db.AutoMigrate(&SearchQuery{}); err != nil {
 		return nil, err
 	}
 
@@ -161,7 +182,7 @@ func GetTag(db *gorm.DB, tagName string) Tag {
 	tag := Tag{Name: cases.Title(language.Und).String(tagName)}
 
 	db.FirstOrCreate(&tag, tag)
-	fmt.Println("Tag:", tagName, " --> ", tag)
+	// fmt.Println("Tag:", tagName, " --> ", tag)
 
 	return tag
 }

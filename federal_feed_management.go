@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -82,7 +83,7 @@ func RunFetcherService() {
 		}
 
 		text := downloadLawFullText(item.FullTextUrl)
-		mods := downloadLawFullText(item.DescriptiveMetaUrl)
+		mods := downloadModsXML(item.DescriptiveMetaUrl)
 
 		db.Create(&GovtLawText{
 			GovtRssItemId: item.ID,
@@ -95,7 +96,6 @@ func RunFetcherService() {
 }
 
 func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
-
 	var item GovtLawText
 	db.First(&item, "govt_rss_item_id = ?", src.ID)
 
@@ -144,19 +144,60 @@ func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 		for _, tagName := range tagData.Topics {
 			tag := GetTag(db, tagName)
 
-			tagRel := GovtRssItemTag{
-				GovtRssItemId: item.ID,
+			// Check if the tag relationship already exists
+			var count int64
+			db.Model(&GovtRssItemTag{}).Where("govt_rss_item_id = ? AND tag_id = ?", src.ID, tag.ID).Count(&count)
+
+			var myGovt = GovtRssItemTag{
+				GovtRssItemId: src.ID,
 				TagId:         tag.ID,
-				LawTextOffset: uint(textOffset),
 			}
 
-			db.Create(&tagRel)
-			fmt.Println("ADDED TAG", tagName, "---> ", tagRel.ID, tagRel.GovtRssItemId, tagRel.TagId)
+			db.FirstOrCreate(&myGovt, myGovt)
+			db.Create(&LawOffset{
+				GovtRssItemTagId: myGovt.ID,
+				Offset:           textOffset,
+			})
 		}
 
 		fmt.Println("Tokens Consumed", response.Usage.TotalTokens, response.Usage.PromptTokens, response.Usage.CompletionTokens)
 		textOffset += len(chunk)
 	}
+}
+
+func downloadModsXML(url string) string {
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Failed to make GET request:", err)
+		return ""
+	}
+	defer resp.Body.Close()
+
+	// Read the body and return the string
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Failed to read body:", err)
+		return ""
+	}
+
+	return string(body)
+}
+
+type ModsInfo struct {
+	Title string
+}
+
+func processModsXML(xml string) {
+	// Parse the XML data
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(xml))
+	if err != nil {
+		fmt.Println("Failed to parse XML data:", err)
+		return
+	}
+
+	// Find the title tag and print the text
+	fmt.Println(doc.Text())
+
 }
 
 func downloadLawFullText(url string) string {

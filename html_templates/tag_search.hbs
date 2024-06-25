@@ -2,4 +2,7 @@
     {{#each Tags }} 
         <span class="tag"><a href="/tag/{{ TagId }}">{{ Name }}</a></span>
     {{/each}}
+    {{#unless Tags}}
+        <span class="no-tags">No tags available</span>
+    {{/unless}}
 </div>
