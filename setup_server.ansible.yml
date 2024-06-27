@@ -22,6 +22,7 @@
           - git
           - git-lfs
           - graphviz
+          - certbot
         state: present
         update_cache: true
     - name: Configure Firewall
