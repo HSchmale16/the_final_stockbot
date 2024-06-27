@@ -17,8 +17,8 @@ function fetchDataForChamber(chamber) {
 function drawNetwork(data) {
     // Use d3 to render the nodes
 
-    const width = 1200;
-    const height = 1200;
+    const width = 800;
+    const height = 800;
 
     const links = data.edges.map(d => ({ ...d }));
     const nodes = data.nodes.map(d => ({ ...d }));
