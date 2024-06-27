@@ -28,7 +28,7 @@ function drawNetwork(data) {
 
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.BioGuideId))
-        .force("charge", d3.forceManyBody().strength(-1))
+        .force("charge", d3.forceManyBody().strength(-5))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .on("tick", ticked);
 
