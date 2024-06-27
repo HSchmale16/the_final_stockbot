@@ -1,0 +1,183 @@
+<mods xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/mods/v3" version="3.3" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd" ID="P0b002ee1c85ed088">
+    <name type="corporate">
+         <namePart>United States Government Publishing Office</namePart>
+         <role>
+              <roleTerm authority="marcrelator" type="text">publisher</roleTerm>
+              <roleTerm authority="marcrelator" type="code">pbl</roleTerm>
+        </role>
+         <role>
+              <roleTerm authority="marcrelator" type="text">distributor</roleTerm>
+              <roleTerm authority="marcrelator" type="code">dst</roleTerm>
+        </role>
+    </name>
+    <name type="corporate">
+         <namePart>United States</namePart>
+         <namePart>Congress</namePart>
+         <namePart>House of Representatives</namePart>
+         <role>
+              <roleTerm authority="marcrelator" type="text">author</roleTerm>
+              <roleTerm authority="marcrelator" type="code">aut</roleTerm>
+        </role>
+         <description>Government Organization</description>
+    </name>
+    <typeOfResource>text</typeOfResource>
+    <genre authority="marcgt">government publication</genre>
+    <language>
+         <languageTerm type="code" authority="iso639-2b">eng</languageTerm>
+    </language>
+    <extension>
+         <collectionCode>BILLS</collectionCode>
+         <searchTitle>Rejecting the United Nations decision to place the Israel Defense Force on a list of child’s rights abusers.;H. Res. 1323 (IH)
+    </searchTitle>
+         <category>Bills and Statutes</category>
+         <waisDatabaseName>118_cong_bills</waisDatabaseName>
+         <branch>legislative</branch>
+         <dateIngested>2024-06-27</dateIngested>
+    </extension>
+    <titleInfo>
+         <title>Rejecting the United Nations decision to place the Israel Defense Force on a list of child’s rights abusers.</title>
+    </titleInfo>
+    <titleInfo type="alternative">
+         <title>H. Res. 1323 (IH)
+    </title>
+    </titleInfo>
+    <originInfo>
+         <publisher>U.S. Government Publishing Office</publisher>
+         <dateIssued encoding="w3cdtf">2024-06-26</dateIssued>
+         <issuance>monographic</issuance>
+    </originInfo>
+    <physicalDescription>
+         <note type="source content type">deposited</note>
+         <digitalOrigin>born digital</digitalOrigin>
+         <extent>3 p.</extent>
+    </physicalDescription>
+    <classification authority="sudocs">Y 1.6:</classification>
+    <classification authority="sudocs">Y 1.4/7:</classification>
+    <identifier type="local">P0b002ee1c85ed088</identifier>
+    <identifier type="uri">https://www.govinfo.gov/app/details/BILLS-118hres1323ih</identifier>
+    <identifier type="preferred citation">H. Res. 1323</identifier>
+    <identifier type="stock number">021-610-00252-9</identifier>
+    <identifier type="Parent ILS system id">000501532</identifier>
+    <identifier type="Child ILS system id">000325574</identifier>
+    <identifier type="Parent ILS title">Congressional bills</identifier>
+    <identifier type="Child ILS title">House resolutions</identifier>
+    <identifier type="former package identifier">f:hr1323_ih.txt</identifier>
+    <location>
+         <url displayLabel="Content Detail" access="object in context">https://www.govinfo.gov/app/details/BILLS-118hres1323ih</url>
+         <url displayLabel="HTML rendition" access="raw object">https://www.govinfo.gov/content/pkg/BILLS-118hres1323ih/html/BILLS-118hres1323ih.htm</url>
+         <url displayLabel="PDF rendition" access="raw object">https://www.govinfo.gov/content/pkg/BILLS-118hres1323ih/pdf/BILLS-118hres1323ih.pdf</url>
+         <url displayLabel="XML rendition" access="raw object">https://www.govinfo.gov/content/pkg/BILLS-118hres1323ih/xml/BILLS-118hres1323ih.xml</url>
+    </location>
+    <accessCondition type="GPO scope determination">fdlp</accessCondition>
+    <recordInfo>
+         <recordContentSource authority="marcorg">DGPO</recordContentSource>
+         <recordCreationDate encoding="w3cdtf">2024-06-27</recordCreationDate>
+         <recordChangeDate encoding="w3cdtf">2024-06-27</recordChangeDate>
+         <recordIdentifier source="DGPO">BILLS-118hres1323ih</recordIdentifier>
+         <recordOrigin>machine generated</recordOrigin>
+         <languageOfCataloging>
+              <languageTerm type="code" authority="iso639-2b">eng</languageTerm>
+        </languageOfCataloging>
+    </recordInfo>
+    <name type="personal">
+         <namePart>Tim Burchett</namePart>
+         <affiliation>United States House of Representatives</affiliation>
+         <role>
+              <roleTerm authority="marcrelator" type="text">sponsor</roleTerm>
+              <roleTerm authority="marcrelator" type="code">spn</roleTerm>
+        </role>
+         <description>United States Congress Member</description>
+    </name>
+    <name type="personal">
+         <namePart>Jared Moskowitz</namePart>
+         <affiliation>United States House of Representatives</affiliation>
+         <role>
+              <roleTerm type="text">cosponsor</roleTerm>
+        </role>
+         <description>United States Congress Member</description>
+    </name>
+    <name type="personal">
+         <namePart>Michael Lawler</namePart>
+         <affiliation>United States House of Representatives</affiliation>
+         <role>
+              <roleTerm type="text">cosponsor</roleTerm>
+        </role>
+         <description>United States Congress Member</description>
+    </name>
+    <name type="personal">
+         <namePart>Josh Gottheimer</namePart>
+         <affiliation>United States House of Representatives</affiliation>
+         <role>
+              <roleTerm type="text">cosponsor</roleTerm>
+        </role>
+         <description>United States Congress Member</description>
+    </name>
+    <name type="corporate">
+         <namePart>United States</namePart>
+         <namePart>Congress</namePart>
+         <namePart>House of Representatives</namePart>
+         <namePart>Committee on Foreign Affairs</namePart>
+         <role>
+              <roleTerm authority="marcrelator" type="text">associated name</roleTerm>
+              <roleTerm authority="marcrelator" type="code">asn</roleTerm>
+        </role>
+    </name>
+    <extension>
+         <docClass>hres</docClass>
+         <accessId>BILLS-118hres1323ih</accessId>
+         <congress>118</congress>
+         <session>2</session>
+         <originChamber>HOUSE</originChamber>
+         <currentChamber>HOUSE</currentChamber>
+         <billNumber>1323</billNumber>
+         <billVersion reprint="false">ih</billVersion>
+         <fileSuffix>ih</fileSuffix>
+         <officialTitle>Rejecting the United Nations decision to place the Israel Defense Force on a list of child’s rights abusers.</officialTitle>
+         <action date="2024-06-26">Mr. Burchett (for himself, Mr. Moskowitz, Mr. Lawler, and Mr. Gottheimer) submitted the following resolution; which was referred to the Committee on Foreign Affairs</action>
+         <congCommittee authorityId="hsfa00" chamber="H" congress="118" type="S">
+                                
+              <name type="authority-standard">Committee on Foreign Affairs</name>
+                                
+              <name type="authority-short">Foreign Affairs</name>
+                            
+        </congCommittee>
+         <congMember bioGuideId="B001309" chamber="H" congress="118" party="R" role="SPONSOR" state="TN">
+                                
+              <name type="parsed">Mr. Burchett</name>
+                                
+              <name type="authority-fnf">Tim Burchett</name>
+                                
+              <name type="authority-lnf">Burchett, Tim</name>
+                            
+        </congMember>
+         <congMember bioGuideId="M001217" chamber="H" congress="118" party="D" role="COSPONSOR" state="FL">
+                                
+              <name type="parsed">Mr. Moskowitz</name>
+                                
+              <name type="authority-fnf">Jared Moskowitz</name>
+                                
+              <name type="authority-lnf">Moskowitz, Jared</name>
+                            
+        </congMember>
+         <congMember bioGuideId="L000599" chamber="H" congress="118" party="R" role="COSPONSOR" state="NY">
+                                
+              <name type="parsed">Mr. Lawler</name>
+                                
+              <name type="authority-fnf">Michael Lawler</name>
+                                
+              <name type="authority-lnf">Lawler, Michael</name>
+                            
+        </congMember>
+         <congMember bioGuideId="G000583" chamber="H" congress="118" party="D" role="COSPONSOR" state="NJ">
+                                
+              <name type="parsed">Mr. Gottheimer</name>
+                                
+              <name type="authority-fnf">Josh Gottheimer</name>
+                                
+              <name type="authority-lnf">Gottheimer, Josh</name>
+                            
+        </congMember>
+         <isPrivate>false</isPrivate>
+         <isAppropriation>false</isAppropriation>
+    </extension>
+</mods>

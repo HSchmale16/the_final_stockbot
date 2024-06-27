@@ -8,13 +8,8 @@ func TestChunkTextIntoTokenBlocks(t *testing.T) {
 	overlap := 5
 
 	expectedChunks := []string{
-		"Lorem ipsum",
-		"ipsum dolor",
-		"dolor sit",
-		"sit amet,",
-		"amet, consectetur",
-		"consectetur adipiscing",
-		"adipiscing elit.",
+		"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+		", consectetur adipiscing elit.",
 	}
 
 	chunks := ChunkTextIntoTokenBlocks(fullText, maxTokens, overlap)

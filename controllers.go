@@ -1,55 +1,20 @@
 package main
 
 import (
-	"embed"
 	"fmt"
 	"html"
-	"io/fs"
-	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gofiber/template/handlebars/v2"
+	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
-
-//go:embed html_templates/*
-var templates embed.FS
-
-//go:embed all:static
-var embedDirStatic embed.FS
-
-func GetTemplateEngine() fiber.Views {
-	subFS, err := fs.Sub(templates, "html_templates")
-	if err != nil {
-		panic(err)
-	}
-	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
-	engine.Debug(true)
-	engine.AddFunc("formatDate", func(date string) string {
-		// parse the date from isoformat 2023-11-08 00:22:00 +0000 UTC to Jan 2, 2006
-		date = date[:10]
-		layout := "2006-01-02"
-		t, err := time.Parse(layout, date)
-		if err != nil {
-			fmt.Println(err)
-			return "FUCK!"
-		}
-		return t.Format("Jan 2, 2006")
-	})
-
-	for k := range engine.Templates {
-		fmt.Println(k)
-	}
-
-	return engine
-}
 
 func SetupServer() {
 	db, err := setupDB()
@@ -70,11 +35,11 @@ func SetupServer() {
 		Format: "${pid} ${latency} ${locals:requestid} ${status} - ${method} ${path}\n",
 	}))
 
-	app.Use("/static", filesystem.New(filesystem.Config{
-		Root:       http.FS(embedDirStatic),
-		PathPrefix: "static",
-		Browse:     true,
-	}))
+	// Serve static files only on debug mode
+	if os.Getenv("DEBUG") == "true" {
+
+		app.Static("/static", "./static")
+	}
 
 	// Middleware to pass db instance
 	app.Use(func(c *fiber.Ctx) error {
@@ -94,6 +59,7 @@ func SetupServer() {
 	app.Get("/help", func(c *fiber.Ctx) error {
 		return c.Render("help", fiber.Map{}, "layouts/main")
 	})
+	app.Get("/congress-network", CongressNetwork)
 
 	app.Listen(":8080")
 }
@@ -112,14 +78,18 @@ func TagList(c *fiber.Ctx) error {
 func Index(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var articleTags, totalTags int64
+	var articleTags, totalTags, totalLaws int64
 	db.Model(&GovtRssItemTag{}).Count(&articleTags)
 	db.Model(&Tag{}).Count(&totalTags)
+	db.Model(&GovtRssItem{}).Count(&totalLaws)
+
+	p := message.NewPrinter(message.MatchLanguage("en"))
 
 	return c.Render("index", fiber.Map{
 		"Title":       "Congress Magnifying Glass",
-		"TotalTopics": articleTags,
-		"TotalTags":   totalTags,
+		"TotalTopics": p.Sprintf("%d", articleTags),
+		"TotalTags":   p.Sprintf("%d", totalTags),
+		"TotalLaws":   p.Sprintf("%d", totalLaws),
 	}, "layouts/main")
 }
 
@@ -127,7 +97,12 @@ func LawIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var laws []GovtRssItem
-	db.Order("pub_date DESC").Limit(100).Preload(clause.Associations).Find(&laws)
+	// Pub date before
+	x := db.Debug().Order("pub_date DESC").Limit(50) //.Find(&laws)
+	if c.FormValue("before") != "" {
+		x = x.Where("pub_date <= ?", c.FormValue("before"))
+	}
+	x.Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
 		"Title": "Most Recent Laws",
@@ -211,9 +186,65 @@ func LawView(c *fiber.Ctx) error {
 	var lawText GovtLawText
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
 
+	metadata := ReadLawModsData(lawText.ModsXML)
+
 	return c.Render("law_view", fiber.Map{
-		"Title":   html.UnescapeString(law.Title),
-		"Law":     law,
-		"LawText": lawText,
+		"Title":    html.UnescapeString(law.Title),
+		"Law":      law,
+		"LawText":  lawText,
+		"Metadata": metadata,
+	}, "layouts/main")
+}
+
+func CongressNetwork(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var results []struct {
+		RssId   int64
+		ModsXML string
+		PubDate time.Time
+	}
+	db.Raw("SELECT govt_rss_item.id as rss_id, govt_rss_item.pub_date, govt_law_text.mods_xml FROM govt_rss_item JOIN govt_law_text ON govt_law_text.govt_rss_item_id = govt_rss_item.id").Scan(&results)
+
+	// Create a bigraph of all the congress critters who work together
+	type Edge struct {
+		Source CongressMember
+		Target CongressMember
+	}
+
+	edges := make(map[Edge]int)
+
+	for _, result := range results {
+		mods := ReadLawModsData(result.ModsXML)
+		if len(mods.CongressMembers) == 0 {
+			continue
+		}
+		sponser := mods.CongressMembers[0]
+		for _, member := range mods.CongressMembers[1:] {
+			edge := Edge{
+				Source: sponser,
+				Target: member,
+			}
+			edges[edge]++
+		}
+	}
+
+	type s struct {
+		Edge
+		Count int
+	}
+
+	edges_array := make([]s, 0, len(edges))
+
+	for edge, count := range edges {
+		edges_array = append(edges_array, s{
+			Edge:  edge,
+			Count: count,
+		})
+	}
+	fmt.Println(len(edges_array))
+
+	return c.Render("congress_network", fiber.Map{
+		"Edges": edges_array,
 	}, "layouts/main")
 }

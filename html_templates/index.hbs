@@ -11,8 +11,20 @@
     </p>
     <p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on topics have changed.</p>
 
+    <div class="row">
+        <div class="col-4">
+            {{> 'partials/gauge' title="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
+        </div>
+        <div class="col-4">
+            {{> 'partials/gauge' title="Total Tags Applied" value=TotalTopics }}
+        </div>
+        <div class="col-4">
+            {{> 'partials/gauge' title="Total Laws Indexed" value=TotalLaws }}
+        </div>
+    </div>
+
     <h3>
-        Search Topics ({{ TotalTags }} / {{ TotalTopics}})
+        Search Topics
         <span class="htmx-indicator">
             <img src="/img/bars.svg" /> Searching...
         </span>

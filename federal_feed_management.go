@@ -222,7 +222,6 @@ func downloadLawFullText(url string) string {
 }
 
 func handleLawRss(rssLink string, ch LawRssItemChannel) {
-	defer close(ch)
 	// Parse the RSS feed using gofeed
 	parser := gofeed.NewParser()
 	feed, err := parser.ParseURL(rssLink)

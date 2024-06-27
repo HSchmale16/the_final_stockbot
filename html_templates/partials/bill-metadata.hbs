@@ -1,0 +1,18 @@
+<div class="bill-metadata">
+    <h2>Bill Metadata</h2>
+
+    <h3>Congress Members</h3>
+    <ul>
+        {{#each Metadata.CongressMembers}}
+        <li><a href="https://bioguide.congress.gov/search/bio/{{ BioGuideId }}">
+            {{ Name }} ({{Party}} - {{State}}) ({{Role}})
+        </a></li>
+        {{/each}}
+    </ul>
+    <h3>Committees</h3>
+    <ul>
+        {{#each Metadata.CongressCommittees}}
+        <li>{{ Name }} ({{Chamber}})</li>
+        {{/each}}
+    </ul>
+</div>
