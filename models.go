@@ -71,6 +71,10 @@ type GovtLawText struct {
 	GovtRssItem   GovtRssItem
 	Text          string
 	ModsXML       string
+
+	// Many to many relationship to represent the mods info
+	CongressMembers    []CongressPerson       `gorm:"many2many:govt_law_text_congress_member;"`
+	CongressCommittees []DB_CongressCommittee `gorm:"many2many:govt_law_text_congress_committee;"`
 }
 
 func (GovtLawText) TableName() string {
@@ -138,6 +142,17 @@ func (SearchQuery) TableName() string {
 	return "search_query"
 }
 
+// //////////////////////////////////////////////////////
+type CongressPerson struct {
+	ID uint
+	CongressMember
+}
+
+type DB_CongressCommittee struct {
+	ID uint
+	CongressCommittee
+}
+
 /**
  * Sets up the stupid database
  */
@@ -171,7 +186,7 @@ func setupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&SearchQuery{}); err != nil {
+	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressCommittee{}, &CongressPerson{}); err != nil {
 		return nil, err
 	}
 

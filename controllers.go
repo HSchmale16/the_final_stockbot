@@ -269,5 +269,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 }
 
 func CongressNetworkLayout(c *fiber.Ctx) error {
-	return c.Render("congress_network", fiber.Map{}, "layouts/main")
+	return c.Render("congress_network", fiber.Map{
+		"Title": "Congress Network Visualization",
+	}, "layouts/main")
 }

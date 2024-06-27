@@ -16,6 +16,7 @@ import (
 
 var rssLinks = []string{
 	"https://www.govinfo.gov/rss/bills.xml",
+	"https://www.govinfo.gov/rss/bills-enr.xml",
 	"https://www.govinfo.gov/rss/plaw.xml",
 }
 

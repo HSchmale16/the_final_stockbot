@@ -83,10 +83,13 @@ function drawNetwork(data) {
         // Remove any previous highlights
         d3.selectAll('circle').attr('r', 5).attr('fill', d => d.Party === "R" ? "red" : "blue");
 
-        // Find and highlight the node that matches the search term
-        d3.selectAll('circle').filter(d => d.Name.toLowerCase().includes(searchTerm))
-            .attr('r', 10) // Increase size
-            .attr('fill', 'green'); // Change color
+
+        if (searchTerm !== "") {
+            // Find and highlight the node that matches the search term
+            d3.selectAll('circle').filter(d => d.Name.toLowerCase().includes(searchTerm))
+                .attr('r', 10) // Increase size
+                .attr('fill', 'green'); // Change color
+        }
     });
 
     // Put my svg in #container
