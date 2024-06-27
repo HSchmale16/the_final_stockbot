@@ -59,7 +59,8 @@ func SetupServer() {
 	app.Get("/help", func(c *fiber.Ctx) error {
 		return c.Render("help", fiber.Map{}, "layouts/main")
 	})
-	app.Get("/congress-network", CongressNetwork)
+	app.Get("/json/congress-network", CongressNetwork)
+	app.Get("/congress-network", CongressNetworkLayout)
 
 	app.Listen(":8080")
 }
@@ -208,11 +209,12 @@ func CongressNetwork(c *fiber.Ctx) error {
 
 	// Create a bigraph of all the congress critters who work together
 	type Edge struct {
-		Source CongressMember
-		Target CongressMember
+		Source string `json:"source"`
+		Target string `json:"target"`
 	}
 
 	edges := make(map[Edge]int)
+	nodes := make(map[string]CongressMember)
 
 	for _, result := range results {
 		mods := ReadLawModsData(result.ModsXML)
@@ -220,10 +222,19 @@ func CongressNetwork(c *fiber.Ctx) error {
 			continue
 		}
 		sponser := mods.CongressMembers[0]
+		nodes[sponser.BioGuideId] = sponser
 		for _, member := range mods.CongressMembers[1:] {
 			edge := Edge{
-				Source: sponser,
-				Target: member,
+				Source: sponser.BioGuideId,
+				Target: member.BioGuideId,
+			}
+			nodes[member.BioGuideId] = member
+			edges[edge]++
+
+			// reverse the edge
+			edge = Edge{
+				Source: member.BioGuideId,
+				Target: sponser.BioGuideId,
 			}
 			edges[edge]++
 		}
@@ -231,7 +242,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 
 	type s struct {
 		Edge
-		Count int
+		Value int `json:"value"`
 	}
 
 	edges_array := make([]s, 0, len(edges))
@@ -239,12 +250,22 @@ func CongressNetwork(c *fiber.Ctx) error {
 	for edge, count := range edges {
 		edges_array = append(edges_array, s{
 			Edge:  edge,
-			Count: count,
+			Value: count,
 		})
 	}
 	fmt.Println(len(edges_array))
 
-	return c.Render("congress_network", fiber.Map{
-		"Edges": edges_array,
-	}, "layouts/main")
+	node_values := make([]CongressMember, 0, len(nodes))
+	for _, v := range nodes {
+		node_values = append(node_values, v)
+	}
+
+	return c.JSON(fiber.Map{
+		"nodes": node_values,
+		"edges": edges_array,
+	})
+}
+
+func CongressNetworkLayout(c *fiber.Ctx) error {
+	return c.Render("congress_network", fiber.Map{}, "layouts/main")
 }
