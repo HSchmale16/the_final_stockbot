@@ -1,8 +1,12 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 
-window.onload = function () {
-    fetch("/json/congress-network")
+function fetchDataForChamber(chamber) {
+    // Clear it before generating new element
+    document.getElementById("container").innerHTML = "";
+
+    // load the data
+    fetch("/json/congress-network?" + new URLSearchParams({chamber: chamber}))
         .then(response => response.json())
         .then(data => {
             drawNetwork(data);
@@ -14,7 +18,7 @@ function drawNetwork(data) {
     // Use d3 to render the nodes
 
     const width = 1200;
-    const height = 800;
+    const height = 1200;
 
     const links = data.edges.map(d => ({...d}));
     const nodes = data.nodes.map(d => ({...d}));
@@ -24,7 +28,7 @@ function drawNetwork(data) {
 
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.BioGuideId))
-        .force("charge", d3.forceManyBody())
+        .force("charge", d3.forceManyBody().strength(-1))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .on("tick", ticked);
 
@@ -70,3 +74,5 @@ function drawNetwork(data) {
             .attr("cy", d => d.y);
     }
 }
+
+window.fetchDataForChamber = fetchDataForChamber;

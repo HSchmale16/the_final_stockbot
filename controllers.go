@@ -200,6 +200,8 @@ func LawView(c *fiber.Ctx) error {
 func CongressNetwork(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
+	chamber := c.FormValue("chamber")
+
 	var results []struct {
 		RssId   int64
 		ModsXML string
@@ -218,7 +220,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 
 	for _, result := range results {
 		mods := ReadLawModsData(result.ModsXML)
-		if len(mods.CongressMembers) == 0 {
+		if len(mods.CongressMembers) == 0 || mods.CongressMembers[0].Chamber != chamber {
 			continue
 		}
 		sponser := mods.CongressMembers[0]
@@ -229,7 +231,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 				Target: member.BioGuideId,
 			}
 			nodes[member.BioGuideId] = member
-			edges[edge]++
+			edges[edge] += 2
 
 			// reverse the edge
 			edge = Edge{

@@ -21,6 +21,7 @@
           - nginx
           - git
           - git-lfs
+          - graphviz
         state: present
         update_cache: true
     - name: Configure Firewall

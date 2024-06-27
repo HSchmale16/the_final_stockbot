@@ -1,5 +1,31 @@
 <h1>Congress Network</h1>
 
+
+<p>
+    This visualization shows the network of congress members based on their co-sponsorship of bills.
+    Each node represents a congress member, and each edge represents a bill that both members have co-sponsored.
+    The size of the node is proportional to the number of bills the member has co-sponsored.
+    The color of the node is based on the party of the member.
+    The color of the edge is based on the number of bills that the two members have co-sponsored.
+</p>
+
+{{!-- Radio Buttons for House or Senate per bootstrap --}}
+<div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
+        onchange="fetchDataForChamber('H')">
+    <label class="btn btn-outline-primary" for="btnradio1">House</label>
+
+    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
+        onchange="fetchDataForChamber('S')">
+    <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
+</div>
+
+
+
 <div id="container"></div>
 <script type="module" src="/static/viz-js/congress-network.js"></script>
-
+<script>
+    window.onload = () => {
+        fetchDataForChamber('H');
+    }
+</script>

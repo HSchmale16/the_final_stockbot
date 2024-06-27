@@ -20,6 +20,8 @@ type CongressMember struct {
 	BioGuideId string `xml:"bioGuideId,attr"`
 	Role       string `xml:"role,attr"`
 	Name       string `xml:"name"`
+	Chamber    string `xml:"chamber,attr"`
+	Congress   string `xml:"congress,attr"`
 }
 
 type LawModsData struct {
