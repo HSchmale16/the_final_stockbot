@@ -6,7 +6,7 @@ function fetchDataForChamber(chamber) {
     document.getElementById("container").innerHTML = "";
 
     // load the data
-    fetch("/json/congress-network?" + new URLSearchParams({chamber: chamber}))
+    fetch("/json/congress-network?" + new URLSearchParams({ chamber: chamber }))
         .then(response => response.json())
         .then(data => {
             drawNetwork(data);
@@ -20,8 +20,8 @@ function drawNetwork(data) {
     const width = 1200;
     const height = 1200;
 
-    const links = data.edges.map(d => ({...d}));
-    const nodes = data.nodes.map(d => ({...d}));
+    const links = data.edges.map(d => ({ ...d }));
+    const nodes = data.nodes.map(d => ({ ...d }));
 
 
     const simulation = d3.forceSimulation(nodes)
@@ -53,12 +53,12 @@ function drawNetwork(data) {
         .join("circle")
         .attr("r", 5)
         .attr("fill", d => d.Party === "R" ? "red" : "blue");
-    
+
 
     // When I hover over a node, show the name
     node.append("title")
         .text(d => `${d.Name} (${d.State} - ${d.Party})`);
-    
+
     node.call(d3.drag()
         .on("start", (event, d) => {
             if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -75,6 +75,19 @@ function drawNetwork(data) {
             d.fy = null;
         }))
 
+
+    const input = document.getElementById("search");
+    input.addEventListener('keyup', (event) => {
+        const searchTerm = event.target.value.toLowerCase();
+        console.log(searchTerm)
+        // Remove any previous highlights
+        d3.selectAll('circle').attr('r', 5).attr('fill', d => d.Party === "R" ? "red" : "blue");
+
+        // Find and highlight the node that matches the search term
+        d3.selectAll('circle').filter(d => d.Name.toLowerCase().includes(searchTerm))
+            .attr('r', 10) // Increase size
+            .attr('fill', 'green'); // Change color
+    });
 
     // Put my svg in #container
     document.getElementById("container").appendChild(svg.node());
