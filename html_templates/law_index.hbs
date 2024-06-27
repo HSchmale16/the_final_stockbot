@@ -1,12 +1,5 @@
 <div class="container">
     <h1>{{ Title }}</h1>
 
-    {{#each Laws }}
-    <div class="law">
-        <h2>{{{ Title }}}</h2>
-        <small>Published on {{formatDate PubDate }}</small>
-        <p>{{ Description }}</p>
-        <a href="/law/{{ ID }}">Read more</a>
-    </div>
-    {{/each}}
+    {{> 'partials/law-list' }}
 </div>

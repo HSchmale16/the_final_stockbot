@@ -9,7 +9,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
@@ -29,10 +28,9 @@ func SetupServer() {
 	})
 
 	// Logging Request ID
-	app.Use(requestid.New())
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
-		Format: "${pid} ${latency} ${locals:requestid} ${status} - ${method} ${path}\n",
+		Format: "${pid} ${latency} ${status} - ${method} ${path}?${queryParams}\n",
 	}))
 
 	// Serve static files only on debug mode
@@ -97,12 +95,25 @@ func Index(c *fiber.Ctx) error {
 func LawIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
+	// convert to int minus 1
+	page := c.Query("page", "missing")
+	LIMIT := 10
+
 	var laws []GovtRssItem
 	// Pub date before
-	x := db.Debug().Order("pub_date DESC").Limit(50) //.Find(&laws)
-	if c.FormValue("before") != "" {
-		x = x.Where("pub_date <= ?", c.FormValue("before"))
+	x := db.Debug().Order("pub_date DESC").Limit(LIMIT) //.Find(&laws)
+
+	if page != "missing" {
+
+		x.Where("pub_date < ?", page).Find(&laws)
+		// we don't use a layout here for htmx.
+		// fuck if I get why I'm using htmx
+		return c.Render("partials/law-list", fiber.Map{
+			"Title": "Most Recent Laws",
+			"Laws":  laws,
+		})
 	}
+
 	x.Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
