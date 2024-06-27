@@ -23,19 +23,18 @@ function drawNetwork(data) {
     const links = data.edges.map(d => ({...d}));
     const nodes = data.nodes.map(d => ({...d}));
 
-    console.log(links);
-    console.log(nodes)
 
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.BioGuideId))
-        .force("charge", d3.forceManyBody().strength(-5))
-        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("charge", d3.forceManyBody())
+        .force("x", d3.forceX())
+        .force("y", d3.forceY())
         .on("tick", ticked);
 
     const svg = d3.create("svg")
         .attr("width", width)
         .attr("height", height)
-        .attr("viewBox", [0, 0, width, height])
+        .attr("viewBox", [-width / 2, -height / 2, width, height])
         .attr("style", "max-width: 100%; height: auto;");
 
     const link = svg.append("g")
@@ -60,7 +59,23 @@ function drawNetwork(data) {
     node.append("title")
         .text(d => `${d.Name} (${d.State} - ${d.Party})`);
     
-    
+    node.call(d3.drag()
+        .on("start", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        })
+        .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+        })
+        .on("end", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }))
+
+
     // Put my svg in #container
     document.getElementById("container").appendChild(svg.node());
 
