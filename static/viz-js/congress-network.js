@@ -51,6 +51,10 @@ function drawNetwork(data) {
         .attr("r", 5)
         .attr("fill", d => d.Party === "R" ? "red" : "blue");
     
+
+    // When I hover over a node, show the name
+    node.append("title")
+        .text(d => `${d.Name} (${d.State} - ${d.Party})`);
     
     
     // Put my svg in #container
