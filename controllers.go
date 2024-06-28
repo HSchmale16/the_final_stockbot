@@ -70,6 +70,18 @@ func SetupServer() {
 	app.Get("/json/congress-network", CongressNetwork)
 	app.Get("/congress-network", CongressNetworkLayout)
 	app.Get("/tos", TermsOfService)
+	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
+		db := c.Locals("db").(*gorm.DB)
+
+		law_id := c.Params("law_id")
+
+		var tags []Tag
+		db.Model(&Tag{}).Where("govt_rss_item_id = ?", law_id).Joins("JOIN govt_rss_item_tag ON tag.id = govt_rss_item_tag.tag_id").Find(&tags)
+
+		return c.Render("tag_search", fiber.Map{
+			"Tags": tags,
+		})
+	})
 
 	app.Listen(":8080")
 }

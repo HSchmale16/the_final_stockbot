@@ -3,7 +3,9 @@
 
     {{> 'partials/bill-metadata' }}
     
-
-    
     <pre>{{ LawText.Text }}</pre>
+
+    <h1>Tags Applied To Legislation</h1>
+    <div class="tags" hx-get="/law/{{ Law.ID }}/tags" hx-trigger="revealed" hx-swap="afterend">
+    </div>
 </div>
