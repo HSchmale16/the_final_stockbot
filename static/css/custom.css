@@ -21,7 +21,7 @@
 .navbar-brand {
     font-weight: bold;
     text-decoration: none;
-    color: #333;
+    color: #EEE;
 }
 
 .navbar-nav {
@@ -36,9 +36,13 @@
 
 .nav-link {
     text-decoration: none;
-    color: #333;
+    color: #EEE;
 }
 
 .bill-metadata ul {
     columns: 2;
+}
+
+#search-results {
+    margin-top: 20px;
 }

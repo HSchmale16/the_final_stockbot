@@ -30,9 +30,10 @@
         </span>
     </h3>
     <p>Search for the topics most important to you!</p>
-    <input class="form-control" type="search" name="search" placeholder="Begin Typing To Search Tags and Topics..."
+    <input class="form-control-lg" style="width:100%" type="search" name="search" placeholder="Begin Typing To Search Tags and Topics..."
         hx-get="/htmx/topic-search" hx-trigger="input changed delay:250ms, search" hx-target="#search-results"
         hx-indicator=".htmx-indicator">
+
 
     <div id="search-results"></div>
 
