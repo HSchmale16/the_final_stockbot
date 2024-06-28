@@ -75,8 +75,11 @@ func SetupServer() {
 
 		law_id := c.Params("law_id")
 
-		var tags []Tag
-		db.Model(&Tag{}).Where("govt_rss_item_id = ?", law_id).Joins("JOIN govt_rss_item_tag ON tag.id = govt_rss_item_tag.tag_id").Find(&tags)
+		var tags []struct {
+			TagId int64
+			Name  string
+		}
+		db.Raw("SELECT tag.id as tag_id, tag.name FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id WHERE govt_rss_item_tag.govt_rss_item_id = ?", law_id).Scan(&tags)
 
 		return c.Render("tag_search", fiber.Map{
 			"Tags": tags,
