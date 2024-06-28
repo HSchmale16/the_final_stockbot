@@ -50,6 +50,7 @@ func SetupServer() {
 	app.Use(func(c *fiber.Ctx) error {
 		c.Bind(fiber.Map{
 			"CacheBust": CacheBustTimestamp,
+			"Title":     "DirtyCongress.com",
 		})
 		return c.Next()
 	})
