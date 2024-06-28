@@ -49,6 +49,7 @@ func SetupServer() {
 		c.Bind(fiber.Map{
 			"CacheBust": time.Now().Unix(),
 		})
+		return c.Next()
 	})
 
 	app.Static("/static", "./static")
