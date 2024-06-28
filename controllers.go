@@ -59,6 +59,7 @@ func SetupServer() {
 	})
 	app.Get("/json/congress-network", CongressNetwork)
 	app.Get("/congress-network", CongressNetworkLayout)
+	app.Get("/tos", TermsOfService)
 
 	app.Listen(":8080")
 }
@@ -88,7 +89,7 @@ func Index(c *fiber.Ctx) error {
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
 	return c.Render("index", fiber.Map{
-		"Title":       "Congress Magnifying Glass",
+		"Title":       "DirtyCongress.com",
 		"TotalTopics": p.Sprintf("%d", articleTags),
 		"TotalTags":   p.Sprintf("%d", totalTags),
 		"TotalLaws":   p.Sprintf("%d", totalLaws),
@@ -286,4 +287,8 @@ func CongressNetworkLayout(c *fiber.Ctx) error {
 	return c.Render("congress_network", fiber.Map{
 		"Title": "Congress Network Visualization",
 	}, "layouts/main")
+}
+
+func TermsOfService(c *fiber.Ctx) error {
+	return c.Render("tos", fiber.Map{}, "layouts/main")
 }
