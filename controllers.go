@@ -82,6 +82,9 @@ func Index(c *fiber.Ctx) error {
 	db.Model(&Tag{}).Count(&totalTags)
 	db.Model(&GovtRssItem{}).Count(&totalLaws)
 
+	var recentLaws []GovtRssItem = make([]GovtRssItem, 0, 10)
+	db.Order("pub_date DESC").Limit(10).Find(&recentLaws)
+
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
 	return c.Render("index", fiber.Map{
@@ -89,6 +92,7 @@ func Index(c *fiber.Ctx) error {
 		"TotalTopics": p.Sprintf("%d", articleTags),
 		"TotalTags":   p.Sprintf("%d", totalTags),
 		"TotalLaws":   p.Sprintf("%d", totalLaws),
+		"Laws":        recentLaws,
 	}, "layouts/main")
 }
 
