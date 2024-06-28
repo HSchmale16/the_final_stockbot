@@ -7,7 +7,7 @@
     service_user_name: final_stockbot
     do_litestream: false
     static_root: /var/lib/final_stockbot/the_final_stockbot/static/
-    server_name: govt.henryschmale.org
+    server_name: www.dirtycongress.com
 
   tasks:
     - name: Install Packages
@@ -32,11 +32,18 @@
         port: "80"
         comment: "Allow HTTP traffic"
         state: enabled
-
     - name: Configure Firewall
       become: true
       community.general.ufw:
         rule: allow
+        port: "443"
+        comment: "Allow HTTPS traffic"
+        state: enabled
+
+    - name: Configure Firewall
+      become: true
+      community.general.ufw:
+        rule: deny
         port: "8080"
         comment: "Allow Proxy HTTP traffic"
         state: enabled
@@ -97,61 +104,6 @@
         dest: /etc/nginx/sites-enabled/govt-stocks-site
         state: link
 
-    # - name: Copy the Database File
-    #   become: true
-    #   ansible.builtin.copy:
-    #     src: test.db
-    #     dest: "/var/lib/{{ service_user_name }}/test.db"
-    #     mode: "0644"
-    #     owner: "{{ service_user_name }}"
-    #     group: "{{ service_user_name }}"
-
-
-    # - name: Sync the stockbot repository
-    #   ansible.builtin.copy:
-    #     src: "{{ item }}"
-    #     dest: "/root/the_final_stockbot/{{ item | basename }}"
-    #     mode: "0644"
-    #   loop: "{{ query('fileglob', '*go*') }}"
-    #   notify:
-    #     - Build my application
-
-    # # Create the service
-    # - name: Create a systemd unit file
-    #   become: true
-    #   ansible.builtin.template:
-    #     src: final-stockbot.service.j2
-    #     dest: /etc/systemd/system/final-stockbot.service
-    #     mode: "0644"
-    #   notify:
-    #     - Reload systemd
-
-    # - name: Ensure Ollama Service is Started
-    #   ansible.builtin.systemd:
-    #     name: ollama
-    #     enabled: true
-    #     state: started
-
-    # - name: Pull Ollama Models Required For Work
-    #   changed_when: false
-    #   ansible.builtin.command: ollama list
-    #   register: ollama_list_output
-
-    # - name: Filter Installed Models
-    #   ansible.builtin.set_fact:
-    #     installed_models: "{{ ollama_list_output.stdout_lines | map('regex_replace', '^\\s*(\\S+).*$', '\\1') | list }}"
-
-    # - ansible.builtin.debug:
-    #     var: installed_models
-
-    # - name: Pull Ollama Models
-    #   changed_when: true
-    #   ansible.builtin.command:
-    #     cmd: ollama pull "{{ item }}"
-    #   loop:
-    #     - "phi3:3.8b"
-    #     - "gemma:2b"
-    #   when: item not in installed_models
 
   ##### Handlers #####
   handlers:
