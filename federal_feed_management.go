@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var rssLinks = []string{
+var RssLinks = []string{
 	"https://www.govinfo.gov/rss/bills.xml",
 	"https://www.govinfo.gov/rss/bills-enr.xml",
 	"https://www.govinfo.gov/rss/plaw.xml",
@@ -61,17 +61,11 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 	return false, newItem
 }
 
-func RunFetcherService() {
+func RunFetcherService(ch LawRssItemChannel) {
 	db, err := setupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
 		return
-	}
-
-	ch := make(LawRssItemChannel)
-
-	for _, rssLink := range rssLinks {
-		go handleLawRss(rssLink, ch)
 	}
 
 	for item := range ch {

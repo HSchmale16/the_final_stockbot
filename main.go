@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
 	_ "net/http/pprof"
+
+	"github.com/robfig/cron/v3"
 )
 
 var reprocessId int = 0
@@ -38,13 +39,28 @@ func main() {
 	}
 
 	if !disableFetcherService {
-		go RunFetcherService()
+
+		ch := make(LawRssItemChannel, 10)
+
+		go RunFetcherService(ch)
+
+		triggerRssFetch := func() {
+			log.Println("Triggering RSS fetch")
+			for _, rssLink := range RssLinks {
+				go handleLawRss(rssLink, ch)
+			}
+		}
+
+		cron := cron.New()
+		cron.AddFunc("@every 4h", triggerRssFetch)
+
+		cron.Start()
 	}
 
-	// Start the pprof server
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
+	// // Start the pprof server
+	// go func() {
+	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
 
 	if !disableWebServer {
 		SetupServer()

@@ -8,6 +8,7 @@ require (
 	github.com/gofiber/template/handlebars/v2 v2.1.9
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/pkoukk/tiktoken-go v0.1.7
+	github.com/robfig/cron/v3 v3.0.1
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.10
@@ -41,6 +42,6 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 
+	golang.org/x/text v0.15.0
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

@@ -44,14 +44,15 @@ server {
     } # managed by Certbot
 
 
-    # redirect from my old test site
-    if ($host = govt.henryschmale.org) {
-        return 301 https://{{ server_name }}$request_uri;
-    }
-
     server_name {{ server_name }};
     listen 80;
     return 404; # managed by Certbot
 
 
+}
+
+server {
+    listen 80;
+    server_name govt.henryschmale.org;
+    return 301 https://{{ server_name }}$request_uri;
 }
