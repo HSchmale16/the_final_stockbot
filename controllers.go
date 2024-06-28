@@ -101,7 +101,7 @@ func LawIndex(c *fiber.Ctx) error {
 
 	// convert to int minus 1
 	page := c.Query("page", "missing")
-	LIMIT := 10
+	LIMIT := 20
 
 	var laws []GovtRssItem
 	// Pub date before
