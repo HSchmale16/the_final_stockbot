@@ -45,6 +45,12 @@ func SetupServer() {
 		return c.Next()
 	})
 
+	app.Use(func(c *fiber.Ctx) error {
+		c.Bind(fiber.Map{
+			"CacheBust": time.Now().Unix(),
+		})
+	})
+
 	app.Static("/static", "./static")
 
 	// Setup the Routes
