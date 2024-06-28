@@ -82,6 +82,12 @@ type Tag struct {
 	ID        uint
 	CreatedAt time.Time
 	Name      string `gorm:"uniqueIndex"`
+
+	// ShortLine is a short version of the tag name
+	ShortLine string
+
+	// If true do not show by default in the tag list per bill
+	Hidden bool
 }
 
 func (Tag) TableName() string {

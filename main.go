@@ -21,25 +21,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	if reprocessId > 0 {
-		// Reprocess a specific item
-		db, err := setupDB()
-		if err != nil {
-			panic(err)
-		}
-
-		var item GovtRssItem
-		db.First(&item, reprocessId)
-
-		var item2 GovtLawText
-		db.First(&item2, "govt_rss_item_id = ?", item.ID)
-
-		//ProcessLawTextForTags(item, db)
-		processModsXML(item2.ModsXML)
-	}
-
 	if !disableFetcherService {
-
 		ch := make(LawRssItemChannel, 10)
 
 		go RunFetcherService(ch)
@@ -53,6 +35,7 @@ func main() {
 
 		cron := cron.New()
 		cron.AddFunc("@every 4h", triggerRssFetch)
+		triggerRssFetch()
 
 		cron.Start()
 	}

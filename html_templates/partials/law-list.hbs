@@ -1,7 +1,7 @@
 {{#each Laws }}
 <div class="law" {{#if @last}} hx-get="/laws?page={{ PubDate }}" hx-trigger="revealed" hx-swap="afterend" {{/if}}>
     <h2>{{{ Title }}}</h2>
-    <small>Published on {{formatDate PubDate }}</small>
+    <small>Published on {{formatDate PubDate }} | Loaded On {{ formatDate CreatedAt }}</small>
     <p>{{ Description }}</p>
     <a href="/law/{{ ID }}">Read more</a>
 </div>

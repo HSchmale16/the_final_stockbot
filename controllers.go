@@ -108,7 +108,6 @@ func LawIndex(c *fiber.Ctx) error {
 	x := db.Order("pub_date DESC").Limit(LIMIT) //.Find(&laws)
 
 	if page != "missing" {
-
 		x.Where("pub_date < ?", page).Find(&laws)
 		// we don't use a layout here for htmx.
 		// fuck if I get why I'm using htmx
