@@ -45,9 +45,11 @@ func SetupServer() {
 		return c.Next()
 	})
 
+	CacheBustTimestamp := time.Now().Unix()
+
 	app.Use(func(c *fiber.Ctx) error {
 		c.Bind(fiber.Map{
-			"CacheBust": time.Now().Unix(),
+			"CacheBust": CacheBustTimestamp,
 		})
 		return c.Next()
 	})
