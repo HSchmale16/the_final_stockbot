@@ -101,7 +101,7 @@ func LawIndex(c *fiber.Ctx) error {
 
 	var laws []GovtRssItem
 	// Pub date before
-	x := db.Debug().Order("pub_date DESC").Limit(LIMIT) //.Find(&laws)
+	x := db.Order("pub_date DESC").Limit(LIMIT) //.Find(&laws)
 
 	if page != "missing" {
 
