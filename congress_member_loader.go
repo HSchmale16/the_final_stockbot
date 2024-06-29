@@ -61,6 +61,9 @@ func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) 
 		tx.FirstOrCreate(&myCongMember, DB_CongressMember{BioGuideId: myCongMember.BioGuideId})
 		myCongMember.CongressMemberInfo = cong
 		myCongMember.Name = cong.Name.Official
+		if myCongMember.Name == "" {
+			myCongMember.Name = fmt.Sprintf("%s %s", cong.Name.First, cong.Name.Last)
+		}
 
 		fmt.Println(myCongMember.CongressMemberInfo.Terms)
 		tx.Debug().Save(&myCongMember)
@@ -177,4 +180,8 @@ type Terms struct {
 	Start string `json:"start"`
 	End   string `json:"end"`
 	Party string `json:"party"`
+}
+
+func (t Terms) IsSenator() bool {
+	return t.Type == "sen"
 }

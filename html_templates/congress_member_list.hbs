@@ -1,5 +1,5 @@
 <div class="container">
-    <ul>
+    <ul class="member-list">
         {{#each Members}}
         <li>
             <a href="/congress-member/{{this.BioGuideId}}">{{this.name}}</a>
@@ -7,3 +7,9 @@
         {{/each}}
     </ul>
 </div>
+
+<style>
+    .member-list{
+        columns: 3;
+    }
+</style>

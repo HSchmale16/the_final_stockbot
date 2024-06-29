@@ -8,6 +8,16 @@
         </div>
         <div class="col-md-8">
             <h3>Terms</h3>
+            <ul>
+            {{#each Member.CongressMemberInfo.Terms }}
+                {{#if IsSenator }}
+                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Senator</li>
+                {{else}}
+                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Representative</li>
+                {{/if}}
+            {{/each}}
+            </ul>
+            
         </div>
     </div>
 
@@ -18,6 +28,10 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">{{{ Title }}}</h5>
+                        <p class="card-text">{{{ Description }}}
+
+                        <a href="/law/{{ ID }}">Read More</a></p>
+                        </p>
                     </div>
                 </div>
             {{/each}}

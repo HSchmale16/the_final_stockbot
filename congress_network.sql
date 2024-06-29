@@ -25,4 +25,4 @@ sponsor_weights AS (
 SELECT sponsor_id as source, cosponsor_id as target, SUM(weight) as value
 FROM sponsor_weights
 GROUP BY sponsor_id, cosponsor_id
-ORDER BY weight DESC
+-- ORDER BY weight DESC

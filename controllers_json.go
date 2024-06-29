@@ -22,7 +22,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 		Value  int    `json:"value"`
 	}
 
-	db.Debug().Raw(congress_network_sql, chamber).Scan(&edges)
+	db.Raw(congress_network_sql, chamber).Scan(&edges)
 
 	// Distinctify the people in source and target
 	var node_names = make(map[string]bool)
@@ -37,7 +37,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 
 	// Select all the congress people mentioned in node_names keys
 	var congress_people []DB_CongressMember
-	db.Debug().Where("bio_guide_id IN ?", keys).Find(&congress_people)
+	db.Where("bio_guide_id IN ?", keys).Find(&congress_people)
 
 	fmt.Println(len(congress_people), len(keys))
 

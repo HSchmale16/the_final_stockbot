@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	_ "net/http/pprof"
 
@@ -64,13 +65,8 @@ func main() {
 		cron.Start()
 	}
 
-	// // Start the pprof server
-	// go func() {
-	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
-	// }()
-
 	if !disableWebServer {
 		SetupServer()
 	}
-
+	fmt.Println("Done!")
 }
