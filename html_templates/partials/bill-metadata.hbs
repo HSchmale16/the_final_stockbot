@@ -4,7 +4,7 @@
     <h3>Congress Members</h3>
     <ul>
         {{#each Metadata.CongressMembers}}
-        <li><a href="https://bioguide.congress.gov/search/bio/{{ BioGuideId }}">
+        <li><a href="/congress-member/{{ BioGuideId }}">
             {{ Name }} ({{Party}} - {{State}}) ({{Role}})
         </a></li>
         {{/each}}
