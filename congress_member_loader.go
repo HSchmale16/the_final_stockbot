@@ -92,7 +92,7 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 					CongressNumber:              congMember.Congress,
 					Role:                        congMember.Role,
 				}
-				result := db.Debug().Where(CongressMemberSponsored{
+				result := db.Where(CongressMemberSponsored{
 					DB_CongressMemberBioGuideId: dbCongMember.BioGuideId,
 					GovtRssItemId:               law.GovtRssItemId,
 				}).Assign(CongressMemberSponsored{
