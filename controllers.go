@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html"
 	"os"
 	"strings"
@@ -68,7 +67,11 @@ func SetupServer() {
 		return c.Render("help", fiber.Map{}, "layouts/main")
 	})
 	app.Get("/json/congress-network", CongressNetwork)
-	app.Get("/congress-network", CongressNetworkLayout)
+	app.Get("/congress-network", func(c *fiber.Ctx) error {
+		return c.Render("congress_network", fiber.Map{
+			"Title": "Congress Network Visualization",
+		}, "layouts/main")
+	})
 	app.Get("/tos", TermsOfService)
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
 		db := c.Locals("db").(*gorm.DB)
@@ -236,83 +239,6 @@ func LawView(c *fiber.Ctx) error {
 		"Law":      law,
 		"LawText":  lawText,
 		"Metadata": metadata,
-	}, "layouts/main")
-}
-
-func CongressNetwork(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	chamber := c.FormValue("chamber")
-
-	var results []struct {
-		RssId   int64
-		ModsXML string
-		PubDate time.Time
-	}
-	db.Raw("SELECT govt_rss_item.id as rss_id, govt_rss_item.pub_date, govt_law_text.mods_xml FROM govt_rss_item JOIN govt_law_text ON govt_law_text.govt_rss_item_id = govt_rss_item.id").Scan(&results)
-
-	// Create a bigraph of all the congress critters who work together
-	type Edge struct {
-		Source string `json:"source"`
-		Target string `json:"target"`
-	}
-
-	edges := make(map[Edge]int)
-	nodes := make(map[string]CongressMember)
-
-	for _, result := range results {
-		mods := ReadLawModsData(result.ModsXML)
-		if len(mods.CongressMembers) == 0 || mods.CongressMembers[0].Chamber != chamber {
-			continue
-		}
-		sponser := mods.CongressMembers[0]
-		nodes[sponser.BioGuideId] = sponser
-		for _, member := range mods.CongressMembers[1:] {
-			edge := Edge{
-				Source: sponser.BioGuideId,
-				Target: member.BioGuideId,
-			}
-			nodes[member.BioGuideId] = member
-			edges[edge] += 2
-
-			// reverse the edge
-			edge = Edge{
-				Source: member.BioGuideId,
-				Target: sponser.BioGuideId,
-			}
-			edges[edge]++
-		}
-	}
-
-	type s struct {
-		Edge
-		Value int `json:"value"`
-	}
-
-	edges_array := make([]s, 0, len(edges))
-
-	for edge, count := range edges {
-		edges_array = append(edges_array, s{
-			Edge:  edge,
-			Value: count,
-		})
-	}
-	fmt.Println(len(edges_array))
-
-	node_values := make([]CongressMember, 0, len(nodes))
-	for _, v := range nodes {
-		node_values = append(node_values, v)
-	}
-
-	return c.JSON(fiber.Map{
-		"nodes": node_values,
-		"edges": edges_array,
-	})
-}
-
-func CongressNetworkLayout(c *fiber.Ctx) error {
-	return c.Render("congress_network", fiber.Map{
-		"Title": "Congress Network Visualization",
 	}, "layouts/main")
 }
 

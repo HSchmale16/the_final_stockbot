@@ -52,7 +52,7 @@ function drawNetwork(data) {
         .data(nodes)
         .join("circle")
         .attr("r", 5)
-        .attr("fill", d => d.Party === "R" ? "red" : "blue");
+        .attr("fill", d => PartyColor(d.Party));
 
 
     // When I hover over a node, show the name
@@ -81,7 +81,7 @@ function drawNetwork(data) {
         const searchTerm = event.target.value.toLowerCase();
         console.log(searchTerm)
         // Remove any previous highlights
-        d3.selectAll('circle').attr('r', 5).attr('fill', d => d.Party === "R" ? "red" : "blue");
+        d3.selectAll('circle').attr('r', 5).attr('fill', d => PartyColor(d.Party));
 
 
         if (searchTerm !== "") {
@@ -106,4 +106,15 @@ function drawNetwork(data) {
     }
 }
 
-window.fetchDataForChamber = fetchDataForChamber;
+function PartyColor(party) {
+    console.log(party)
+    switch (party[0]) {
+        case 'R':
+            return 'red';
+        case 'D':
+            return 'blue';
+        default:
+            return 'purple';
+    }
+}
+    window.fetchDataForChamber = fetchDataForChamber;

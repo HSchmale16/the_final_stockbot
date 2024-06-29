@@ -61,6 +61,8 @@ func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) 
 		tx.FirstOrCreate(&myCongMember, DB_CongressMember{BioGuideId: myCongMember.BioGuideId})
 		myCongMember.CongressMemberInfo = cong
 		myCongMember.Name = cong.Name.Official
+
+		fmt.Println(myCongMember.CongressMemberInfo.Terms)
 		tx.Debug().Save(&myCongMember)
 	}
 	tx.Commit()
@@ -139,6 +141,7 @@ type US_CongressLegislator struct {
 		Birthday string `json:"birthday"`
 		Gender   string `json:"gender"`
 	} `json:"bio"`
+	Terms []Terms `json:"terms"`
 }
 
 // Implement the scanner interface for US_CongressLegislators
@@ -166,4 +169,12 @@ type CongIdentifiers struct {
 	Icpsr          int      `json:"icpsr"`
 	Wikidata       string   `json:"wikidata"`
 	GoogleEntityID string   `json:"google_entity_id"`
+}
+
+type Terms struct {
+	Type  string `json:"type"`
+	State string `json:"state"`
+	Start string `json:"start"`
+	End   string `json:"end"`
+	Party string `json:"party"`
 }

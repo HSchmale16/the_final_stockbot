@@ -1,4 +1,4 @@
 the_final_stockbot
 *.db
-*.sqlite
+*.sqlite*
 DOWNLOAD_MODELS/*
