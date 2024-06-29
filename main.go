@@ -11,15 +11,26 @@ import (
 var reprocessId int = 0
 var disableFetcherService = false
 var disableWebServer = false
+var loadCongressMembers = false
 
 func init() {
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
 	flag.BoolVar(&disableFetcherService, "disable-fetcher", false, "Disable the fetcher service")
 	flag.BoolVar(&disableWebServer, "disable-web", false, "Disable the web server")
+	flag.BoolVar(&loadCongressMembers, "load-congress-members", false, "Load congress members")
 }
 
 func main() {
 	flag.Parse()
+
+	if loadCongressMembers {
+		db, err := setupDB()
+		if err != nil {
+			log.Fatal(err)
+		}
+		CRON_LoadCongressMembers(db)
+		return
+	}
 
 	if !disableFetcherService {
 		ch := make(LawRssItemChannel, 10)

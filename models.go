@@ -144,11 +144,34 @@ func (SearchQuery) TableName() string {
 	return "search_query"
 }
 
+///////////////////////////////////////////////////////////////////
+
+type DB_CongressMember struct {
+	BioGuideId         string `gorm:"primaryKey"`
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	CongressMemberInfo US_CongressLegislator
+	Name               string
+	Sponsored          []GovtRssItem `gorm:"many2many:congress_member_sponsored;"`
+}
+
+type CongressMemberSponsored struct {
+	DB_CongressMemberBioGuideId string `gorm:"index:,unique,composite:unique_per_item"`
+	GovtRssItemId               uint   `gorm:"index:,unique,composite:unique_per_item"`
+}
+
+func (CongressMemberSponsored) TableName() string {
+	return "congress_member_sponsored"
+}
+
+func (DB_CongressMember) TableName() string {
+	return "congress_member"
+}
+
 /**
  * Sets up the stupid database
  */
 func setupDB() (*gorm.DB, error) {
-
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
@@ -177,7 +200,7 @@ func setupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&SearchQuery{}); err != nil {
+	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressMember{}, &CongressMemberSponsored{}); err != nil {
 		return nil, err
 	}
 
