@@ -4,7 +4,11 @@
     <div class="row">
         <div class="col-md-4">
             <h3>Bio Information</h3>
-            Born: {{ formatDate Member.CongressMemberInfo.Bio.Birthday }}
+            Born: {{#if Member.CongressMemberInfo.Bio.Birthday}}
+                {{ formatDate Member.CongressMemberInfo.Bio.Birthday }}
+            {{else}}
+                Not Available
+            {{/if}}
         </div>
         <div class="col-md-8">
             <h3>Terms</h3>
