@@ -5,7 +5,8 @@ import (
 	"os"
 	"strings"
 	"time"
-
+    "github.com/gofiber/fiber/v2/middleware/cache"
+    
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"golang.org/x/text/message"
@@ -34,9 +35,10 @@ func SetupServer() {
 
 	// Serve static files only on debug mode
 	if os.Getenv("DEBUG") == "true" {
-
 		app.Static("/static", "./static")
 	}
+
+	app.Use(cache.New())
 
 	// Middleware to pass db instance
 	app.Use(func(c *fiber.Ctx) error {
