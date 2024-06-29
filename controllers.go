@@ -85,6 +85,8 @@ func SetupServer() {
 			"Tags": tags,
 		})
 	})
+	app.Get("/congress-members", CongressMemberList)
+	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
 
 	app.Listen(":8080")
 }
@@ -316,4 +318,28 @@ func CongressNetworkLayout(c *fiber.Ctx) error {
 
 func TermsOfService(c *fiber.Ctx) error {
 	return c.Render("tos", fiber.Map{}, "layouts/main")
+}
+
+func CongressMemberList(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var members []DB_CongressMember
+	db.Find(&members)
+
+	return c.Render("congress_member_list", fiber.Map{
+		"Members": members,
+	}, "layouts/main")
+}
+
+func ViewCongressMember(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var member DB_CongressMember
+	db.Debug().Preload("Sponsored").First(&member, DB_CongressMember{
+		BioGuideId: c.Params("bio_guide_id"),
+	})
+
+	return c.Render("congress_member_view", fiber.Map{
+		"Member": member,
+	}, "layouts/main")
 }
