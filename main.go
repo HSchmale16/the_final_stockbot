@@ -12,6 +12,7 @@ var reprocessId int = 0
 var disableFetcherService = false
 var disableWebServer = false
 var loadCongressMembers = false
+var congMemberFile = ""
 var scanLawText = false
 
 func init() {
@@ -20,6 +21,7 @@ func init() {
 	flag.BoolVar(&disableWebServer, "disable-web", false, "Disable the web server")
 	flag.BoolVar(&loadCongressMembers, "load-congress-members", false, "Load congress members")
 	flag.BoolVar(&scanLawText, "scan-law-text", false, "Scan law text")
+	flag.StringVar(&congMemberFile, "congress-members-file", "", "The file to load congress members from")
 }
 
 func main() {
@@ -39,7 +41,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		CRON_LoadCongressMembers(db)
+		LOAD_MEMBERS_JSON(db, congMemberFile)
 		return
 	}
 

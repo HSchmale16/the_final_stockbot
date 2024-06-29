@@ -14,6 +14,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"gorm.io/gorm"
 )
@@ -48,23 +49,41 @@ func GetCurrentLegislatorJson() []US_CongressLegislator {
 }
 
 func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) {
+	// Use a database transaction to ensure that we don't have any partial data
+	// And for speed
+	tx := db.Begin()
 	for _, cong := range memberData {
 		myCongMember := DB_CongressMember{
 			BioGuideId:         cong.Id.Bioguide,
 			CongressMemberInfo: cong,
 		}
 
-		db.FirstOrCreate(&myCongMember, DB_CongressMember{BioGuideId: myCongMember.BioGuideId})
+		tx.FirstOrCreate(&myCongMember, DB_CongressMember{BioGuideId: myCongMember.BioGuideId})
 		myCongMember.CongressMemberInfo = cong
 		myCongMember.Name = cong.Name.Official
-		db.Debug().Save(&myCongMember)
+		tx.Debug().Save(&myCongMember)
 	}
+	tx.Commit()
 }
 
-func CRON_LoadCongressMembers(db *gorm.DB) {
-	tCur := GetCurrentLegislatorJson()
+func LOAD_MEMBERS_JSON(db *gorm.DB, file string) {
+	if file == "" {
+		tCur := GetCurrentLegislatorJson()
+		MangleLegislatorsAndMerge(db, tCur)
+	} else {
+		// open file by name
+		jsonFile, err := os.Open(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer jsonFile.Close()
+		// read file
 
-	MangleLegislatorsAndMerge(db, tCur)
+		byteValue, _ := io.ReadAll(jsonFile)
+		var tCur []US_CongressLegislator
+		json.Unmarshal(byteValue, &tCur)
+		MangleLegislatorsAndMerge(db, tCur)
+	}
 }
 
 func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
