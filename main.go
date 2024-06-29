@@ -12,16 +12,27 @@ var reprocessId int = 0
 var disableFetcherService = false
 var disableWebServer = false
 var loadCongressMembers = false
+var scanLawText = false
 
 func init() {
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
 	flag.BoolVar(&disableFetcherService, "disable-fetcher", false, "Disable the fetcher service")
 	flag.BoolVar(&disableWebServer, "disable-web", false, "Disable the web server")
 	flag.BoolVar(&loadCongressMembers, "load-congress-members", false, "Load congress members")
+	flag.BoolVar(&scanLawText, "scan-law-text", false, "Scan law text")
 }
 
 func main() {
 	flag.Parse()
+
+	if scanLawText {
+		db, err := setupDB()
+		if err != nil {
+			log.Fatal(err)
+		}
+		LOAD_Members_Mods_2_RSS(db)
+		return
+	}
 
 	if loadCongressMembers {
 		db, err := setupDB()

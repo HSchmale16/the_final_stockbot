@@ -156,6 +156,10 @@ type DB_CongressMember struct {
 }
 
 type CongressMemberSponsored struct {
+	CreatedAt                   time.Time
+	CongressNumber              string
+	Chamber                     string
+	Role                        string
 	DB_CongressMemberBioGuideId string `gorm:"index:,unique,composite:unique_per_item"`
 	GovtRssItemId               uint   `gorm:"index:,unique,composite:unique_per_item"`
 }

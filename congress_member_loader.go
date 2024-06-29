@@ -10,7 +10,9 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -63,6 +65,48 @@ func CRON_LoadCongressMembers(db *gorm.DB) {
 	tCur := GetCurrentLegislatorJson()
 
 	MangleLegislatorsAndMerge(db, tCur)
+}
+
+func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
+	// Step through law mods
+	var lawTexts []GovtLawText
+	page := 0
+	for next := true; next; next = len(lawTexts) > 0 {
+		db.Order("ID asc").Offset(page * 100).Limit(100).Find(&lawTexts)
+		log.Print(len(lawTexts))
+		for _, law := range lawTexts {
+			lawData := ReadLawModsData(law.ModsXML)
+			// Find the congress member
+			for _, congMember := range lawData.CongressMembers {
+				var dbCongMember DB_CongressMember
+				db.Where("bio_guide_id = ?", congMember.BioGuideId).First(&dbCongMember)
+				if dbCongMember.BioGuideId == "" {
+					log.Printf("Could not find congress member %s\n", congMember)
+					continue
+				}
+				// Create the association
+				var dbCongMemberSponsored CongressMemberSponsored = CongressMemberSponsored{
+					DB_CongressMemberBioGuideId: dbCongMember.BioGuideId,
+					GovtRssItemId:               law.GovtRssItemId,
+					Chamber:                     congMember.Chamber, // Slightly denormalized here. But it makes sense for the kind of questions we are asking and it can change over time. Trust the library of congress to get it right
+					CongressNumber:              congMember.Congress,
+					Role:                        congMember.Role,
+				}
+				result := db.Debug().Where(CongressMemberSponsored{
+					DB_CongressMemberBioGuideId: dbCongMember.BioGuideId,
+					GovtRssItemId:               law.GovtRssItemId,
+				}).Assign(CongressMemberSponsored{
+					Chamber:        dbCongMemberSponsored.Chamber,
+					CongressNumber: dbCongMemberSponsored.CongressNumber,
+					Role:           dbCongMemberSponsored.Role,
+				}).FirstOrCreate(&dbCongMemberSponsored)
+
+				fmt.Println(result.RowsAffected)
+			}
+		}
+		page += 1
+	}
+
 }
 
 type US_CongressLegislator struct {
