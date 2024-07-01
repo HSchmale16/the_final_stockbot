@@ -15,9 +15,9 @@
             <ul>
             {{#each Member.CongressMemberInfo.Terms }}
                 {{#if IsSenator }}
-                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Senator</li>
+                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Senator - {{ Party }}</li>
                 {{else}}
-                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Representative</li>
+                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Representative - {{ Party }}</li>
                 {{/if}}
             {{/each}}
             </ul>
