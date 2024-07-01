@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:embed congress_network.sql
+//go:embed sql/congress_network.sql
 var congress_network_sql string
 
 func CongressNetwork(c *fiber.Ctx) error {

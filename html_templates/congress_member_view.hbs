@@ -9,6 +9,7 @@
             {{else}}
                 Not Available
             {{/if}}
+            
         </div>
         <div class="col-md-8">
             <h3>Terms</h3>
@@ -27,7 +28,7 @@
 
     <div class="row">
         <div class="col-md-8">
-            <h3>Sponsored</h3>
+            <h3>Sponsored Bills</h3>
             {{#each Member.Sponsored }}
                 <div class="card">
                     <div class="card-body">
@@ -42,6 +43,20 @@
         </div>    
     </div>
 
-    
+    <div class="row">
+        <div class="col-md-8">
+            <h3>External Links</h3>
+            <p>Learn more about this Congressperson from External Resources!</p>
+            {{#with Member.CongressMemberInfo.Id }}
+            <ul>
+                <li><a href="https://en.wikipedia.org/wiki/{{ Wikipedia }}">Wikipedia</a></li>
+                <li><a href="https://ballotpedia.org/{{ Ballotpedia }}">Balltopedia</a></li>
+                {{#each Fec }}
+                    <li><a href="https://www.fec.gov/data/candidate/{{ this }}">Federal Election Commission</a></li>
+                {{/each}}
+            </ul>
+            {{/with}}
+        </div>
+    </div>
 </div>
 

@@ -161,6 +161,8 @@ func (l US_CongressLegislator) Value() (driver.Value, error) {
 	return json.Marshal(l)
 }
 
+// See https://github.com/unitedstates/congress-legislators?tab=readme-ov-file
+// For the data dictionary of each of these fields
 type CongIdentifiers struct {
 	Bioguide       string   `json:"bioguide"`
 	Fec            []string `json:"fec"`

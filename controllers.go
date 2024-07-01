@@ -3,6 +3,7 @@ package main
 import (
 	"html"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -230,18 +231,18 @@ func LawView(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var law GovtRssItem
-	db.Preload(clause.Associations).Find(&law, c.Params("law_id"))
+	db.Debug().Preload(clause.Associations).Find(&law, c.Params("law_id"))
 
 	var lawText GovtLawText
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
 
-	metadata := ReadLawModsData(lawText.ModsXML)
+	// metadata := ReadLawModsData(lawText.ModsXML)
 
 	return c.Render("law_view", fiber.Map{
-		"Title":    html.UnescapeString(law.Title),
-		"Law":      law,
-		"LawText":  lawText,
-		"Metadata": metadata,
+		"Title":   html.UnescapeString(law.Title),
+		"Law":     law,
+		"LawText": lawText,
+		// "Metadata": metadata,
 	}, "layouts/main")
 }
 
@@ -255,8 +256,22 @@ func CongressMemberList(c *fiber.Ctx) error {
 	var members []DB_CongressMember
 	db.Find(&members)
 
+	// Partition the members by being active
+	// TODO: Expose more of the terms via the sql database
+	var activeMembers []DB_CongressMember
+	for _, member := range members {
+		if member.IsActiveMember() {
+			activeMembers = append(activeMembers, member)
+		}
+	}
+
+	// Sort each by state
+	sort.Slice(activeMembers, func(i, j int) bool {
+		return activeMembers[i].State() < activeMembers[j].State()
+	})
+
 	return c.Render("congress_member_list", fiber.Map{
-		"Members": members,
+		"ActiveMembers": activeMembers,
 	}, "layouts/main")
 }
 
@@ -264,11 +279,41 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var member DB_CongressMember
-	db.Debug().Preload("Sponsored").First(&member, DB_CongressMember{
+	db.Preload("Sponsored").First(&member, DB_CongressMember{
 		BioGuideId: c.Params("bio_guide_id"),
 	})
 
 	return c.Render("congress_member_view", fiber.Map{
 		"Member": member,
 	}, "layouts/main")
+}
+
+func CongressMemberWorksWith(c *fiber.Ctx) error {
+	// Do a simple graph search in both directions of degree 2 to see who they work with most often
+
+	db := c.Locals("db").(*gorm.DB)
+
+	var member DB_CongressMember
+	db.First(&member, DB_CongressMember{
+		BioGuideId: c.Params("bio_guide_id"),
+	})
+
+	// Get the members they work with
+	var sponsored []CongressMemberSponsored
+	db.Where("db_congress_member_bio_guide_id = ?", member.BioGuideId).Find(&sponsored)
+
+	// Get the members they work with
+	var worksWith []DB_CongressMember
+	for _, sponsor := range sponsored {
+		var member DB_CongressMember
+		db.First(&member, DB_CongressMember{
+			BioGuideId: sponsor.DB_CongressMemberBioGuideId,
+		})
+		worksWith = append(worksWith, member)
+	}
+
+	return c.Render("congress_works_with", fiber.Map{
+		"Member":    member,
+		"WorksWith": worksWith,
+	})
 }

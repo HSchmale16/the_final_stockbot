@@ -22,8 +22,9 @@ type GovtRssItem struct {
 	ProcessedOn        time.Time
 
 	// many to many relationship of tags through GovtRssItemTag
-	Tags       []Tag `gorm:"many2many:govt_rss_item_tag;"`
-	Categories []Tag `gorm:"many2many:rss_category"`
+	Tags       []Tag               `gorm:"many2many:govt_rss_item_tag;"`
+	Categories []Tag               `gorm:"many2many:rss_category"`
+	Sponsors   []DB_CongressMember `gorm:"many2many:congress_member_sponsored;"`
 }
 
 func (GovtRssItem) TableName() string {
@@ -155,6 +156,28 @@ type DB_CongressMember struct {
 	Sponsored          []GovtRssItem `gorm:"many2many:congress_member_sponsored;"`
 }
 
+func (d DB_CongressMember) TableName() string {
+	return "congress_member"
+}
+
+func (d DB_CongressMember) Party() string {
+	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].Party
+}
+
+func (d DB_CongressMember) State() string {
+	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].State
+}
+
+func (d DB_CongressMember) IsActiveMember() bool {
+	currentTerm := d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1]
+	now := time.Now()
+	// conver to time.time
+	termEnd, _ := time.Parse("2006-01-02", currentTerm.End)
+	termStart, _ := time.Parse("2006-01-02", currentTerm.Start)
+
+	return now.After(termStart) && now.Before(termEnd)
+}
+
 type CongressMemberSponsored struct {
 	CreatedAt                   time.Time
 	CongressNumber              string
@@ -168,9 +191,7 @@ func (CongressMemberSponsored) TableName() string {
 	return "congress_member_sponsored"
 }
 
-func (DB_CongressMember) TableName() string {
-	return "congress_member"
-}
+///////////////////////////////////////////////////////////////////
 
 /**
  * Sets up the stupid database

@@ -13,6 +13,7 @@ prompts:
     Topics include people, places, and things. If you're mentioning a person always include their title if available.
 
     List only the topics that are mentioned in the text. If a topic is not mentioned, do not list it. Keep topics relative generic, but related to specific industries.
+    If a country is mentioned make sure it is is included in the tags. Countries and states are extremely important.
 
     Avoid using conjunctions and prepositions as topics. Only use a conjunction if it's part of an entity's name.
 

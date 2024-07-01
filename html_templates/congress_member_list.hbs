@@ -1,15 +1,16 @@
 <div class="container">
+    <h1>Active Members of Congress</h1>
     <ul class="member-list">
-        {{#each Members}}
+        {{#each ActiveMembers}}
         <li>
-            <a href="/congress-member/{{this.BioGuideId}}">{{this.name}}</a>
+            <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} - {{ this.State }}</a>
         </li>
         {{/each}}
     </ul>
 </div>
 
 <style>
-    .member-list{
+    .member-list {
         columns: 3;
     }
 </style>
