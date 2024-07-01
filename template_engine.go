@@ -44,6 +44,10 @@ func GetTemplateEngine() fiber.Views {
 		return t.Format("Jan 2, 2006")
 	})
 
+	engine.AddFunc("firstChar", func(s string) string {
+		return string(s[0])
+	})
+
 	for k := range engine.Templates {
 		fmt.Println(k)
 	}

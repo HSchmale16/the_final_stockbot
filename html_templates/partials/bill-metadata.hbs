@@ -7,7 +7,7 @@
     <h3>Congress Members</h3>
     <ul>
         {{#each Law.Sponsors }}
-        <li><a href="/congress-member/{{ BioGuideId }}">
+        <li class="{{ this.Role}}"><a href="/congress-member/{{ BioGuideId }}">
             {{ Name }} ({{Party}} - {{State}})
         </a></li>
         {{/each}}

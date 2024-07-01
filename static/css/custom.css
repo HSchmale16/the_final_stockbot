@@ -46,3 +46,12 @@
 #search-results {
     margin-top: 20px;
 }
+
+
+li.rep {
+    list-style-image: url("/static/icons/meeting.png");
+}
+
+li.sen {
+    list-style-image: url("/static/icons/congress.png");
+}
