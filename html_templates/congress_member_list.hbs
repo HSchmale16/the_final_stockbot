@@ -3,7 +3,7 @@
     <ul class="member-list">
         {{#each ActiveMembers}}
         <li class="{{ this.Role }}">
-            <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} - {{ this.State }} - {{ this.Party }}</a>
+            <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} ({{ this.State }} - {{ this.Party }})</a>
         </li>
         {{/each}}
     </ul>
