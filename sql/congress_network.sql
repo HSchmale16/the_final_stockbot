@@ -11,7 +11,7 @@ sponsor_weights AS (
     SELECT 
         sponsors.db_congress_member_bio_guide_id AS sponsor_id,
         cosponsors.db_congress_member_bio_guide_id AS cosponsor_id,
-        2 as weight
+        1 as weight
     FROM sponsors
     INNER JOIN cosponsors ON sponsors.govt_rss_item_id = cosponsors.govt_rss_item_id
     UNION ALL

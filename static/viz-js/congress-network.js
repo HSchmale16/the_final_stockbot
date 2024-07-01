@@ -43,7 +43,7 @@ function drawNetwork(data) {
         .selectAll()
         .data(links)
         .join("line")
-        .attr("stroke-width", d => Math.sqrt(d.value));
+        .attr("stroke-width", d => d.value / 5);
 
     const node = svg.append("g")
         .attr("stroke", "#fff")
@@ -107,7 +107,6 @@ function drawNetwork(data) {
 }
 
 function PartyColor(party) {
-    console.log(party)
     switch (party[0]) {
         case 'R':
             return 'red';

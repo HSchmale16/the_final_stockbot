@@ -178,6 +178,14 @@ func (d DB_CongressMember) IsActiveMember() bool {
 	return now.After(termStart) && now.Before(termEnd)
 }
 
+func (d DB_CongressMember) Role() string {
+	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].Type
+}
+
+func (d DB_CongressMember) IsSenator() bool {
+	return d.Role() == "sen"
+}
+
 type CongressMemberSponsored struct {
 	CreatedAt                   time.Time
 	CongressNumber              string

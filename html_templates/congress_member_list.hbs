@@ -2,15 +2,44 @@
     <h1>Active Members of Congress</h1>
     <ul class="member-list">
         {{#each ActiveMembers}}
-        <li>
+        <li class="{{ this.Role }}">
             <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} - {{ this.State }}</a>
         </li>
         {{/each}}
     </ul>
+
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="attribution">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{@index}}" aria-expanded="true" aria-controls="collapse{{@index}}">
+                    Icon Attribution
+                </button>
+            </h2>
+            <div id="collapse{{@index}}" class="accordion-collapse collapse" aria-labelledby="attribution"
+                data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+
+                    <a href="https://www.flaticon.com/free-icons/congress" title="congress icons">Congress icons created by noomtah - Flaticon</a><br/>
+                    
+                    <a href="https://www.flaticon.com/free-icons/intro" title="intro icons">Intro icons created by Vectors Tank - Flaticon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <style>
     .member-list {
         columns: 3;
+    }
+
+    li.rep {
+        list-style-image: url("/static/icons/meeting.png");
+    }
+
+    li.sen {
+        list-style-image: url("/static/icons/congress.png");
     }
 </style>
