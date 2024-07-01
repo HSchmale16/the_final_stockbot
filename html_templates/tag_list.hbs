@@ -1,7 +1,13 @@
 <h1>Tag List</h1>
 
-<ul>
+<ul class="tag-list">
 {{#each Tags }}
     <li>{{ Name }}</li>
 {{/each}}
 </ul>
+
+<style>
+    .tag-list {
+        columns: 3;
+    }
+</style>
