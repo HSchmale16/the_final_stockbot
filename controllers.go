@@ -97,7 +97,7 @@ func TagList(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var tags []Tag
-	db.Raw("SELECT tag.id, tag.name, COUNT(*) as count FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id GROUP BY tag.id ORDER BY count DESC").Limit(200).Scan(&tags)
+	db.Raw("SELECT tag.id, tag.name, COUNT(*) as count FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id GROUP BY tag.id ORDER BY count DESC LIMIT 500").Scan(&tags)
 
 	return c.Render("tag_list", fiber.Map{
 		"Tags": tags,
