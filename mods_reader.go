@@ -5,7 +5,10 @@
 package main
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"strings"
 )
 
@@ -24,9 +27,29 @@ type CongressMember struct {
 	Congress   string `xml:"congress,attr"`
 }
 
+type ModsAction struct {
+	Date string `xml:"date,attr"`
+	Text string `xml:",chardata"`
+}
+
 type LawModsData struct {
+	OfficialTitle      string
+	Actions            []ModsAction
 	CongressCommittees []CongressCommittee
 	CongressMembers    []CongressMember
+}
+
+func (l *LawModsData) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("failed to scan US_CongressLegislators")
+	}
+	return json.Unmarshal(b, l)
+}
+
+func (l LawModsData) Value() (driver.Value, error) {
+	return json.Marshal(l)
+
 }
 
 func (l LawModsData) Equals(other LawModsData) bool {
@@ -65,6 +88,16 @@ func ReadLawModsData(xmlString string) LawModsData {
 				decoder.DecodeElement(&committee, &se)
 				modsData.CongressCommittees = append(modsData.CongressCommittees, committee)
 			}
+			if se.Name.Local == "action" {
+				var action ModsAction
+				decoder.DecodeElement(&action, &se)
+				modsData.Actions = append(modsData.Actions, action)
+			}
+			if se.Name.Local == "officialTitle" {
+				// read char data from element
+				decoder.DecodeElement(&modsData.OfficialTitle, &se)
+			}
+
 		}
 	}
 	return modsData

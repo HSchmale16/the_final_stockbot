@@ -14,6 +14,7 @@ var disableFetcherService = false
 var disableWebServer = false
 var loadCongressMembers = false
 var congMemberFile = ""
+var doSitemap = false
 var scanLawText = false
 
 func init() {
@@ -22,11 +23,17 @@ func init() {
 	flag.BoolVar(&disableWebServer, "disable-web", false, "Disable the web server")
 	flag.BoolVar(&loadCongressMembers, "load-congress-members", false, "Load congress members")
 	flag.BoolVar(&scanLawText, "scan-law-text", false, "Scan law text")
+	flag.BoolVar(&doSitemap, "sitemap", false, "Generate a sitemap")
 	flag.StringVar(&congMemberFile, "congress-members-file", "", "The file to load congress members from")
 }
 
 func main() {
 	flag.Parse()
+
+	if doSitemap {
+		MakeSitemap()
+		return
+	}
 
 	if scanLawText {
 		db, err := setupDB()

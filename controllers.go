@@ -62,6 +62,7 @@ func SetupServer() {
 	app.Get("/tag/:tag_id", TagIndex)
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/law/:law_id", LawView)
+	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
 	app.Get("/help", func(c *fiber.Ctx) error {
 		return c.Render("help", fiber.Map{}, "layouts/main")
@@ -73,6 +74,8 @@ func SetupServer() {
 		}, "layouts/main")
 	})
 	app.Get("/tos", TermsOfService)
+
+	// HTMX End Point
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
 		db := c.Locals("db").(*gorm.DB)
 
@@ -231,7 +234,7 @@ func LawView(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var law GovtRssItem
-	db.Debug().Preload(clause.Associations).Find(&law, c.Params("law_id"))
+	db.Preload(clause.Associations).Find(&law, c.Params("law_id"))
 
 	var lawText GovtLawText
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
@@ -239,9 +242,10 @@ func LawView(c *fiber.Ctx) error {
 	// metadata := ReadLawModsData(lawText.ModsXML)
 
 	return c.Render("law_view", fiber.Map{
-		"Title":   html.UnescapeString(law.Title),
-		"Law":     law,
-		"LawText": lawText,
+		"Title":      html.UnescapeString(law.Title),
+		"Law":        law,
+		"LawText":    lawText,
+		"RenderMods": strings.HasSuffix(c.Path(), "/mods"),
 		// "Metadata": metadata,
 	}, "layouts/main")
 }

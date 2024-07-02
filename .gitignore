@@ -3,3 +3,4 @@ the_final_stockbot
 *.sqlite*
 DOWNLOAD_MODELS/*
 *.json
+static/*.xml

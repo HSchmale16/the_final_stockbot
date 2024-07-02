@@ -100,6 +100,14 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 		log.Print(len(lawTexts))
 		for _, law := range lawTexts {
 			lawData := ReadLawModsData(law.ModsXML)
+
+			var GovtRssItem GovtRssItem
+			db.Where("id = ?", law.GovtRssItemId).First(&GovtRssItem)
+
+			GovtRssItem.Metadata = lawData
+
+			db.Save(&GovtRssItem)
+
 			// Find the congress member
 			for _, congMember := range lawData.CongressMembers {
 				var dbCongMember DB_CongressMember

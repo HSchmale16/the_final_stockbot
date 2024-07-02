@@ -1,15 +1,48 @@
-
-
-
 <div class="container">
     <h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
     <p>
-        They pour out so much stuff on a good day that no one in their right mind can keep up. The smallest things can have 
-        the largest impacts on our society. A little tarif increase or reduction can have wide rammifications. A new rule can make an 
-        industry completely unviable now. Find out what topics are included in every rule and browse the parts that matter to you the ordinary citizen. 
-        Inform yourself better than the average citizen with the primary source. Do your own research using the actual primary sources with this AI enhanced site.
+        They pour out so much stuff on a good day that no one in their right mind can keep up. The smallest things can
+        have
+        the largest impacts on our society. A little tarif increase or reduction can have wide rammifications. A new
+        rule can make an
+        industry completely unviable now. Find out what topics are included in every rule and browse the parts that
+        matter to you the ordinary citizen.
+        Inform yourself better than the average citizen with the primary source. Do your own research using the actual
+        primary sources with this AI enhanced site.
     </p>
-    <p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on topics have changed.</p>
+    <p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on
+        topics have changed.</p>
+
+    <div class="row g-2 align-items-center">
+        {{!-- Radio Buttons for House or Senate per bootstrap --}}
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
+                    onchange="fetchDataForChamber('H')">
+                <label class="btn btn-outline-primary" for="btnradio1">House</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
+                    onchange="fetchDataForChamber('S')">
+                <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
+            </div>
+        </div>
+        <div class="col-auto">
+            <input class="form-control-lg" type="text" id="search" placeholder="Search for your Congress Person">
+        </div>
+
+    </div>
+
+    <div class="row">
+
+
+        <div id="container"></div>
+        <script type="module" src="/static/viz-js/congress-network.js?cache-bust={{ CacheBust }}"></script>
+        <script>
+            window.onload = () => {
+                fetchDataForChamber('H');
+            }
+        </script>
+    </div>
 
     <div class="row">
         <div class="col-4">
@@ -23,7 +56,7 @@
         </div>
     </div>
 
-    <hr/>
+    <hr />
 
     <h3>
         Search Topics
@@ -32,14 +65,14 @@
         </span>
     </h3>
     <p>Search for the topics most important to you!</p>
-    <input class="form-control-lg" style="width:100%" type="search" name="search" placeholder="Begin Typing To Search Tags and Topics..."
-        hx-get="/htmx/topic-search" hx-trigger="input changed delay:250ms, search" hx-target="#search-results"
-        hx-indicator=".htmx-indicator">
+    <input class="form-control-lg" style="width:100%" type="search" name="search"
+        placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
+        hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
 
 
     <div id="search-results"></div>
 
-    <hr/>
+    <hr />
 
     <h3>Recent Laws</h3>
     {{> 'partials/law-list' }}

@@ -20,6 +20,7 @@ type GovtRssItem struct {
 	Link               string    `gorm:"index:,unique,composite:unique_per_item"`
 	PubDate            time.Time `gorm:"index:,unique,composite:unique_per_item"`
 	ProcessedOn        time.Time
+	Metadata           LawModsData
 
 	// many to many relationship of tags through GovtRssItemTag
 	Tags       []Tag               `gorm:"many2many:govt_rss_item_tag;"`

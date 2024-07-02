@@ -24,11 +24,20 @@ func TestModsXML(t *testing.T) {
 	result := ReadLawModsData(string(data))
 
 	expected := LawModsData{
+		OfficialTitle: "Rejecting the United Nations decision to place the Israel Defense Force on a list of child’s rights abusers.",
+		Actions: []ModsAction{{
+			Date: "2024-06-26",
+			Text: "Mr. Burchett (for himself, Mr. Moskowitz, Mr. Lawler, and Mr. Gottheimer) submitted the following resolution; which was referred to the Committee on Foreign Affairs",
+		}},
+		CongressCommittees: []CongressCommittee{{
+			Name:    "Foreign Affairs",
+			Chamber: "H",
+		}},
 		CongressMembers: []CongressMember{
-			{Party: "R", State: "TN", BioGuideId: "B001309", Role: "SPONSOR", Name: "Burchett, Tim"},
-			{Party: "D", State: "FL", BioGuideId: "M001217", Role: "COSPONSOR", Name: "Moskowitz, Jared"},
-			{Party: "R", State: "NY", BioGuideId: "L000599", Role: "COSPONSOR", Name: "Lawler, Michael"},
-			{Party: "D", State: "NJ", BioGuideId: "G000583", Role: "COSPONSOR", Name: "Gottheimer, Josh"},
+			{Party: "R", State: "TN", BioGuideId: "B001309", Role: "SPONSOR", Name: "Burchett, Tim", Chamber: "H", Congress: "118"},
+			{Party: "D", State: "FL", BioGuideId: "M001217", Role: "COSPONSOR", Name: "Moskowitz, Jared", Chamber: "H", Congress: "118"},
+			{Party: "R", State: "NY", BioGuideId: "L000599", Role: "COSPONSOR", Name: "Lawler, Michael", Chamber: "H", Congress: "118"},
+			{Party: "D", State: "NJ", BioGuideId: "G000583", Role: "COSPONSOR", Name: "Gottheimer, Josh", Chamber: "H", Congress: "118"},
 		},
 	}
 

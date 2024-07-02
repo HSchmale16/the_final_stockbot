@@ -55,3 +55,7 @@ li.rep {
 li.sen {
     list-style-image: url("/static/icons/congress.png");
 }
+
+div.law {
+    border-bottom: 1px solid #ccc;
+}
