@@ -15,11 +15,6 @@ require (
 )
 
 require (
-	github.com/philhofer/fwd v1.1.2 // indirect
-	github.com/tinylib/msgp v1.1.8 // indirect
-)
-
-require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
