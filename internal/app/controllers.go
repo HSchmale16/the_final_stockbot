@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"html"
 	"os"
 	"sort"
@@ -311,7 +312,7 @@ func CongressMemberFinances(c *fiber.Ctx) error {
 
 	db.Find(&orgs, "candidate_id IN ?", fecIds)
 
-	return c.Render("congress_member_finances", fiber.Map{
+	return c.Render("partials/congress_member_finances", fiber.Map{
 		"Orgs": orgs,
 	})
 }
@@ -346,8 +347,16 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 	var worksWith []DB_CongressMember
 	db.Where("bio_guide_id IN ?", sponsoredBy).Find(&worksWith)
 
-	return c.Render("congress_member_works_with", fiber.Map{
+	parties := make(map[string]int)
+	for _, member := range worksWith {
+		parties[member.Party()]++
+	}
+	// dump to json
+	data, _ := json.Marshal(parties)
+
+	return c.Render("partials/congress_member_works_with", fiber.Map{
 		"Member":    member,
 		"WorksWith": worksWith,
+		"Parties":   string(data),
 	})
 }
