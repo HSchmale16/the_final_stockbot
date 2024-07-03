@@ -11,25 +11,6 @@
     The color of the edge is based on the number of bills that the two members have co-sponsored.
 </p>
 
-{{!-- Radio Buttons for House or Senate per bootstrap --}}
-<div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
-        onchange="fetchDataForChamber('H')">
-    <label class="btn btn-outline-primary" for="btnradio1">House</label>
+{{> 'partials/congress-network' }}
 
-    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
-        onchange="fetchDataForChamber('S')">
-    <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
-</div>
-
-<!-- Add this to your HTML -->
-<input type="text" id="search" placeholder="Search for your Congress Person">
-
-<div id="container"></div>
-<script type="module" src="/static/viz-js/congress-network.js?cache-bust={{ CacheBust }}"></script>
-<script>
-    window.onload = () => {
-        fetchDataForChamber('H');
-    }
-</script>
 </div>

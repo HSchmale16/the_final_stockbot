@@ -2,7 +2,6 @@ package app
 
 import (
 	_ "embed"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -38,8 +37,6 @@ func CongressNetwork(c *fiber.Ctx) error {
 	// Select all the congress people mentioned in node_names keys
 	var congress_people []DB_CongressMember
 	db.Where("bio_guide_id IN ?", keys).Find(&congress_people)
-
-	fmt.Println(len(congress_people), len(keys))
 
 	type Node struct {
 		BioGuideId string

@@ -1,5 +1,13 @@
+{{#if Laws }}
+
+{{#if SubTitle }}
+<h3>{{ SubTitle }}</h3>
+{{/if}}
+
+{{> 'partials/ad-roll' }}
+
 {{#each Laws }}
-<div class="law" {{#if @last}} hx-get="/laws?page={{ PubDate }}" hx-trigger="revealed" hx-swap="afterend" {{/if}}>
+<div class="row law" {{#if EnableLoad }}{{#if @last}} hx-get="/laws?page={{ PubDate }}" hx-trigger="revealed" hx-swap="afterend" {{/if}}{{/if}}>
     <h2>{{{ Title }}}</h2>
     <small>Published on {{formatDate PubDate }} | Loaded On {{ formatDate CreatedAt }}</small>
     <p>
@@ -10,6 +18,7 @@
         {{/each}}
         <a href="/law/{{ ID }}">Read more</a>
     </p>
-
 </div>
 {{/each}}
+
+{{/if}}

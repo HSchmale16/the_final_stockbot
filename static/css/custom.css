@@ -56,10 +56,16 @@ li.sen {
     list-style-image: url("/static/icons/congress.png");
 }
 
-div.law {
+/* div.law {
     border-bottom: 1px solid #ccc;
-}
+} */
 
 .member-list {
     columns: 3;
+}
+
+/** Adverstisment CSS */
+div.ad p {
+    text-align: center;
+    font-weight: bold;
 }

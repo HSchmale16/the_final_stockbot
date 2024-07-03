@@ -21,7 +21,8 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 window.d3 = d3;
 
 // Create a bar chart using d3
-const data = new Map(Object.entries({{{ Parties }}}));
+const data = {{{ Parties }}};
+console.log(data)
 
 // data looks like { PartyName : Count }
 
@@ -40,12 +41,14 @@ const svg = d3.select("#works-with-chart")
 const partyColors = {
     "Republican": "#FF0000", // Red
     "Democrat": "#0000FF", // Blue
+    "Independent": "#A020F0", // Purple
     // Add more mappings as needed
 };
 
 const color = d => partyColors[d] || "#CCCCCC";
 
-data.entries().forEach(([party, count], i) => {
+Object.entries(data).forEach(([party, count], i) => {
+    console.log(party, count)
     const arc = d3.arc()
         .innerRadius(0)
         .outerRadius(radius);
@@ -53,7 +56,7 @@ data.entries().forEach(([party, count], i) => {
     const pie = d3.pie()
         .value(d => d[1]);
 
-    const arcs = pie(data.entries());
+    const arcs = pie(Object.entries(data));
 
 
 

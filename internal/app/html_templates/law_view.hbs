@@ -4,14 +4,15 @@
     <div class="bill-metadata">
         <h2>Bill Metadata</h2>
 
-        <p>Publish Date: {{ formatDate Law.PubDate }}</p>
-        <p>Scanned and Processed on: {{ formatDate Law.CreatedAt }}</p>
+        <p><b>Publish Date:</b> {{ formatDate Law.PubDate }}</p>
+        <p><b>Scanned and Processed on:</b> {{ formatDate Law.CreatedAt }}</p>
 
         {{#if Law.Metadata.OfficialTitle }}
-        <p>Official Title: {{ Law.Metadata.OfficialTitle }}</p>
+        <p><b>Official Title</b>: {{ Law.Metadata.OfficialTitle }}</p>
         {{/if}}
 
 
+        {{#if Law.Metadata.Actions }}
         <h3>Actions</h3>
         <ul>
             {{#each Law.Metadata.Actions }}
@@ -19,6 +20,7 @@
             <br />
             {{/each}}
         </ul>
+        {{/if}}
 
         {{#if Law.Sponsors }}
         <h3>Congress Members</h3>
@@ -34,13 +36,47 @@
 
     <hr />
 
-    {{#if RenderMods }}
-    <pre>{{ LawText.ModsXML }}</pre>
-    {{else}}
-    <pre>{{ LawText.Text }}</pre>
-    {{/if}}
-
-    <h1>Tags Applied To Legislation</h1>
-    <div class="tags" hx-get="/law/{{ Law.ID }}/tags" hx-trigger="revealed" hx-swap="afterend">
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="attribution">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{@index}}" aria-expanded="true" aria-controls="collapse{{@index}}">
+                    Bill Text
+                </button>
+            </h2>
+            <div id="collapse{{@index}}" class="accordion-collapse collapse" aria-labelledby="attribution"
+                data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {{#if RenderMods }}
+                    <pre>{{ LawText.ModsXML }}</pre>
+                    {{else}}
+                    <pre>{{ LawText.Text }}</pre>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="attribution">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseTags" aria-expanded="true" aria-controls="collapseTags">
+                    Bill Tags
+                </button>
+            </h2>
+            <div id="collapseTags" class="accordion-collapse collapse" aria-labelledby="attribution"
+                data-bs-parent="#accordionExample">
+                <div class="accordion-body"  hx-get="/law/{{ Law.ID }}/tags" hx-trigger="revealed" hx-swap="afterend">
+                </div>
+            </div>
+        </div>
     </div>
+
+
+    <div class="related-laws row" hx-get="/htmx/law/{{ Law.ID }}/related_laws" hx-trigger="revealed" hx-swap="afterend">
+    </div>
+
+
+    <div class="accordion" id="accordion2">
+        
+    </div>
+
 </div>

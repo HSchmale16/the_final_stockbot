@@ -17,7 +17,7 @@ function fetchDataForChamber(chamber) {
 function drawNetwork(data) {
     // Use d3 to render the nodes
 
-    const width = 800;
+    const width = 1000;
     const height = 800;
 
     const links = data.edges.map(d => ({ ...d }));
@@ -25,7 +25,7 @@ function drawNetwork(data) {
 
 
     const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.BioGuideId))
+        .force("link", d3.forceLink(links).id(d => d.BioGuideId).distance(40))
         .force("charge", d3.forceManyBody())
         .force("x", d3.forceX())
         .force("y", d3.forceY())
@@ -59,6 +59,36 @@ function drawNetwork(data) {
     node.append("title")
         .text(d => `${d.Name} (${d.State} - ${d.Party})`);
 
+    // JavaScript: Enhance node hover effect and implement tooltips
+    const tooltip = d3.select("#tooltip")
+        .style("opacity", 0);
+
+    node.on("mouseover", (event, d) => {
+        // Enhance node appearance
+        d3.select(event.currentTarget)
+            .attr("r", 10) // Increase radius
+            .attr("fill", "gold"); // Change color
+
+        // Show tooltip
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+        tooltip.html(`${d.Name} (${d.State} - ${d.Party})`)
+            .style("left", (event.pageX) + "px")
+            .style("top", (event.pageY - 28) + "px");
+    })
+        .on("mouseout", (event, d) => {
+            // Reset node appearance
+            d3.select(event.currentTarget)
+                .attr("r", 5) // Reset radius
+                .attr("fill", d => PartyColor(d.Party)); // Reset color
+
+            // Hide tooltip
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
     node.call(d3.drag()
         .on("start", (event, d) => {
             if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -71,8 +101,8 @@ function drawNetwork(data) {
         })
         .on("end", (event, d) => {
             if (!event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
+            // d.fx = null;
+            // d.fy = null;
         }))
 
 
@@ -116,4 +146,4 @@ function PartyColor(party) {
             return 'purple';
     }
 }
-    window.fetchDataForChamber = fetchDataForChamber;
+window.fetchDataForChamber = fetchDataForChamber;

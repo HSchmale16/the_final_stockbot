@@ -92,53 +92,33 @@ func LOAD_MEMBERS_JSON(db *gorm.DB, file string) {
 }
 
 func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
-	// Step through law mods
-	var lawTexts []GovtLawText
-	page := 0
-	for next := true; next; next = len(lawTexts) > 0 {
-		db.Order("ID asc").Offset(page * 100).Limit(100).Find(&lawTexts)
-		log.Print(len(lawTexts))
-		for _, law := range lawTexts {
-			lawData := ReadLawModsData(law.ModsXML)
-
-			var GovtRssItem GovtRssItem
-			db.Where("id = ?", law.GovtRssItemId).First(&GovtRssItem)
-
-			GovtRssItem.Metadata = lawData
-
-			db.Save(&GovtRssItem)
-
-			// Find the congress member
-			for _, congMember := range lawData.CongressMembers {
-				var dbCongMember DB_CongressMember
-				db.Where("bio_guide_id = ?", congMember.BioGuideId).First(&dbCongMember)
-				if dbCongMember.BioGuideId == "" {
-					log.Printf("Could not find congress member %s\n", congMember)
-					continue
-				}
-				// Create the association
-				var dbCongMemberSponsored CongressMemberSponsored = CongressMemberSponsored{
-					DB_CongressMemberBioGuideId: dbCongMember.BioGuideId,
-					GovtRssItemId:               law.GovtRssItemId,
-					Chamber:                     congMember.Chamber, // Slightly denormalized here. But it makes sense for the kind of questions we are asking and it can change over time. Trust the library of congress to get it right
-					CongressNumber:              congMember.Congress,
-					Role:                        congMember.Role,
-				}
-				result := db.Where(CongressMemberSponsored{
-					DB_CongressMemberBioGuideId: dbCongMember.BioGuideId,
-					GovtRssItemId:               law.GovtRssItemId,
-				}).Assign(CongressMemberSponsored{
-					Chamber:        dbCongMemberSponsored.Chamber,
-					CongressNumber: dbCongMemberSponsored.CongressNumber,
-					Role:           dbCongMemberSponsored.Role,
-				}).FirstOrCreate(&dbCongMemberSponsored)
-
-				fmt.Println(result.RowsAffected)
-			}
-		}
-		page += 1
+	type foo struct {
+		A string
+		B uint
 	}
+	numCongress := make(map[foo]bool)
 
+	rows, err := db.Debug().Model(&GovtLawText{}).Rows()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var law GovtLawText
+		db.ScanRows(rows, &law)
+
+		db.Model(&law).Association("GovtRssItem").Find(&law.GovtRssItem)
+
+		modsData := ReadLawModsData(law.ModsXML)
+		for _, member := range modsData.CongressMembers {
+			numCongress[foo{member.BioGuideId, law.GovtRssItemId}] = true
+		}
+
+		ScanLawSponsors(modsData, law.GovtRssItem, db)
+	}
+	var x int64
+	db.Model(&CongressMemberSponsored{}).Count(&x)
+	fmt.Println(len(numCongress), x)
 }
 
 type US_CongressLegislator struct {

@@ -9,7 +9,10 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"golang.org/x/text/message"
 
@@ -58,8 +61,9 @@ func SetupServer() {
 		})
 		return c.Next()
 	})
+	app.Use(helmet.New())
 
-	app.Static("/static", "./static")
+	cacheMW := cache.New(cache.Config{})
 
 	// Setup the Routes
 	app.Get("/", Index)
@@ -69,16 +73,16 @@ func SetupServer() {
 	app.Get("/law/:law_id", LawView)
 	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
-	app.Get("/help", func(c *fiber.Ctx) error {
+	app.Get("/help", cacheMW, func(c *fiber.Ctx) error {
 		return c.Render("help", fiber.Map{}, "layouts/main")
 	})
 	app.Get("/json/congress-network", CongressNetwork)
-	app.Get("/congress-network", func(c *fiber.Ctx) error {
+	app.Get("/congress-network", cacheMW, func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
 			"Title": "Congress Network Visualization",
 		}, "layouts/main")
 	})
-	app.Get("/tos", TermsOfService)
+	app.Get("/tos", cacheMW, TermsOfService)
 
 	// HTMX End Point
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
@@ -96,12 +100,34 @@ func SetupServer() {
 			"Tags": tags,
 		})
 	})
-	app.Get("/congress-members", CongressMemberList)
+	app.Get("/congress-members", cacheMW, CongressMemberList)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
+	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
 
 	app.Listen(":8080")
+}
+
+func RelatedLaws(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var govtLaw GovtRssItem
+	db.First(&govtLaw, c.Params("law_id"))
+
+	title := govtLaw.Title
+	// decode the html entities in title
+	before, _, _ := strings.Cut(title, "(")
+
+	x := strings.ReplaceAll(before, "&nbsp;", "%") + " %"
+
+	var govtLaws []GovtRssItem
+	db.Where("title LIKE ?", x).Where("ID != ?", govtLaw.ID).Limit(10).Find(&govtLaws)
+
+	return c.Render("partials/law-list", fiber.Map{
+		"Laws":     govtLaws,
+		"SubTitle": "Related Laws",
+	})
 }
 
 func TagList(c *fiber.Ctx) error {
@@ -146,7 +172,7 @@ func LawIndex(c *fiber.Ctx) error {
 
 	// convert to int minus 1
 	page := c.Query("page", "missing")
-	LIMIT := 20
+	LIMIT := 7
 
 	var laws []GovtRssItem
 	// Pub date before
@@ -157,8 +183,9 @@ func LawIndex(c *fiber.Ctx) error {
 		// we don't use a layout here for htmx.
 		// fuck if I get why I'm using htmx
 		return c.Render("partials/law-list", fiber.Map{
-			"Title": "Most Recent Laws",
-			"Laws":  laws,
+			"Title":      "Most Recent Laws",
+			"Laws":       laws,
+			"EnableLoad": true,
 		})
 	}
 

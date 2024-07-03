@@ -62,6 +62,7 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 }
 
 func RunFetcherService(ch LawRssItemChannel) {
+	defer close(ch)
 	db, err := SetupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
@@ -92,8 +93,47 @@ func RunFetcherService(ch LawRssItemChannel) {
 			congressMembers[i] = member.Name
 		}
 		CreateTagsOnItem(congressMembers, item, 0, db)
-
+		ScanLawSponsors(modsData, item, db)
 		ProcessLawTextForTags(item, db)
+	}
+}
+
+func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
+	item.Metadata = modsData
+	db.Save(&item)
+
+	// Find the congress member
+	for _, congMember := range modsData.CongressMembers {
+		var dbCongMember DB_CongressMember
+		db.Where("bio_guide_id = ?", congMember.BioGuideId).First(&dbCongMember)
+		if dbCongMember.BioGuideId == "" {
+			log.Printf("Could not find congress member %s\n", congMember)
+			continue
+		}
+		// Create the association
+		dbCongMemberSponsored := CongressMemberSponsored{
+			DB_CongressMemberBioGuideId: congMember.BioGuideId,
+			GovtRssItemId:               item.ID,
+			// Slightly denormalized here. But it makes sense for the kind of questions we are asking and
+			// it can change over time. Trust the library of congress to get it right
+			Chamber:        congMember.Chamber,
+			CongressNumber: congMember.Congress,
+			Role:           congMember.Role,
+		}
+
+		x := CongressMemberSponsored{
+			DB_CongressMemberBioGuideId: congMember.BioGuideId,
+			GovtRssItemId:               item.ID,
+		}
+
+		count := int64(0)
+		db.Where(&x).Count(&count)
+
+		if count == 0 {
+			db.Create(&dbCongMemberSponsored)
+		}
+
+		//fmt.Println("SCANNED SPONSORS ADDED: ", result.RowsAffected)
 	}
 }
 

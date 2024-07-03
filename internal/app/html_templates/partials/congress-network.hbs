@@ -1,0 +1,48 @@
+<div class="row g-2 align-items-center">
+    {{!-- Radio Buttons for House or Senate per bootstrap --}}
+    <div class="col">
+        <div class="btn-group" role="group">
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
+                onchange="fetchDataForChamber('H')">
+            <label class="btn btn-outline-primary" for="btnradio1">House</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
+                onchange="fetchDataForChamber('S')">
+            <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="input-group">
+            <div class="input-group-text">Congress Person</div>
+            <input class="form-control w-80" type="text" id="search" placeholder="Search for your Congress Person">
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <div id="tooltip"></div>
+    </div>
+    <div class="col-md-10">
+        <div id="container"></div>
+    </div>
+
+</div>
+
+<script type="module" src="/static/viz-js/congress-network.js?cache-bust={{ CacheBust }}"></script>
+<script>
+    window.onload = () => {
+        fetchDataForChamber('H');
+    }
+</script>
+
+<style>
+    #container {
+        display: flex;
+    }
+
+    #container svg {
+        margin: 0 auto;
+    }
+</style>

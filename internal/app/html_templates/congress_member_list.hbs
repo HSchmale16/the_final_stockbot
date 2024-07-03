@@ -1,10 +1,12 @@
 <div class="container">
     <h1>Active Members of Congress</h1>
-    <ul class="member-list">
+
+    <div class="row">
         {{#each ActiveMembers}}
         <li class="{{ this.Role }}">
             <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} ({{ this.State }} - {{firstChar this.Party }})</a>
         </li>
         {{/each}}
-    </ul>
+    </div>
 </div>
+
