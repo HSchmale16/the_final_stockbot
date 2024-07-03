@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"encoding/json"
@@ -62,7 +62,7 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 }
 
 func RunFetcherService(ch LawRssItemChannel) {
-	db, err := setupDB()
+	db, err := SetupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
 		return
@@ -210,7 +210,7 @@ func downloadLawFullText(url string) string {
 	return doc.Find("pre").First().Text()
 }
 
-func handleLawRss(rssLink string, ch LawRssItemChannel) {
+func HandleLawRss(rssLink string, ch LawRssItemChannel) {
 	// Parse the RSS feed using gofeed
 	parser := gofeed.NewParser()
 	feed, err := parser.ParseURL(rssLink)

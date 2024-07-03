@@ -4,7 +4,7 @@
  * And I just want to get the data loaded so I can do cool things with it.
  */
 
-package main
+package app
 
 import (
 	"database/sql/driver"

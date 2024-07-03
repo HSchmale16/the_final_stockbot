@@ -2,7 +2,7 @@
  * Reads the mods XML data and generates a structure containing details about the data
  */
 
-package main
+package app
 
 import (
 	"database/sql/driver"

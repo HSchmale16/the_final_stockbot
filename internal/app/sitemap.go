@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ const (
 )
 
 func MakeSitemap() {
-	db, err := setupDB()
+	db, err := SetupDB()
 	if err != nil {
 		panic(err)
 	}

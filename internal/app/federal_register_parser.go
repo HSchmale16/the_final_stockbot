@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"bytes"
@@ -37,7 +37,7 @@ func FederalRegisterParser() {
 		log.Fatal(err)
 	}
 
-	db, err := setupDB()
+	db, err := SetupDB()
 	if err != nil {
 		log.Fatal(err)
 	}

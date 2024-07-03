@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"log"
@@ -205,7 +205,7 @@ func (CongressMemberSponsored) TableName() string {
 /**
  * Sets up the stupid database
  */
-func setupDB() (*gorm.DB, error) {
+func SetupDB() (*gorm.DB, error) {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{

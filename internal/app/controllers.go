@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"html"
@@ -16,7 +16,7 @@ import (
 )
 
 func SetupServer() {
-	db, err := setupDB()
+	db, err := SetupDB()
 	if err != nil {
 		panic(err)
 	}

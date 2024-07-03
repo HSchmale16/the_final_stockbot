@@ -6,6 +6,7 @@ import (
 	"log"
 	_ "net/http/pprof"
 
+	"github.com/hschmale16/the_final_stockbot/internal/app"
 	"github.com/robfig/cron/v3"
 )
 
@@ -31,37 +32,37 @@ func main() {
 	flag.Parse()
 
 	if doSitemap {
-		MakeSitemap()
+		app.MakeSitemap()
 		return
 	}
 
 	if scanLawText {
-		db, err := setupDB()
+		db, err := app.SetupDB()
 		if err != nil {
 			log.Fatal(err)
 		}
-		LOAD_Members_Mods_2_RSS(db)
+		app.LOAD_Members_Mods_2_RSS(db)
 		return
 	}
 
 	if loadCongressMembers {
-		db, err := setupDB()
+		db, err := app.SetupDB()
 		if err != nil {
 			log.Fatal(err)
 		}
-		LOAD_MEMBERS_JSON(db, congMemberFile)
+		app.LOAD_MEMBERS_JSON(db, congMemberFile)
 		return
 	}
 
 	if !disableFetcherService {
-		ch := make(LawRssItemChannel, 10)
+		ch := make(app.LawRssItemChannel, 10)
 
-		go RunFetcherService(ch)
+		go app.RunFetcherService(ch)
 
 		triggerRssFetch := func() {
 			log.Println("Triggering RSS fetch")
-			for _, rssLink := range RssLinks {
-				go handleLawRss(rssLink, ch)
+			for _, rssLink := range app.RssLinks {
+				go app.HandleLawRss(rssLink, ch)
 			}
 		}
 
@@ -73,7 +74,7 @@ func main() {
 	}
 
 	if !disableWebServer {
-		SetupServer()
+		app.SetupServer()
 	}
 	fmt.Println("Done!")
 }
