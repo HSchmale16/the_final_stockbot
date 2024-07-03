@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
@@ -27,16 +28,16 @@ func SetupServer() {
 		Views: GetTemplateEngine(),
 	})
 
+	// Serve static files only on debug mode
+	if os.Getenv("DEBUG") == "true" {
+		app.Static("/static", "./static")
+	}
+
 	// Logging Request ID
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
 		Format: "${pid} ${latency} ${status} - ${method} ${path}?${queryParams}\n",
 	}))
-
-	// Serve static files only on debug mode
-	if os.Getenv("DEBUG") == "true" {
-		app.Static("/static", "./static")
-	}
 
 	// Middleware to pass db instance
 	app.Use(func(c *fiber.Ctx) error {
@@ -46,10 +47,13 @@ func SetupServer() {
 
 	CacheBustTimestamp := time.Now().Unix()
 
+	IsDebug := os.Getenv("DEBUG") == "true"
+
 	app.Use(func(c *fiber.Ctx) error {
 		c.Bind(fiber.Map{
 			"CacheBust": CacheBustTimestamp,
 			"Title":     "DirtyCongress.com",
+			"DEBUG":     IsDebug,
 		})
 		return c.Next()
 	})
@@ -93,6 +97,8 @@ func SetupServer() {
 	})
 	app.Get("/congress-members", CongressMemberList)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
+	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
+	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 
 	app.Listen(":8080")
 }
@@ -292,6 +298,24 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	}, "layouts/main")
 }
 
+func CongressMemberFinances(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var member DB_CongressMember
+	db.First(&member, DB_CongressMember{
+		BioGuideId: c.Params("bio_guide_id"),
+	})
+
+	fecIds := member.CongressMemberInfo.Id.Fec
+	var orgs []fecwrangling.CampaignCanidateLinkage
+
+	db.Find(&orgs, "candidate_id IN ?", fecIds)
+
+	return c.Render("congress_member_finances", fiber.Map{
+		"Orgs": orgs,
+	})
+}
+
 func CongressMemberWorksWith(c *fiber.Ctx) error {
 	// Do a simple graph search in both directions of degree 2 to see who they work with most often
 
@@ -302,21 +326,27 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 		BioGuideId: c.Params("bio_guide_id"),
 	})
 
-	// Get the members they work with
+	// Get the bills they sponsored
 	var sponsored []CongressMemberSponsored
 	db.Where("db_congress_member_bio_guide_id = ?", member.BioGuideId).Find(&sponsored)
 
-	// Get the members they work with
-	var worksWith []DB_CongressMember
-	for _, sponsor := range sponsored {
-		var member DB_CongressMember
-		db.First(&member, DB_CongressMember{
-			BioGuideId: sponsor.DB_CongressMemberBioGuideId,
-		})
-		worksWith = append(worksWith, member)
+	bills := make([]uint, len(sponsored))
+	for i, bill := range sponsored {
+		bills[i] = bill.GovtRssItemId
 	}
 
-	return c.Render("congress_works_with", fiber.Map{
+	var sponsoredBy []string
+	db.
+		Model(&CongressMemberSponsored{}).
+		Distinct("db_congress_member_bio_guide_id").
+		Where("govt_rss_item_id IN ?", bills).
+		Find(&sponsoredBy)
+
+	// Get the members they work with
+	var worksWith []DB_CongressMember
+	db.Where("bio_guide_id IN ?", sponsoredBy).Find(&worksWith)
+
+	return c.Render("congress_member_works_with", fiber.Map{
 		"Member":    member,
 		"WorksWith": worksWith,
 	})

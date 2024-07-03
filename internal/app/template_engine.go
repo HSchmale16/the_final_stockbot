@@ -18,7 +18,7 @@ var templates embed.FS
 func getEngine() *handlebars.Engine {
 	// Check for debug environment variable
 	if os.Getenv("DEBUG") == "true" {
-		engine := handlebars.New("./html_templates", ".hbs")
+		engine := handlebars.New("./internal/app/html_templates", ".hbs")
 		engine.Reload(true)
 		return engine
 	}

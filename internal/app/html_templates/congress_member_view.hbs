@@ -9,7 +9,6 @@
             {{else}}
                 Not Available
             {{/if}}
-            
         </div>
         <div class="col-md-8">
             <h3>Terms</h3>
@@ -22,7 +21,6 @@
                 {{/if}}
             {{/each}}
             </ul>
-            
         </div>
     </div>
 
@@ -43,6 +41,16 @@
         </div>    
     </div>
 
+    <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/finances" hx-trigger="revealed">
+        <h3>Finances</h3>
+    </div>
+
+    <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/works_with" hx-trigger="revealed">
+        <h3>Works With</h3>
+    </div>
+
+
+
     <div class="row">
         <div class="col-md-8">
             <h3>External Links</h3>
@@ -58,5 +66,7 @@
             {{/with}}
         </div>
     </div>
+
+
 </div>
 

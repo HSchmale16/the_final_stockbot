@@ -59,3 +59,7 @@ li.sen {
 div.law {
     border-bottom: 1px solid #ccc;
 }
+
+.member-list {
+    columns: 3;
+}

@@ -7,6 +7,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
+	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/robfig/cron/v3"
 )
 
@@ -17,6 +18,7 @@ var loadCongressMembers = false
 var congMemberFile = ""
 var doSitemap = false
 var scanLawText = false
+var loadCclFile = ""
 
 func init() {
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
@@ -26,6 +28,7 @@ func init() {
 	flag.BoolVar(&scanLawText, "scan-law-text", false, "Scan law text")
 	flag.BoolVar(&doSitemap, "sitemap", false, "Generate a sitemap")
 	flag.StringVar(&congMemberFile, "congress-members-file", "", "The file to load congress members from")
+	flag.StringVar(&loadCclFile, "load-ccl-file", "", "The file to load the CCL file from")
 }
 
 func main() {
@@ -33,6 +36,20 @@ func main() {
 
 	if doSitemap {
 		app.MakeSitemap()
+		return
+	}
+
+	if loadCclFile != "" {
+		db, err := app.SetupDB()
+		if err != nil {
+			log.Fatal(err)
+		}
+		x := fecwrangling.LoadLinkageZipFile(loadCclFile)
+
+		for i := range x {
+			//fmt.Println(i)
+			db.Debug().Create(&i)
+		}
 		return
 	}
 
