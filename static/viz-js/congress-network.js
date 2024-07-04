@@ -74,7 +74,7 @@ function drawNetwork(data) {
 
         // Show tooltip
         tooltip.transition()
-            .duration(200)
+            .duration(400)
             .style("opacity", .9);
 
         tooltip.html(`<div hx-trigger="revealed" hx-get="${getCongressPersonDetailsUrl(d.BioGuideId)}" >${d.Name}</div>`)
@@ -89,9 +89,9 @@ function drawNetwork(data) {
                 .attr("fill", d => PartyColor(d.Party)); // Reset color
 
             // Hide tooltip
-            // tooltip.transition()
-            //     .duration(500)
-            //     .style("opacity", 0);
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
         });
 
     node.call(d3.drag()
