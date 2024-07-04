@@ -66,32 +66,50 @@ function drawNetwork(data) {
     const tooltip = d3.select("#tooltip")
         .style("opacity", 0);
 
+    let clicked = false;
+
     node.on("mouseover", (event, d) => {
-        // Enhance node appearance
-        d3.select(event.currentTarget)
-            .attr("r", 10) // Increase radius
-            .attr("fill", "gold"); // Change color
+        if (!clicked) {
+            // Enhance node appearance
+            d3.select(event.currentTarget)
+                .attr("r", 10) // Increase radius
+                .attr("fill", "gold"); // Change color
 
-        // Show tooltip
-        tooltip.transition()
-            .duration(400)
-            .style("opacity", .9);
+            // Show tooltip
+            tooltip.transition()
+                .duration(400)
+                .style("opacity", .9);
 
-        tooltip.html(`<div hx-trigger="revealed" hx-get="${getCongressPersonDetailsUrl(d.BioGuideId)}" >${d.Name}</div>`)
+            tooltip.html(`<div hx-trigger="revealed" hx-get="${getCongressPersonDetailsUrl(d.BioGuideId)}" >${d.Name}</div>`)
 
 
-        htmx.process(document.getElementById("tooltip"));
+            htmx.process(document.getElementById("tooltip"));
+        }
     })
         .on("mouseout", (event, d) => {
-            // Reset node appearance
-            d3.select(event.currentTarget)
-                .attr("r", 5) // Reset radius
-                .attr("fill", d => PartyColor(d.Party)); // Reset color
+            if (!clicked) {
+                // Reset node appearance
+                d3.select(event.currentTarget)
+                    .attr("r", 5) // Reset radius
+                    .attr("fill", d => PartyColor(d.Party)); // Reset color
 
-            // Hide tooltip
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+                // Hide tooltip
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            }
+        })
+        .on('click', (event, d) => {
+            clicked = !clicked;
+            if (clicked) {
+                d3.select(event.currentTarget)
+                    .attr("r", 10) // Increase radius
+                    .attr("fill", "gold"); // Change color
+            } else {
+                d3.select(event.currentTarget)
+                    .attr("r", 5) // Reset radius
+                    .attr("fill", d => PartyColor(d.Party)); // Reset color
+            }
         });
 
     node.call(d3.drag()
