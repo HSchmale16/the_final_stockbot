@@ -90,6 +90,8 @@ func main() {
 		cron.Start()
 	}
 
+	fmt.Println("Starting up...")
+
 	if !disableWebServer {
 		app.SetupServer()
 	}

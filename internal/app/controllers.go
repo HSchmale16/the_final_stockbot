@@ -102,6 +102,7 @@ func SetupServer() {
 	})
 	app.Get("/congress-members", cacheMW, CongressMemberList)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
+	app.Get("/congress-member/:bio_guide_id/embed", EmbedCongressMember)
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
@@ -385,5 +386,19 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 		"Member":    member,
 		"WorksWith": worksWith,
 		"Parties":   string(data),
+	})
+}
+
+func EmbedCongressMember(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var member DB_CongressMember
+	db.First(&member, DB_CongressMember{
+		BioGuideId: c.Params("bio_guide_id"),
+	})
+
+	return c.Render("embed/congress_member", fiber.Map{
+		"Member": member,
+		"Image":  "/static/img/muddy-" + string(member.Party()[0]) + ".jpg",
 	})
 }

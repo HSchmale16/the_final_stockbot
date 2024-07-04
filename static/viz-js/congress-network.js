@@ -13,6 +13,9 @@ function fetchDataForChamber(chamber) {
         });
 }
 
+function getCongressPersonDetailsUrl(bioGuideId) {
+    return `/congress-member/${bioGuideId}/embed`;
+}
 
 function drawNetwork(data) {
     // Use d3 to render the nodes
@@ -56,12 +59,12 @@ function drawNetwork(data) {
 
 
     // When I hover over a node, show the name
-    node.append("title")
-        .text(d => `${d.Name} (${d.State} - ${d.Party})`);
+    // node.append("title")
+    //     .text(d => );
 
     // JavaScript: Enhance node hover effect and implement tooltips
     const tooltip = d3.select("#tooltip")
-        .style("opacity", 0);
+        // .style("opacity", 0);
 
     node.on("mouseover", (event, d) => {
         // Enhance node appearance
@@ -70,12 +73,14 @@ function drawNetwork(data) {
             .attr("fill", "gold"); // Change color
 
         // Show tooltip
-        tooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
-        tooltip.html(`${d.Name} (${d.State} - ${d.Party})`)
-            .style("left", (event.pageX) + "px")
-            .style("top", (event.pageY - 28) + "px");
+        // tooltip.transition()
+        //     .duration(200)
+        //     .style("opacity", .9);
+
+        tooltip.html(`<div hx-trigger="revealed" hx-get="${getCongressPersonDetailsUrl(d.BioGuideId)}" >${d.Name}</div>`)
+
+
+        htmx.process(document.getElementById("tooltip"));
     })
         .on("mouseout", (event, d) => {
             // Reset node appearance
@@ -84,9 +89,9 @@ function drawNetwork(data) {
                 .attr("fill", d => PartyColor(d.Party)); // Reset color
 
             // Hide tooltip
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+            // tooltip.transition()
+            //     .duration(500)
+            //     .style("opacity", 0);
         });
 
     node.call(d3.drag()
