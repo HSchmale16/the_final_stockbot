@@ -64,7 +64,7 @@ function drawNetwork(data) {
 
     // JavaScript: Enhance node hover effect and implement tooltips
     const tooltip = d3.select("#tooltip")
-        // .style("opacity", 0);
+        .style("opacity", 0);
 
     node.on("mouseover", (event, d) => {
         // Enhance node appearance
@@ -73,9 +73,9 @@ function drawNetwork(data) {
             .attr("fill", "gold"); // Change color
 
         // Show tooltip
-        // tooltip.transition()
-        //     .duration(200)
-        //     .style("opacity", .9);
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
 
         tooltip.html(`<div hx-trigger="revealed" hx-get="${getCongressPersonDetailsUrl(d.BioGuideId)}" >${d.Name}</div>`)
 
