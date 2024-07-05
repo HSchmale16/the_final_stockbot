@@ -32,6 +32,8 @@ func SetupServer() {
 		Views: GetTemplateEngine(),
 	})
 
+	app.Use(helmet.New())
+
 	// Serve static files only on debug mode
 	if os.Getenv("DEBUG") == "true" {
 		app.Static("/static", "./static")
