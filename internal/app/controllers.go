@@ -35,7 +35,6 @@ func SetupServer() {
 	app.Use(helmet.New(helmet.Config{
 		HSTSPreloadEnabled: true,
 		HSTSMaxAge:         300,
-		FrameDeny:          true,
 	}))
 
 	// Serve static files only on debug mode
