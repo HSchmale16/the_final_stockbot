@@ -35,14 +35,20 @@ func CongressNetwork(c *fiber.Ctx) error {
 	}
 
 	// Select all the congress people mentioned in node_names keys
-	var congress_people []DB_CongressMember
-	db.Where("bio_guide_id IN ?", keys).Find(&congress_people)
+	var congress_people []struct {
+		DB_CongressMember
+		Count int
+	}
+	db.Table("congress_member").
+		Select("congress_member.*", "(SELECT COUNT(*) FROM congress_member_sponsored WHERE db_congress_member_bio_guide_id = congress_member.bio_guide_id) as count").
+		Where("bio_guide_id IN ?", keys).Find(&congress_people)
 
 	type Node struct {
 		BioGuideId string
 		Name       string
 		State      string
 		Party      string
+		Count      int
 	}
 
 	var nodes = make([]Node, len(congress_people))
@@ -52,6 +58,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 		nodes[i].Name = person.Name
 		nodes[i].State = person.CongressMemberInfo.Terms[0].State
 		nodes[i].Party = person.CongressMemberInfo.Terms[0].Party
+		nodes[i].Count = person.Count
 	}
 
 	return c.JSON(fiber.Map{

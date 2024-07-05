@@ -17,6 +17,10 @@ function getCongressPersonDetailsUrl(bioGuideId) {
     return `/congress-member/${bioGuideId}/embed`;
 }
 
+function NodeSizeHandler(d) {
+    return 1.5 * d.Count;
+}
+
 function drawNetwork(data) {
     // Use d3 to render the nodes
 
@@ -28,7 +32,7 @@ function drawNetwork(data) {
 
 
     const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.BioGuideId).distance(40))
+        .force("link", d3.forceLink(links).id(d => d.BioGuideId).distance(80))
         .force("charge", d3.forceManyBody())
         .force("x", d3.forceX())
         .force("y", d3.forceY())
@@ -54,13 +58,10 @@ function drawNetwork(data) {
         .selectAll()
         .data(nodes)
         .join("circle")
-        .attr("r", 5)
+        .attr("r", d => d.Count * 1.2 + 2)
         .attr("fill", d => PartyColor(d.Party));
 
 
-    // When I hover over a node, show the name
-    // node.append("title")
-    //     .text(d => );
 
     // JavaScript: Enhance node hover effect and implement tooltips
     const tooltip = d3.select("#tooltip")
@@ -72,8 +73,8 @@ function drawNetwork(data) {
         if (!clicked) {
             // Enhance node appearance
             d3.select(event.currentTarget)
-                .attr("r", 10) // Increase radius
-                .attr("fill", "gold"); // Change color
+                // .attr("r", 10) // Increase radius
+                .attr("stroke", "gold"); // Change color
 
             // Show tooltip
             tooltip.transition()
@@ -90,8 +91,9 @@ function drawNetwork(data) {
             if (!clicked) {
                 // Reset node appearance
                 d3.select(event.currentTarget)
-                    .attr("r", 5) // Reset radius
-                    .attr("fill", d => PartyColor(d.Party)); // Reset color
+                    .attr("r", NodeSizeHandler) // Reset radius
+                    .attr("fill", d => PartyColor(d.Party)) // Reset color
+                    .attr("stroke", "#fff"); // Reset color
 
                 // Hide tooltip
                 tooltip.transition()
