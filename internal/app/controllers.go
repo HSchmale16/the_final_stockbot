@@ -32,7 +32,9 @@ func SetupServer() {
 		Views: GetTemplateEngine(),
 	})
 
-	app.Use(helmet.New())
+	app.Use(helmet.New(helmet.Config{
+		ContentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'self'; frame-src 'self';",
+	}))
 
 	// Serve static files only on debug mode
 	if os.Getenv("DEBUG") == "true" {
