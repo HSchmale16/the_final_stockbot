@@ -33,7 +33,9 @@ func SetupServer() {
 	})
 
 	app.Use(helmet.New(helmet.Config{
-		ContentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'self'; frame-src 'self';",
+		HSTSPreloadEnabled: true,
+		HSTSMaxAge:         300,
+		FrameDeny:          true,
 	}))
 
 	// Serve static files only on debug mode
