@@ -81,7 +81,7 @@ func SetupServer() {
 	app.Get("/help", cacheMW, func(c *fiber.Ctx) error {
 		return c.Render("help", fiber.Map{}, "layouts/main")
 	})
-	app.Get("/json/congress-network", CongressNetwork)
+	app.Get("/json/congress-network", cacheMW, CongressNetwork)
 	app.Get("/congress-network", cacheMW, func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
 			"Title": "Congress Network Visualization",
