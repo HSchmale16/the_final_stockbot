@@ -23,7 +23,10 @@ server {
         alias {{ static_root }};
         autoindex off;
         gzip on;
-        gzip_types application/javascript text/javascript;
+        gzip_types application/javascript text/javascript image/jpeg;
+        etag on;
+        expires 3h;
+        add_header Cache-Control "public";
         try_files $uri $uri/ /index.html;
     }
 
