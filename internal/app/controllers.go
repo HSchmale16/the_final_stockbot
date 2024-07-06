@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/utils"
 
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
@@ -69,7 +70,11 @@ func SetupServer() {
 	})
 	app.Use(helmet.New())
 
-	cacheMW := cache.New(cache.Config{})
+	cacheMW := cache.New(cache.Config{
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return utils.CopyString(c.Path()) + utils.CopyString(string(c.Context().URI().QueryString()))
+		},
+	})
 
 	// Setup the Routes
 	app.Get("/", Index)
