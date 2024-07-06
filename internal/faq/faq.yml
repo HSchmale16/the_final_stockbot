@@ -8,7 +8,7 @@
     answer: >
       The bill data is updated every 2 hours. The data is pulled from the <a href="https://www.govtinfo.gov">Govinfo.gov</a> website.
     slug: "how-often-is-the-data-updated"
-  - question: "What tols does this site provide?"
+  - question: "What tools does this site provide?"
     answer: >
       This site provides tools to search for bills by keyword, topic, or reference. It also provides tools to search for members of the House and Senate, as well as the committees that they serve on. It also provides tools to search for issues that are being debated in the House and Senate, as well as the bills that are being introduced to address those issues. It provides visualizations of the data.
     slug: "what-tools-does-this-site-provide"
