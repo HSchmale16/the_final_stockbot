@@ -6,7 +6,7 @@
     slug: "what-does-this-site-track"
   - question: "How often is the data updated?"
     answer: >
-      The bill data is updated every 2 hours. The data is pulled from the <a href="https://www.govtinfo.gov">Govinfo.gov</a> website.
+      The bill data is updated every 2 hours. The data is pulled from the <a href="https://www.govinfo.gov">Govinfo.gov</a> website.
     slug: "how-often-is-the-data-updated"
   - question: "What tools does this site provide?"
     answer: >
