@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 
+	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"golang.org/x/text/message"
 
@@ -78,9 +79,6 @@ func SetupServer() {
 	app.Get("/law/:law_id", LawView)
 	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
-	app.Get("/help", cacheMW, func(c *fiber.Ctx) error {
-		return c.Render("help", fiber.Map{}, "layouts/main")
-	})
 	app.Get("/json/congress-network", cacheMW, CongressNetwork)
 	app.Get("/congress-network", cacheMW, func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
@@ -111,6 +109,8 @@ func SetupServer() {
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
+
+	faq.SetupRoutes(app)
 
 	app.Listen(":8080")
 }

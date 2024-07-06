@@ -1,0 +1,84 @@
+- category: "General"
+  questions:
+  - question: "What does this site track?"
+    answer: >
+      This site tracks the bills introduced to the House of Representatives and the Senate. It also tracks the members of the House and Senate, as well as the committees that they serve on. The site also tracks the various issues that are being debated in the House and Senate, as well as the various bills that are being introduced to address those issues. It tracks the topics and references within the bills and generates an index of topics. It also provides visualizations.
+    slug: "what-does-this-site-track"
+  - question: "How often is the data updated?"
+    answer: >
+      The bill data is updated every 2 hours. The data is pulled from the <a href="https://www.govtinfo.gov">Govinfo.gov</a> website.
+    slug: "how-often-is-the-data-updated"
+  - question: "What tols does this site provide?"
+    answer: >
+      This site provides tools to search for bills by keyword, topic, or reference. It also provides tools to search for members of the House and Senate, as well as the committees that they serve on. It also provides tools to search for issues that are being debated in the House and Senate, as well as the bills that are being introduced to address those issues. It provides visualizations of the data.
+    slug: "what-tools-does-this-site-provide"
+  - question: "Why should I care what my congress people are doing?"
+    answer: >
+      Your congress people are elected to represent you and your interests. They are responsible for making laws that affect your daily life. It is important to know what they are doing so that you can hold them accountable for their actions.
+    slug: "why-should-i-care-what-my-congress-people-are-doing"
+  - question: "How do I hold my congress people accountable?"
+    answer: >
+      You can hold your congress people accountable by staying informed about what they are doing, contacting them to express your opinions, voting in elections, and participating in the political process.
+    slug: "how-do-i-hold-my-congress-people-accountable"
+
+#############################################################
+- category: Elections
+  questions: 
+  - question: "What is the Electoral College?"
+    answer: >
+      The Electoral College is a group of electors who are chosen by the voters in each state to elect the President and Vice President of the United States. Each state has a certain number of electors, which is equal to the number of representatives and senators that the state has in Congress. The candidate who receives the majority of the electoral votes (270 out of 538) is elected President. The Electoral College was established by the Constitution as a compromise between electing the President by a vote in Congress and electing the President by a popular vote of qualified citizens.
+    slug: "what-is-the-electoral-college"
+  - question: "What is the Federal Elections Commission?"
+    answer: >
+      The <a href="https://fec.gov">Federal Election Commission (FEC)</a> is an independent regulatory agency that was established by the Federal Election Campaign Act of 1971. The FEC is responsible for administering and enforcing the federal campaign finance laws that govern the financing of federal elections. The FEC is composed of six commissioners who are appointed by the President and confirmed by the Senate. The FEC is responsible for disclosing campaign finance information, enforcing the contribution limits and prohibitions, and overseeing the public funding of presidential elections.
+    slug: "what-is-the-federal-elections-commission"
+  - question: "How do I find my polling place?"
+    answer: >
+      You can find your polling place by visiting the <a href="https://www.vote.org/polling-place-locator/">Vote.org</a> website and entering your address.
+    slug: "how-do-i-find-my-polling-place"
+  - question: "How do I register to vote?"
+    answer: >
+      You can register to vote by visiting the <a href="https://www.vote.org/register-to-vote/">Vote.org</a> website and following the instructions for your state.
+    slug: "how-do-i-register-to-vote"
+
+
+#############################################################
+- category: The House of Representatives
+  questions:
+  - question: "What is the House of Representives?"
+    answer: "The House of Representatives is one of the two houses of the United States Congress. The House is composed of representatives who sit in congressional districts that are allocated to each of the 50 states on a basis of population as measured by the U.S. Census, with each district entitled to one representative. The number of representatives can change every 10 years, after the U.S. Census is conducted. The House is presided over by the Speaker of the House, who is elected by the members of the House. There are several nonvoting members for the various terriorities of the United States."
+    slug: "what-is-the-house-of-representives"
+  - question: "How many members are in the House of Representatives?"
+    answer: "There are 435 members in the House of Representatives. The number of representatives can change every 10 years, after the U.S. Census is conducted."
+    slug: "how-many-members-are-in-the-house-of-representatives"
+  - question: "How long is a term for a member of the House of Representatives?"
+    answer: "A term for a member of the House of Representatives is two years."
+    slug: "how-long-is-a-term-for-a-member-of-the-house-of-representatives"
+  - question: "What are the qualifications to be a member of the House of Representatives?"
+    answer: "To be a member of the House of Representatives, a person must be at least 25 years old, have been a U.S. citizen for at least seven years, and be an inhabitant of the state they represent."
+    slug: "what-are-the-qualifications-to-be-a-member-of-the-house-of-representatives"
+  - question: "How do I find out who my representative is?"
+    answer: |
+      You can find out who your representative is by visiting the <a href="https://www.house.gov">House of Representatives</a> website and entering your zip code into the widget at the top of the page.
+    slug: "how-do-i-find-out-who-my-representative-is"
+
+
+#############################################################
+- category: "The Senate"
+  questions:
+  - question: "What is the Senate?"
+    answer: "The Senate is the upper chamber of the United States Congress, which along with the United States House of Representatives—the lower chamber—comprises the legislative branch of the federal government of the United States. The Senate is composed of senators, each of whom represents a single state in its entirety. Each state, regardless of its population size, is equally represented by two senators who serve staggered six-year terms. The Senate is presided over by the Vice President of the United States, who is also the President of the Senate. In the Vice President's absence, the President Pro Tempore, who is elected by the Senate, presides over the Senate."
+    slug: "what-is-the-senate"
+  - question: "How many members are in the Senate?"
+    answer: "There are 100 members in the Senate. Each state, regardless of its population size, is equally represented by two senators who serve staggered six-year terms."
+    slug: "how-many-members-are-in-the-senate"
+  - question: "How long is a term for a member of the Senate?"
+    answer: "A term for a member of the Senate is six years."
+    slug: "how-long-is-a-term-for-a-member-of-the-senate"
+  - question: "What are the qualifications to be a member of the Senate?"
+    answer: "To be a member of the Senate, a person must be at least 30 years old, have been a U.S. citizen for at least nine years, and be an inhabitant of the state they represent."
+    slug: "what-are-the-qualifications-to-be-a-member-of-the-senate"
+  - question: "How do I find out who my senators are?"
+    answer: |
+      You can find out who your senators are by visiting the <a href="https://www.senate.gov/states/statesmap.htm">Senate State Map</a> website and selecting your state from the map image.
+    slug: "how-do-i-find-out-who-my-senators-are"

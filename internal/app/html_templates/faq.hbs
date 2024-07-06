@@ -1,0 +1,32 @@
+<div class="container">
+    <h1>Contents</h1>
+    {{#each Categories}}
+    <h2>{{ Category }}</h2>
+    <ol>
+        {{#each Questions }}
+        <li><a href="#{{slug}}">{{question}}</a></li>
+        {{/each}}
+    </ol>
+
+    {{/each}}
+
+
+    {{#each Categories}}
+    <h2>{{ Category }}</h2>
+    {{#each Questions }}
+    <h3 id="{{slug}}">{{question}}</h3>
+    <p>{{{answer}}}</p>
+    {{/each}}
+    {{/each}}
+</div>
+
+<script>
+    function copyLinkToClipboard(slug) {
+        const url = window.location.href.split('#')[0] + '#' + slug; // Construct the URL
+        navigator.clipboard.writeText(url).then(function () {
+            console.log('Copying to clipboard was successful!');
+        }, function (err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+</script>
