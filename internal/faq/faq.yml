@@ -12,6 +12,15 @@
     answer: >
       This site provides tools to search for bills by keyword, topic, or reference. It also provides tools to search for members of the House and Senate, as well as the committees that they serve on. It also provides tools to search for issues that are being debated in the House and Senate, as well as the bills that are being introduced to address those issues. It provides visualizations of the data.
     slug: "what-tools-does-this-site-provide"
+
+  - question: "What kinds of data visualizations are available?"
+    answer: >
+      <ol>
+        <li>Who is sponsoring the most bills?</li>
+        <li>Pie chart showing how often a congress person reaches across the aisle</li>
+        <li>Network graph showing how congress people are connected by co-sponsorship</li>
+        <li>Word Clouds of Topics in the Bills</li>
+      </ol>
   - question: "Why should I care what my congress people are doing?"
     answer: >
       Your congress people are elected to represent you and your interests. They are responsible for making laws that affect your daily life. It is important to know what they are doing so that you can hold them accountable for their actions.
