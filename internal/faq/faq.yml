@@ -21,6 +21,17 @@
       You can hold your congress people accountable by staying informed about what they are doing, contacting them to express your opinions, voting in elections, and participating in the political process.
     slug: "how-do-i-hold-my-congress-people-accountable"
 
+  - question: "What are the common forms of corruption within congress?"
+    answer: >
+      Common forms of corruption within congress include bribery, extortion, embezzlement, cronyism, nepotism, patronage, graft, and kickbacks. These forms of corruption can undermine the integrity of the legislative process and erode public trust in government.
+    slug: "what-are-the-common-forms-of-corruption-within-congress"
+
+  - question: "What is the difference between a bill and a law?"
+    answer: >
+      A bill is a proposed piece of legislation that is introduced in either the House of Representatives or the Senate. Once a bill is passed by both chambers of Congress and signed by the President, it becomes a law. A bill must pass through several stages in both chambers of Congress before it can become a law, including committee review, floor debate, and a final vote.
+    slug: "what-is-the-difference-between-a-bill-and-a-law"
+
+
 #############################################################
 - category: Elections
   questions: 
