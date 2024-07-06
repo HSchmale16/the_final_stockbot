@@ -111,6 +111,7 @@ func SetupServer() {
 	app.Get("/congress-members", cacheMW, CongressMemberList)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
 	app.Get("/congress-member/:bio_guide_id/embed", EmbedCongressMember)
+	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", SponsorsBillsWithPiChart)
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
@@ -356,8 +357,6 @@ func CongressMemberFinances(c *fiber.Ctx) error {
 }
 
 func CongressMemberWorksWith(c *fiber.Ctx) error {
-	// Do a simple graph search in both directions of degree 2 to see who they work with most often
-
 	db := c.Locals("db").(*gorm.DB)
 
 	var member DB_CongressMember
