@@ -4,3 +4,6 @@ the_final_stockbot
 DOWNLOAD_MODELS/*
 *.json
 static/*.xml
+
+# Stupid Air Puts Things into temp
+tmp/*
