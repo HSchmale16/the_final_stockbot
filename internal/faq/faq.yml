@@ -31,9 +31,17 @@
       A bill is a proposed piece of legislation that is introduced in either the House of Representatives or the Senate. Once a bill is passed by both chambers of Congress and signed by the President, it becomes a law. A bill must pass through several stages in both chambers of Congress before it can become a law, including committee review, floor debate, and a final vote.
     slug: "what-is-the-difference-between-a-bill-and-a-law"
 
+#############################################################
+- category: Congress Member Profiles
+  questions:
+  - question: "What information is on the congress member profiles?"
+    answer: >
+      The congress member profiles contain information about the member's background, voting record, committee assignments, sponsored and cosponsored bills, and contact information. The profiles also include visualizations of the member's voting record and bill sponsorship.
+    slug: "what-information-is-on-the-congress-member-profiles"
+
 
 #############################################################
-- category: Elections
+- category: Elections and Voting
   questions: 
   - question: "What is the Electoral College?"
     answer: >
