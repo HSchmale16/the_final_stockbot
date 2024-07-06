@@ -111,7 +111,7 @@ func SetupServer() {
 	app.Get("/congress-members", cacheMW, CongressMemberList)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
 	app.Get("/congress-member/:bio_guide_id/embed", EmbedCongressMember)
-	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", SponsorsBillsWithPiChart)
+	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", cacheMW, SponsorsBillsWithPiChart)
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
