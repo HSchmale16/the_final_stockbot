@@ -50,6 +50,16 @@
 
 
 #############################################################
+
+- category: Lobbying
+  questions:
+  - question: "What is lobbying?"
+    answer: >
+      Lobbying is the act of attempting to influence the decisions made by government officials, typically legislators or
+      members of regulatory agencies. Lobbyists are individuals or groups who are paid to influence the decisions made by government officials on behalf of their clients. Lobbyists may work for corporations, trade associations, labor unions, or other organizations. Lobbying can take many forms, including meeting with government officials, providing information and research, testifying at hearings, and organizing grassroots campaigns.
+    slug: "what-is-lobbying"
+
+#############################################################
 - category: Elections and Voting
   questions: 
   - question: "What is the Electoral College?"
