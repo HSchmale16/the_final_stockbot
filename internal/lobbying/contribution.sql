@@ -11,18 +11,10 @@ from contributions, json_each(contributions.json_item, '$.contribution_items')
 where 
     json_item->>'no_contributions' = false
 )
--- select 
---     registrant_name
---     , printf('%,.2f', sum(cast(amount as float))) as total_amount
---     , count(*)
--- from unfolded
--- group by registrant_name;
-
 select 
-    filing_year,
     registrant_name
     , printf('%,.2f', sum(cast(amount as float))) as total_amount
     , count(*)
-from Test
-group by registrant_name, filing_year
+from unfolded
+group by filing_year, registrant_name
 order by sum(cast(amount as float)) DESC LIMIT 10;

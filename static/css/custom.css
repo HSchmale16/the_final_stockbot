@@ -69,3 +69,7 @@ div.ad p {
     text-align: center;
     font-weight: bold;
 }
+
+.align-right {
+    text-align: right;
+}
