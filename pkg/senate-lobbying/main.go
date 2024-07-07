@@ -61,6 +61,7 @@ func Main() {
 		list = append(list, response.Results...)
 		err = json.Unmarshal(res, &response)
 		if err != nil {
+			fmt.Println(response.Next, string(res))
 			panic(err)
 		}
 
