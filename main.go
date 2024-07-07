@@ -8,6 +8,7 @@ import (
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
+	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"github.com/robfig/cron/v3"
 )
 
@@ -19,6 +20,7 @@ var congMemberFile = ""
 var doSitemap = false
 var scanLawText = false
 var loadCclFile = ""
+var doSenateLobbyingMain = false
 
 func init() {
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
@@ -29,10 +31,16 @@ func init() {
 	flag.BoolVar(&doSitemap, "sitemap", false, "Generate a sitemap")
 	flag.StringVar(&congMemberFile, "congress-members-file", "", "The file to load congress members from")
 	flag.StringVar(&loadCclFile, "load-ccl-file", "", "The file to load the CCL file from")
+	flag.BoolVar(&doSenateLobbyingMain, "senate-lobbying-main", false, "Run the senate lobbying main")
 }
 
 func main() {
 	flag.Parse()
+
+	if doSenateLobbyingMain {
+		senatelobbying.Main()
+		return
+	}
 
 	if doSitemap {
 		app.MakeSitemap()
