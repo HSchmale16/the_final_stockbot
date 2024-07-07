@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+const BASE_URL = "https://lda.senate.gov/api/v1/"
+
 var SENATE_TOKEN string
 
 func init() {

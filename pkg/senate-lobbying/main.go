@@ -22,7 +22,7 @@ func Main() {
 	// Dummy Main to Do Things
 
 	url := GetContributionListUrl(ContributionListingFilterParams{
-		FilingYear: "2019",
+		FilingYear: "2021",
 	})
 
 	res, err := SendRequest(url)
@@ -32,6 +32,12 @@ func Main() {
 		panic(err)
 	}
 
+	db, err := sql.Open("sqlite3", "file:contribution_list.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	var list []ContributionListing = make([]ContributionListing, 0, 50000)
 	var response ContributionListResponse
 
@@ -40,7 +46,7 @@ func Main() {
 		panic(err)
 	}
 	list = append(list, response.Results...)
-	WriteToDatabase(response.Results)
+	WriteToDatabase(db, response.Results)
 
 	// while the response.Next is present we want to keep making requests
 	// and appending the results to the list
@@ -78,7 +84,7 @@ func Main() {
 			panic(err)
 		}
 		list = append(list, response.Results...)
-		WriteToDatabase(response.Results)
+		WriteToDatabase(db, response.Results)
 
 		fmt.Println(len(list), "of", response.Count, response.Next)
 
@@ -90,15 +96,9 @@ func Main() {
 	WriteArray(list)
 }
 
-func WriteToDatabase(x []ContributionListing) {
+func WriteToDatabase(db *sql.DB, x []ContributionListing) {
 	// Dummy Write to Database
 	fmt.Println("Writing to Database")
-
-	db, err := sql.Open("sqlite3", "file:contribution_list.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	for _, item := range x {
 		xjson, err := json.Marshal(item)

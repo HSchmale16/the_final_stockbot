@@ -1,13 +1,25 @@
 package senatelobbying_test
 
 import (
+	_ "embed"
 	"testing"
 
+	"encoding/json"
+
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(t *testing.T) {
+//go:embed test_data/filings.json
+var filingsData []byte
 
+func TestLoad_FilingData(t *testing.T) {
+	var filings senatelobbying.FilingListResponse
+	err := json.Unmarshal(filingsData, &filings)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1739337, filings.Count)
+	assert.Equal(t, 25, len(filings.Results))
 }
 
 func TestGetContributionListUrl(t *testing.T) {

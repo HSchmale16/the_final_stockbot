@@ -27,12 +27,18 @@ type FilingListing struct {
 	RegistratiantCountry  string        `json:"registrant_country"`
 	Registraint           S_Registraint `json:"registrant"`
 	Client                S_Client      `json:"client"`
+
+	// Big old lists
+	LobbyingActivities      []LobbyingActivities   `json:"lobbying_activities"`
+	ConvictionDisclosures   []ConvictionDisclosure `json:"conviction_disclosures"`
+	ForeignEntities         []ForeignEntity        `json:"foreign_entities"`
+	AffiliatedOrganizations []S_Registraint        `json:"affiliated_organizations"`
 }
 
 type S_Client struct {
 	Id                     int    `json:"id"`
 	Url                    string `json:"url"`
-	ClientId               string `json:"client_id"`
+	ClientId               int    `json:"client_id"`
 	Name                   string `json:"name"`
 	GeneralDescription     string `json:"general_description"`
 	ClientGovernmentEntity bool   `json:"client_government_entity"`
@@ -59,4 +65,27 @@ type FilingLobbyist struct {
 type GovernmentEntity struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type ConvictionDisclosure struct {
+	Lobbyist    S_Lobbyist `json:"lobbyist"`
+	Date        string     `json:"date"`
+	Description string     `json:"description"`
+}
+
+type ForeignEntity struct {
+	Name                string `json:"name"`
+	Contribution        string `json:"contribution"`
+	OwnershipPercentage string `json:"ownership_percentage"`
+	Address             string `json:"address"`
+	City                string `json:"city"`
+	State               string `json:"state"`
+	StateDisplay        string `json:"state_display"`
+	Country             string `json:"country"`
+	CountryDisplay      string `json:"country_display"`
+	PpbCity             string `json:"ppb_city"`
+	PpbState            string `json:"ppb_state"`
+	PpbStateDisplay     string `json:"ppb_state_display"`
+	PpbCountry          string `json:"ppb_country"`
+	PpbCountryDisplay   string `json:"ppb_country_display"`
 }
