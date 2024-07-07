@@ -3,9 +3,21 @@ package senatelobbying
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"os"
+	"runtime/pprof"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func Main() {
+	pprofFile, pprofErr := os.Create("cpu.pb.gz")
+	if pprofErr != nil {
+		log.Fatal(pprofErr)
+	}
+	pprof.StartCPUProfile(pprofFile)
+	defer pprof.StopCPUProfile()
 	// Dummy Main to Do Things
 
 	url := GetContributionListUrl(ContributionListingFilterParams{
@@ -29,19 +41,46 @@ func Main() {
 	// while the response.next is present we want to keep making requests
 	// and appending the results to the list
 	for response.Next != "" {
-		list = append(list, response.Results...)
 		res, err = SendRequest(response.Next)
 		if err != nil {
-			panic(err)
+			if strings.HasPrefix(err.Error(), "retry") {
+				// If we get a rate limit error, we should wait and retry
+				retryAfter, err := strconv.Atoi(strings.TrimPrefix(err.Error(), "retry "))
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println("Sleeping for ", retryAfter, " seconds")
+				time.Sleep(time.Duration(retryAfter) * time.Second)
+				continue
+			} else {
+				// Otherwise WE PANIC
+				panic(err)
+			}
 		}
+
+		list = append(list, response.Results...)
 		err = json.Unmarshal(res, &response)
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println(len(list), "of", response.Count)
+		fmt.Println(len(list), "of", response.Count, response.Next)
+
+		if len(list) > response.Count {
+			break
+		}
 	}
 
-	fmt.Println(list)
+	outfile, err := os.Create("contribution_list.json")
+	if err != nil {
+		panic(err)
+	}
+	defer outfile.Close()
 
+	enc := json.NewEncoder(outfile)
+	enc.SetIndent("", "  ")
+	err = enc.Encode(list)
+	if err != nil {
+		panic(err)
+	}
 }
