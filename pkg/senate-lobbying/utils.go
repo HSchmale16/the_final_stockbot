@@ -25,7 +25,11 @@ func SendRequest(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Token %s", SENATE_TOKEN))
+
+	// This is an anon api but it's a hell of a lot faster with a token
+	if SENATE_TOKEN != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Token %s", SENATE_TOKEN))
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
