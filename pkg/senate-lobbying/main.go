@@ -22,7 +22,7 @@ func Main() {
 	// Dummy Main to Do Things
 
 	url := GetContributionListUrl(ContributionListingFilterParams{
-		FilingYear: "2022",
+		FilingYear: "2019",
 	})
 
 	res, err := SendRequest(url)
