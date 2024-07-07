@@ -1,15 +1,16 @@
 <div class="container">
-    <h1>Lobbyist Contributions in {{ Year }}</h1>
+    <h1>Lobbyist Contribution Breakdown in {{ Year }} for {{ Type }}</h1>
 
     <p>
-        How lobbyists and who they are working for is an important topic to understand what is actually going on and
-        people might be dirty?
+        The below are the top spenders and receipments for the selected contribution type. The amount is the total amount.
+        The number of contributions is the number of times the contributor contributed to the payee.
     </p>
 
     <table class="table table-sm">
         <thead>
             <tr>
-                <th scope="col">Contribution Type</th>
+                <th scope="col">Contributor</th>
+                <th scope="col">Payee</th> <!-- Payee is the person or entity that received the contribution -->
                 <th class="align-right" scope="col">Amount</th>
                 <th class="align-right" scope="col">Number of Contributions</th>
 
@@ -18,7 +19,8 @@
         <tbody>
             {{#each Data }}
             <tr>
-                <td>{{ this.ContributionTypeDisplay }}</td>
+                <td>{{ this.ContributorName }}</td>
+                <td>{{ this.PayeeName }}</td>
                 <td class="align-right">{{ this.AmountStr }}</td>
                 <td class="align-right">
                     <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
