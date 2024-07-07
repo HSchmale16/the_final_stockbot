@@ -42,7 +42,7 @@ func SponsorsBillsWithPiChart(c *fiber.Ctx) error {
 		parties[member.Party()]++
 	}
 
-	c.Set("Content-Type", "image/png")
+	c.Set("Content-Type", "image/svg+xml")
 
 	b, err := renderPieChart(parties, member)
 	if err != nil {
@@ -87,7 +87,7 @@ func renderPieChart(parties map[string]float64, member DB_CongressMember) ([]byt
 
 	// Render the pie chart as a PNG image
 	b := bytes.NewBuffer([]byte{})
-	err := pie.Render(chart.PNG, b)
+	err := pie.Render(chart.SVG, b)
 	if err != nil {
 		return nil, err
 	}
