@@ -58,6 +58,16 @@
       Lobbying is the act of attempting to influence the decisions made by government officials, typically legislators or
       members of regulatory agencies. Lobbyists are individuals or groups who are paid to influence the decisions made by government officials on behalf of their clients. Lobbyists may work for corporations, trade associations, labor unions, or other organizations. Lobbying can take many forms, including meeting with government officials, providing information and research, testifying at hearings, and organizing grassroots campaigns.
     slug: "what-is-lobbying"
+  - question: Why is lobbying controversial?
+    answer: >
+      Lobbying is controversial for several reasons. Critics argue that lobbying can give wealthy individuals and corporations undue influence over the political process, leading to policies that benefit the interests of the few at the expense of the many. Lobbying can also create conflicts of interest for government officials, who may be more responsive to the interests of lobbyists than to the needs of their constituents. Lobbying can also undermine the transparency and accountability of the political process, as lobbyists often work behind the scenes to influence decisions.
+    slug: "why-is-lobbying-controversial"
+
+  - question: "What can this site show me about the lobbying activities within congress?"
+    answer: >
+      This site can show you which organizations are lobbying congress, which congress people are being lobbied, and which bills are being lobbied. It can also show you the topics of the lobbying efforts.
+      Check out the <a href="/lobbying">Lobbying Page</a> for more information.
+    slug: "what-can-this-site-show-me-about-the-lobbying-activities-within-congress"
 
 #############################################################
 - category: Elections and Voting
