@@ -1,33 +1,46 @@
 <div class="container">
-    <h1>Lobbyist Contribution Breakdown in {{ Year }} for {{ Type }}</h1>
+    <h1>Lobbyist Contribution Breakdown in {{ Year }} for {{ TypeDisplay }}</h1>
 
     <p>
-        The below are the top spenders and receipments for the selected contribution type. The amount is the total amount.
+        The below are the top spenders and receipments for the selected contribution type. The amount is the total
+        amount.
         The number of contributions is the number of times the contributor contributed to the payee.
     </p>
 
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th scope="col">Contributor</th>
-                <th scope="col">Payee</th> <!-- Payee is the person or entity that received the contribution -->
-                <th class="align-right" scope="col">Amount</th>
-                <th class="align-right" scope="col">Number of Contributions</th>
+    <p>
+        <a href="/lobbying/{{ Year }}">View breakdown for all types of contributions in {{ Year }}</a>
+    </p>
 
-            </tr>
-        </thead>
-        <tbody>
-            {{#each Data }}
-            <tr>
-                <td>{{ this.ContributorName }}</td>
-                <td>{{ this.PayeeName }}</td>
-                <td class="align-right">{{ this.AmountStr }}</td>
-                <td class="align-right">
-                    <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
+    <div class="col-lg-8">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Contributor</th>
+                    <th scope="col">Payee</th> <!-- Payee is the person or entity that received the contribution -->
+                    <th class="align-right" scope="col">Amount</th>
+                    <th class="align-right" scope="col">Number of Contributions</th>
 
-    </table>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each Data }}
+                <tr>
+                    <td>{{ this.ContributorName }}</td>
+                    <td>{{ this.PayeeName }}</td>
+                    <td class="align-right">{{ this.AmountStr }}</td>
+                    <td class="align-right">
+                        {{ this.Count }}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>View Other Years</h2>
+    <ul>
+        {{#each Years }}
+        <li><a href="/lobbying/breakdown/{{this}}/{{ Type }}">{{ this }}</a></li>
+        {{/each}}
+    </ul>
 </div>

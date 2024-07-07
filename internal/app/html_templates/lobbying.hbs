@@ -6,26 +6,28 @@
         people might be dirty?
     </p>
 
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th scope="col">Contribution Type</th>
-                <th class="align-right" scope="col">Amount</th>
-                <th class="align-right" scope="col">Number of Contributions</th>
+    <div class="col-lg-8">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Contribution Type</th>
+                    <th class="align-right" scope="col">Amount</th>
+                    <th class="align-right" scope="col">Number of Contributions</th>
 
-            </tr>
-        </thead>
-        <tbody>
-            {{#each Data }}
-            <tr>
-                <td>{{ this.ContributionTypeDisplay }}</td>
-                <td class="align-right">{{ this.AmountStr }}</td>
-                <td class="align-right">
-                    <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each Data }}
+                <tr>
+                    <td>{{ this.ContributionTypeDisplay }}</td>
+                    <td class="align-right">{{ this.AmountStr }}</td>
+                    <td class="align-right">
+                        <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
 
-    </table>
+        </table>
+    </div>
 </div>

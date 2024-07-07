@@ -71,11 +71,11 @@ func SetupServer() {
 	})
 	app.Use(helmet.New())
 
-	cacheMW := cache.New(cache.Config{
+	app.Use(cache.New(cache.Config{
 		KeyGenerator: func(c *fiber.Ctx) string {
 			return utils.CopyString(c.Path()) + utils.CopyString(string(c.Context().URI().QueryString()))
 		},
-	})
+	}))
 
 	// Setup the Routes
 	app.Get("/", Index)
@@ -85,13 +85,13 @@ func SetupServer() {
 	app.Get("/law/:law_id", LawView)
 	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
-	app.Get("/json/congress-network", cacheMW, CongressNetwork)
-	app.Get("/congress-network", cacheMW, func(c *fiber.Ctx) error {
+	app.Get("/json/congress-network", CongressNetwork)
+	app.Get("/congress-network", func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
 			"Title": "Congress Network Visualization",
 		}, "layouts/main")
 	})
-	app.Get("/tos", cacheMW, TermsOfService)
+	app.Get("/tos", TermsOfService)
 
 	// HTMX End Point
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
@@ -109,10 +109,10 @@ func SetupServer() {
 			"Tags": tags,
 		})
 	})
-	app.Get("/congress-members", cacheMW, CongressMemberList)
+	app.Get("/congress-members", CongressMemberList)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
 	app.Get("/congress-member/:bio_guide_id/embed", EmbedCongressMember)
-	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", cacheMW, SponsorsBillsWithPiChart)
+	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", SponsorsBillsWithPiChart)
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)

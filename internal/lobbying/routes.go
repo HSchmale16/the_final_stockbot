@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var YearsLoaded = []string{"2018", "2019", "2020", "2021", "2022", "2023"}
+
 func SetupRoutes(app *fiber.App) {
 	app.Get("/lobbying/:year", RenderLobbyingPage)
 	app.Get("/lobbying/breakdown/:year/:type", RenderBreakdownPage)
@@ -53,6 +55,7 @@ func RenderLobbyingPage(c *fiber.Ctx) error {
 		"Title": "Lobbying Spending for " + c.Params("year"),
 		"Year":  c.Params("year"),
 		"Data":  lobbyingContributions,
+		"Years": YearsLoaded,
 	}, "layouts/main")
 }
 
@@ -81,9 +84,11 @@ func RenderBreakdownPage(c *fiber.Ctx) error {
 	}
 
 	return c.Render("lobbying_breakdown", fiber.Map{
-		"Title": "Lobbying Spending for " + c.Params("year"),
-		"Year":  c.Params("year"),
-		"Type":  ContributionType[contributionType],
-		"Data":  lobbyingContributions,
+		"Title":       "Lobbying Spending for " + c.Params("year"),
+		"Year":        c.Params("year"),
+		"TypeDisplay": ContributionType[contributionType],
+		"Type":        contributionType,
+		"Data":        lobbyingContributions,
+		"Years":       YearsLoaded,
 	}, "layouts/main")
 }
