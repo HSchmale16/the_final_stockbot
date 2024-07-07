@@ -16,6 +16,7 @@ import (
 
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
+	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
 	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
@@ -117,6 +118,7 @@ func SetupServer() {
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
 
 	faq.SetupRoutes(app)
+	lobbying.SetupRoutes(app)
 
 	app.Listen(":8080")
 }

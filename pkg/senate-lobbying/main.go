@@ -1,6 +1,7 @@
 package senatelobbying
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -20,11 +21,11 @@ func Main() {
 	defer pprof.StopCPUProfile()
 	// Dummy Main to Do Things
 
-	url := GetContributionListUrl(ContributionListingFilterParams{
-		FilingYear: "2021",
-	})
+	// url := GetContributionListUrl(ContributionListingFilterParams{
+	// 	FilingYear: "2022",
+	// })
 
-	res, err := SendRequest(url)
+	res, err := SendRequest("https://lda.senate.gov/api/v1/contributions/?filing_year=2022&page=486")
 
 	if err != nil {
 		fmt.Printf("Error: %s\nBody: %s", err.Error(), string(res))
@@ -39,9 +40,11 @@ func Main() {
 		panic(err)
 	}
 	list = append(list, response.Results...)
+	WriteToDatabase(response.Results)
 
 	// while the response.Next is present we want to keep making requests
 	// and appending the results to the list
+	errCount := 0
 	for response.Next != "" {
 		res, err = SendRequest(response.Next)
 		if err != nil {
@@ -51,13 +54,22 @@ func Main() {
 				if err != nil {
 					panic(err)
 				}
+				WriteArray(list)
 				fmt.Println("Sleeping for ", retryAfter, " seconds")
 				time.Sleep(time.Duration(retryAfter) * time.Second)
 				continue
 			} else {
 				// Otherwise WE PANIC
-				panic(err)
+				fmt.Println(response.Next, err.Error())
+				errCount++
+				if errCount > 5 {
+					panic(err)
+				}
+				continue
 			}
+		} else {
+			// Reset the Error Count Because it's 5 errors in a row we die on.
+			errCount = 0
 		}
 
 		err = json.Unmarshal(res, &response)
@@ -66,6 +78,7 @@ func Main() {
 			panic(err)
 		}
 		list = append(list, response.Results...)
+		WriteToDatabase(response.Results)
 
 		fmt.Println(len(list), "of", response.Count, response.Next)
 
@@ -74,6 +87,32 @@ func Main() {
 		}
 	}
 
+	WriteArray(list)
+}
+
+func WriteToDatabase(x []ContributionListing) {
+	// Dummy Write to Database
+	fmt.Println("Writing to Database")
+
+	db, err := sql.Open("sqlite3", "file:contribution_list.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	for _, item := range x {
+		xjson, err := json.Marshal(item)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = db.Exec("INSERT INTO contributions(uuid, json_item) VALUES (?, ?) ON CONFLICT(uuid) DO UPDATE SET json_item = excluded.json_item", item.FilingUuid, xjson)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func WriteArray(x []ContributionListing) {
 	outfile, err := os.Create("contribution_list.json")
 	if err != nil {
 		panic(err)
@@ -82,7 +121,7 @@ func Main() {
 
 	enc := json.NewEncoder(outfile)
 	enc.SetIndent("", "  ")
-	err = enc.Encode(list)
+	err = enc.Encode(x)
 	if err != nil {
 		panic(err)
 	}

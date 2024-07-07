@@ -80,7 +80,7 @@ type ContributionItem struct {
 	Amount           string `json:"amount"`
 	PayeeName        string `json:"payee_name"`
 	HonreeName       string `json:"honoree_name"`
-	RecipientName    string `json:"recipient_name"`
+	ContributorName  string `json:"contributor_name"`
 	ContributionType string `json:"contribution_type"`
 	Date             string `json:"date"`
 }

@@ -7,3 +7,7 @@ static/*.xml
 
 # Stupid Air Puts Things into temp
 tmp/*
+temp/*
+
+cpu.pprof
+cpu.pb.gz
