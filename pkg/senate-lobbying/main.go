@@ -27,7 +27,7 @@ func Main() {
 	res, err := SendRequest(url)
 
 	if err != nil {
-		fmt.Printf("Error: %s\n", err.Error(), string(res))
+		fmt.Printf("Error: %s\nBody: %s", err.Error(), string(res))
 		panic(err)
 	}
 
