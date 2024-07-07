@@ -21,11 +21,11 @@ func Main() {
 	defer pprof.StopCPUProfile()
 	// Dummy Main to Do Things
 
-	// url := GetContributionListUrl(ContributionListingFilterParams{
-	// 	FilingYear: "2022",
-	// })
+	url := GetContributionListUrl(ContributionListingFilterParams{
+		FilingYear: "2022",
+	})
 
-	res, err := SendRequest("https://lda.senate.gov/api/v1/contributions/?filing_year=2022&page=486")
+	res, err := SendRequest(url)
 
 	if err != nil {
 		fmt.Printf("Error: %s\nBody: %s", err.Error(), string(res))
