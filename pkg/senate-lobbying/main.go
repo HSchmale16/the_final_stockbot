@@ -38,8 +38,9 @@ func Main() {
 	if err != nil {
 		panic(err)
 	}
+	list = append(list, response.Results...)
 
-	// while the response.next is present we want to keep making requests
+	// while the response.Next is present we want to keep making requests
 	// and appending the results to the list
 	for response.Next != "" {
 		res, err = SendRequest(response.Next)
@@ -59,12 +60,12 @@ func Main() {
 			}
 		}
 
-		list = append(list, response.Results...)
 		err = json.Unmarshal(res, &response)
 		if err != nil {
 			fmt.Println(response.Next, string(res))
 			panic(err)
 		}
+		list = append(list, response.Results...)
 
 		fmt.Println(len(list), "of", response.Count, response.Next)
 
