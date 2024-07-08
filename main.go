@@ -38,7 +38,7 @@ func main() {
 	flag.Parse()
 
 	if doSenateLobbyingMain {
-		senatelobbying.Main()
+		senatelobbying.LoadFilings()
 		return
 	}
 

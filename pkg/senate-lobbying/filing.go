@@ -59,7 +59,7 @@ type LobbyingActivities struct {
 type FilingLobbyist struct {
 	Lobbyist        S_Lobbyist `json:"lobbyist"`
 	CoveredPosition string     `json:"covered_position"`
-	New             string     `json:"new"`
+	New             bool       `json:"new"`
 }
 
 type GovernmentEntity struct {
@@ -88,4 +88,12 @@ type ForeignEntity struct {
 	PpbStateDisplay     string `json:"ppb_state_display"`
 	PpbCountry          string `json:"ppb_country"`
 	PpbCountryDisplay   string `json:"ppb_country_display"`
+}
+
+type FilingListingFilterParams struct {
+	FilingYear string
+}
+
+func GetFilingListUrl(params FilingListingFilterParams) string {
+	return "https://lda.senate.gov/api/v1/filings/?filing_year=" + params.FilingYear
 }
