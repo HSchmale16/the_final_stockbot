@@ -1,0 +1,33 @@
+<div class="container">
+    <h1>Lobbyist Contributions in {{ Year }}</h1>
+
+    <p>
+        How lobbyists and who they are working for is an important topic to understand what is actually going on and
+        people might be dirty?
+    </p>
+
+    <div class="col-lg-8">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Contribution Type</th>
+                    <th class="align-right" scope="col">Amount</th>
+                    <th class="align-right" scope="col">Number of Contributions</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {{#each Data }}
+                <tr>
+                    <td>{{ this.ContributionTypeDisplay }}</td>
+                    <td class="align-right">{{ this.AmountStr }}</td>
+                    <td class="align-right">
+                        <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+
+        </table>
+    </div>
+</div>

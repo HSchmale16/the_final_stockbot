@@ -13,8 +13,15 @@ import (
 var YearsLoaded = []string{"2018", "2019", "2020", "2021", "2022", "2023"}
 
 func SetupRoutes(app *fiber.App) {
+
 	app.Get("/lobbying/:year", RenderLobbyingPage)
 	app.Get("/lobbying/breakdown/:year/:type", RenderBreakdownPage)
+	app.Get("/lobbying", func(c *fiber.Ctx) error {
+		return c.Render("lobbying", fiber.Map{
+			"Title": "Lobbyist Contributions Year Index",
+			"Years": YearsLoaded,
+		}, "layouts/main")
+	})
 }
 
 var ContributionType = map[string]string{
@@ -51,7 +58,7 @@ func RenderLobbyingPage(c *fiber.Ctx) error {
 
 	fmt.Println(year, lobbyingContributions)
 
-	return c.Render("lobbying", fiber.Map{
+	return c.Render("lobbying_types", fiber.Map{
 		"Title": "Lobbying Spending for " + c.Params("year"),
 		"Year":  c.Params("year"),
 		"Data":  lobbyingContributions,

@@ -71,11 +71,13 @@ func SetupServer() {
 	})
 	app.Use(helmet.New())
 
-	app.Use(cache.New(cache.Config{
-		KeyGenerator: func(c *fiber.Ctx) string {
-			return utils.CopyString(c.Path()) + utils.CopyString(string(c.Context().URI().QueryString()))
-		},
-	}))
+	if !IsDebug {
+		app.Use(cache.New(cache.Config{
+			KeyGenerator: func(c *fiber.Ctx) string {
+				return utils.CopyString(c.Path()) + utils.CopyString(string(c.Context().URI().QueryString()))
+			},
+		}))
+	}
 
 	// Setup the Routes
 	app.Get("/", Index)
