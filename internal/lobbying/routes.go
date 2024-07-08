@@ -82,7 +82,7 @@ func RenderBreakdownPage(c *fiber.Ctx) error {
 	var lobbyingContributions []Row
 
 	year2, _ := strconv.Atoi(year)
-	db.Raw("SELECT registrant_name, payee_name, SUM(CAST(amount AS float)) Amount, Count(*) as Count FROM lobbyist_contributions WHERE filing_year = ? AND contribution_type = ? GROUP BY registrant_name, payee_name ORDER BY Amount DESC LIMIT 30", year2, contributionType).Scan(&lobbyingContributions)
+	db.Raw("SELECT registrant_name, payee_name, SUM(CAST(amount AS float)) Amount, Count(*) as Count FROM lobbyist_contributions WHERE filing_year = ? AND contribution_type = ? GROUP BY registrant_name, payee_name ORDER BY Amount DESC LIMIT 50", year2, contributionType).Scan(&lobbyingContributions)
 	p := message.NewPrinter(language.English)
 
 	// iterate and update the contribution type with the diplay version
