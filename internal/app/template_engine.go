@@ -32,6 +32,16 @@ func getEngine() *handlebars.Engine {
 
 func GetTemplateEngine() fiber.Views {
 	engine := getEngine()
+
+	// register an isEquals helper or else
+	engine.AddFunc("isEqualApplyClass", func(a, b, class string) string {
+		fmt.Println("a:", a, "b:", b, "class:", class)
+		if a == b {
+			return class
+		}
+		return ""
+	})
+
 	engine.AddFunc("formatDate", func(date string) string {
 		// parse the date from isoformat 2023-11-08 00:22:00 +0000 UTC to Jan 2, 2006
 		date = date[:10]

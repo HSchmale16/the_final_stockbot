@@ -1,5 +1,14 @@
 <div class="container">
     <h1>{{ Title }}</h1>
 
+    <div class="col">
+        <div class="btn-group" role="group">
+            {{> 'partials/bar-button-item' Label="All Laws" Type="" LawType=LawType }}
+            {{> 'partials/bar-button-item' Label="House Bills" Type="H.R." LawType=LawType}}
+            {{> 'partials/bar-button-item' Label="Senate Bills" Type="S." LawType=LawType}}
+            {{> 'partials/bar-button-item' Label="Public Laws" Type="Public" LawType=LawType}}
+        </div>
+    </div>
+
     {{> 'partials/law-list' EnableLoad=true }}
 </div>

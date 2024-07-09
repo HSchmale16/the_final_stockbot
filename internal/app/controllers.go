@@ -193,6 +193,11 @@ func LawIndex(c *fiber.Ctx) error {
 	var laws []GovtRssItem
 	// Pub date before
 	x := db.Order("pub_date DESC").Limit(LIMIT) //.Find(&laws)
+	lawType := c.Query("type")
+
+	if lawType != "" {
+		x.Where("title LIKE ?", lawType+"%")
+	}
 
 	if page != "missing" {
 		x.Where("pub_date < ?", page).Find(&laws)
@@ -202,14 +207,16 @@ func LawIndex(c *fiber.Ctx) error {
 			"Title":      "Most Recent Laws",
 			"Laws":       laws,
 			"EnableLoad": true,
+			"LawType":    lawType,
 		})
 	}
 
 	x.Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
-		"Title": "Most Recent Laws",
-		"Laws":  laws,
+		"Title":   "Most Recent Laws",
+		"Laws":    laws,
+		"LawType": lawType,
 	}, "layouts/main")
 }
 
