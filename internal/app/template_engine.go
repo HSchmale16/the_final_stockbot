@@ -35,7 +35,6 @@ func GetTemplateEngine() fiber.Views {
 
 	// register an isEquals helper or else
 	engine.AddFunc("isEqualApplyClass", func(a, b, class string) string {
-		fmt.Println("a:", a, "b:", b, "class:", class)
 		if a == b {
 			return class
 		}

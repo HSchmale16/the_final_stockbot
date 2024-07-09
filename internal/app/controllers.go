@@ -199,12 +199,28 @@ func LawIndex(c *fiber.Ctx) error {
 		x.Where("title LIKE ?", lawType+"%")
 	}
 
+	var lawTypeDisplay string
+	switch lawType {
+	case "H.R.":
+		lawTypeDisplay = "House Bills"
+	case "S.":
+		lawTypeDisplay = "Senate Bills"
+	case "S.J.":
+		lawTypeDisplay = "Senate Joint Resolutions"
+	case "H.J.":
+		lawTypeDisplay = "House Joint Resolutions"
+	case "Public":
+		lawTypeDisplay = "Public Laws"
+	case "Private":
+		lawTypeDisplay = "Private Laws"
+	}
+
 	if page != "missing" {
 		x.Where("pub_date < ?", page).Find(&laws)
 		// we don't use a layout here for htmx.
 		// fuck if I get why I'm using htmx
 		return c.Render("partials/law-list", fiber.Map{
-			"Title":      "Most Recent Laws",
+			"Title":      "Most Recent " + lawTypeDisplay,
 			"Laws":       laws,
 			"EnableLoad": true,
 			"LawType":    lawType,
@@ -214,7 +230,7 @@ func LawIndex(c *fiber.Ctx) error {
 	x.Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
-		"Title":   "Most Recent Laws",
+		"Title":   "Most Recent " + lawTypeDisplay,
 		"Laws":    laws,
 		"LawType": lawType,
 	}, "layouts/main")
