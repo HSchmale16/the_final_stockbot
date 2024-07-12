@@ -1,0 +1,17 @@
+# A Not So Empty Robots.txt
+
+# Disallow these scum. Marketing sites suck
+User-Agent: panscient.com
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
+User-agent: BLEXBot
+Disallow: /
+User-agent: AhrefsBot
+Disallow:/
+
+# ChatGPT is the worst
+User-agent: ChatGPT-User
+Disallow: /
+User-agent: GPTBot
+Disallow: /

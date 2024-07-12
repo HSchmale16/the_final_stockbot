@@ -1,6 +1,7 @@
 package app
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strconv"
@@ -20,6 +21,13 @@ const (
 	URL_TEMPLATE = "<url><loc>%s</loc><lastmod>%s</lastmod></url>\n"
 )
 
+// File Location
+var fileLocFlag string // flag.String("fileLoc", "the_final_stockbot/static/sitemap.xml", "Location of the sitemap.xml file")
+
+func init() {
+	flag.StringVar(&fileLocFlag, "fileLoc", "/var/lib/final_stockbot/the_final_stockbot/static/sitemap.xml", "Location of the sitemap.xml file")
+}
+
 func MakeSitemap() {
 	db, err := SetupDB()
 	if err != nil {
@@ -28,7 +36,7 @@ func MakeSitemap() {
 
 	// Open ~/the_final_stockbot/static/sitemap.xml for writing text
 	// Wordexpansion must be perfomred
-	file, err := os.Create("the_final_stockbot/static/sitemap.xml")
+	file, err := os.Create(fileLocFlag)
 	if err != nil {
 		panic(err)
 	}

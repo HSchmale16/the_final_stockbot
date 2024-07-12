@@ -25,6 +25,7 @@
           - git-lfs
           - graphviz
           - certbot
+          - goaccess
         state: present
         update_cache: true
     - name: Configure Firewall
@@ -99,6 +100,31 @@
         mode: "0644"
       notify:
         - Reload nginx
+    - name: Add the web analytics cron job
+      become: true
+      ansible.builtin.cron:
+        name: "Update Web Analytics"
+        minute: "*/30"
+        job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html"
+        user: root
+        state: present
+    - name: Upload the Lobbying Database
+      become: true
+      ansible.posix.synchronize:
+        src: lobbying.duckdb
+        dest: /var/lib/{{ service_user_name }}/lobbying.duckdb
+        owner: "{{ service_user_name }}"
+        group: "{{ service_user_name }}"
+        mode: "0644"
+        compress: true
+
+    # - name: Add the sitemap generation cron job
+    #   ansible.builtin.cron:
+    #     name: "Generate Sitemap"
+    #     minute: "*/30"
+    #     job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html"
+    #     user: final_stockbot
+    #     state: present
     - name: Enable Nginx Site
       become: true
       ansible.builtin.file:
@@ -133,3 +159,4 @@
         name: litestream
         state: restarted
         enabled: true
+
