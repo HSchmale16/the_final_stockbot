@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -51,6 +52,19 @@ func GetTemplateEngine() fiber.Views {
 			return "FUCK!"
 		}
 		return t.Format("Jan 2, 2006")
+	})
+
+	engine.AddFunc("partyColor", func(s string) string {
+		s = strings.ToLower(s)
+		switch s {
+		case "republican":
+			return "red"
+		case "independent":
+			return "purple"
+		case "democrat":
+			return "blue"
+		}
+		return "slate"
 	})
 
 	engine.AddFunc("firstChar", func(s string) string {

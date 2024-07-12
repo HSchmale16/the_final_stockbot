@@ -33,6 +33,27 @@ func (GovtRssItem) TableName() string {
 	return "govt_rss_item"
 }
 
+func (g GovtRssItem) ComputeSponsorship() map[string]float64 {
+	sponsorship := make(map[string]float64)
+
+	for _, sponsor := range g.Sponsors {
+		sponsorship[sponsor.Party()] += 1
+	}
+
+	// Compute Sum
+	sum := 0.0
+	for _, v := range sponsorship {
+		sum += v
+	}
+
+	// Normalize
+	for k, v := range sponsorship {
+		sponsorship[k] = v / sum * 100
+	}
+
+	return sponsorship
+}
+
 type FederalRegisterItem struct {
 	gorm.Model
 	GovtRssItemId uint

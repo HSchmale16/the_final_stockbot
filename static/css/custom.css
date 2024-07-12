@@ -73,3 +73,13 @@ div.ad p {
 .align-right {
     text-align: right;
 }
+
+.horizontal-bar {
+    display: flex;
+    align-items: center;
+}
+
+.bar-segment {
+    height: 20px;
+    margin-right: 5px;
+}

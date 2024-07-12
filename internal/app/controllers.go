@@ -171,7 +171,7 @@ func Index(c *fiber.Ctx) error {
 	db.Model(&GovtRssItem{}).Count(&totalLaws)
 
 	var recentLaws []GovtRssItem = make([]GovtRssItem, 0, 10)
-	db.Order("pub_date DESC").Limit(10).Find(&recentLaws)
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(10).Find(&recentLaws)
 
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
@@ -192,7 +192,7 @@ func LawIndex(c *fiber.Ctx) error {
 
 	var laws []GovtRssItem
 	// Pub date before
-	x := db.Order("pub_date DESC").Limit(LIMIT)
+	x := db.Debug().Preload("Sponsors").Order("pub_date DESC").Limit(LIMIT)
 	lawType := c.Query("type")
 
 	if lawType != "" {
