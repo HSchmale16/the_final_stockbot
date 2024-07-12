@@ -17,7 +17,7 @@ type LobbyingDB struct {
 var LobbyingDBInstance LobbyingDB = LobbyingDB{}
 
 func init() {
-	db, err := sql.Open("duckdb", "lobbying.duckdb")
+	db, err := sql.Open("duckdb", "lobbying.duckdb?access_mode=read_only&threads=4")
 	if err != nil {
 		panic(err)
 	}
