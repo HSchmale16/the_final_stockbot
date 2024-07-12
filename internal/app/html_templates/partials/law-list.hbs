@@ -11,7 +11,9 @@
     <h2>{{{ Title }}}</h2>
     <div class="horizontal-bar">
     {{#each ComputeSponsorship }}
-        <div class="bar-segment" style="background-color: {{partyColor @key}}; width: {{this}}%;"></div>
+        <div class="bar-segment" 
+            title="{{this.Num}} {{@key}} sponsor this bill"
+            style="background-color: {{partyColor @key}}; width: {{this.Percent}}%;"></div>
     {{/each}}
     </div>
     <small>Published on {{formatDate PubDate }} | Loaded On {{ formatDate CreatedAt }}</small>

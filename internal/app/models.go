@@ -33,22 +33,32 @@ func (GovtRssItem) TableName() string {
 	return "govt_rss_item"
 }
 
-func (g GovtRssItem) ComputeSponsorship() map[string]float64 {
-	sponsorship := make(map[string]float64)
+type stupidPair struct{ Num, Percent float64 }
+type SponsorshipMap map[string]stupidPair
+
+func (g GovtRssItem) ComputeSponsorship() SponsorshipMap {
+	sponsorship := make(SponsorshipMap)
 
 	for _, sponsor := range g.Sponsors {
-		sponsorship[sponsor.Party()] += 1
+		p := sponsor.Party()
+		entry, ok := sponsorship[p]
+		if ok {
+			entry.Num++
+		} else {
+			entry.Num = 1
+		}
+		sponsorship[p] = entry
 	}
 
 	// Compute Sum
 	sum := 0.0
 	for _, v := range sponsorship {
-		sum += v
+		sum += v.Num
 	}
 
 	// Normalize
 	for k, v := range sponsorship {
-		sponsorship[k] = v / sum * 100
+		sponsorship[k] = stupidPair{v.Num, v.Num / sum * 100}
 	}
 
 	return sponsorship
