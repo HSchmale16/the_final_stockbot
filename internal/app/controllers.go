@@ -387,7 +387,7 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 		DB_CongressMember
 		Count int
 	}
-	db.Debug().
+	db.
 		Table("congress_member").
 		Joins("JOIN congress_member_sponsored ON db_congress_member_bio_guide_id = bio_guide_id").
 		Where("bio_guide_id != ?", member.BioGuideId).
