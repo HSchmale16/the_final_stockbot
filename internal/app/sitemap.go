@@ -22,7 +22,7 @@ const (
 )
 
 // File Location
-var fileLocFlag string // flag.String("fileLoc", "the_final_stockbot/static/sitemap.xml", "Location of the sitemap.xml file")
+var fileLocFlag string
 
 func init() {
 	flag.StringVar(&fileLocFlag, "fileLoc", "/var/lib/final_stockbot/the_final_stockbot/static/sitemap.xml", "Location of the sitemap.xml file")
