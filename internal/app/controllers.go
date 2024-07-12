@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"html"
 	"os"
 	"sort"
@@ -383,28 +382,32 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 		bills[i] = bill.GovtRssItemId
 	}
 
-	var sponsoredBy []string
-	db.
-		Model(&CongressMemberSponsored{}).
-		Distinct("db_congress_member_bio_guide_id").
+	type foo struct {
+		BioGuideId string
+		Count      int64
+	}
+
+	var sponsoredBy []foo
+	db.Debug().Model(&CongressMemberSponsored{}).
 		Where("govt_rss_item_id IN ?", bills).
-		Find(&sponsoredBy)
+		Group("db_congress_member_bio_guide_id").
+		Select("db_congress_member_bio_guide_id as bio_guide_id, COUNT(*) as count").
+		Having("COUNT(*) > 1").
+		Scan(&sponsoredBy)
+
+	// Get their bioguide ids
+	bioGuideIds := make([]string, len(sponsoredBy))
+	for i, sponsored := range sponsoredBy {
+		bioGuideIds[i] = sponsored.BioGuideId
+	}
 
 	// Get the members they work with
 	var worksWith []DB_CongressMember
-	db.Where("bio_guide_id IN ?", sponsoredBy).Find(&worksWith)
-
-	parties := make(map[string]int)
-	for _, member := range worksWith {
-		parties[member.Party()]++
-	}
-	// dump to json
-	data, _ := json.Marshal(parties)
+	db.Debug().Where("bio_guide_id IN ?", bioGuideIds).Find(&worksWith)
 
 	return c.Render("partials/congress_member_works_with", fiber.Map{
 		"Member":    member,
 		"WorksWith": worksWith,
-		"Parties":   string(data),
 	})
 }
 
