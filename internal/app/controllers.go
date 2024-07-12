@@ -63,10 +63,10 @@ func SetupServer() {
 
 	app.Use(func(c *fiber.Ctx) error {
 		c.Bind(fiber.Map{
-			"CacheBust": CacheBustTimestamp,
-			"Title":     "DirtyCongress.com",
-			"DEBUG":     IsDebug,
-			"Description": "DirtyCongress.com is a website that provides a searchable database of laws and congress members. It also provides a visualization of the congress sponsorship network."
+			"CacheBust":   CacheBustTimestamp,
+			"Title":       "DirtyCongress.com",
+			"DEBUG":       IsDebug,
+			"Description": "DirtyCongress.com is a website that provides a searchable database of laws and congress members. It also provides a visualization of the congress sponsorship network.",
 		})
 		return c.Next()
 	})
