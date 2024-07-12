@@ -15,7 +15,8 @@
         <table class="table table-sm">
             <thead>
                 <tr>
-                    <th scope="col">Contributor</th>
+                    <th scope="col">Registrant</th>
+                    <th scope="col">Honoree</th>
                     <th scope="col">Payee</th> <!-- Payee is the person or entity that received the contribution -->
                     <th class="align-right" scope="col">Amount</th>
                     <th class="align-right" scope="col">Number of Contributions</th>
@@ -25,7 +26,8 @@
             <tbody>
                 {{#each Data }}
                 <tr>
-                    <td>{{ this.ContributorName }}</td>
+                    <td>{{ this.RegistrantName }}</td>
+                    <td>{{ this.HonoreeName }}</td>
                     <td>{{ this.PayeeName }}</td>
                     <td class="align-right">{{ this.AmountStr }}</td>
                     <td class="align-right">
