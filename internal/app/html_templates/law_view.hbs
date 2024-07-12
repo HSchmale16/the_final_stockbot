@@ -24,6 +24,7 @@
 
         {{#if Law.Sponsors }}
         <h3>Congress Members</h3>
+        {{> 'partials/sponsorship-bar' Law=Law}}
         <ul>
             {{#each Law.Sponsors }}
             <li class="{{ this.Role}}"><a href="/congress-member/{{ BioGuideId }}">
