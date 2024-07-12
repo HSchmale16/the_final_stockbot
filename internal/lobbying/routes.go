@@ -47,6 +47,7 @@ func RenderLobbyingYearPage(c *fiber.Ctx) error {
 	year2, _ := strconv.Atoi(year)
 
 	rows, err := LobbyingDBInstance.DB.Query("SELECT contribution_type, Count(*) as Count, SUM(CAST(amount AS float)) Amount FROM contributions_etl WHERE filing_year = ? GROUP BY contribution_type ORDER BY Amount DESC", year2)
+	defer rows.Close()
 	if err != nil {
 		return err
 	}
