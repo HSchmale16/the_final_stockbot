@@ -382,32 +382,25 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 		bills[i] = bill.GovtRssItemId
 	}
 
-	type foo struct {
-		BioGuideId string
-		Count      int64
+	// Get the members that sponsored the same bills
+	var sponsoredBy []struct {
+		DB_CongressMember
+		Count int
 	}
-
-	var sponsoredBy []foo
-	db.Debug().Model(&CongressMemberSponsored{}).
+	db.Debug().
+		Table("congress_member").
+		Joins("JOIN congress_member_sponsored ON db_congress_member_bio_guide_id = bio_guide_id").
+		Where("bio_guide_id != ?", member.BioGuideId).
 		Where("govt_rss_item_id IN ?", bills).
 		Group("db_congress_member_bio_guide_id").
-		Select("db_congress_member_bio_guide_id as bio_guide_id, COUNT(*) as count").
+		Select("congress_member.*, COUNT(*) as Count").
+		Order("Count DESC").
 		Having("COUNT(*) > 1").
 		Scan(&sponsoredBy)
 
-	// Get their bioguide ids
-	bioGuideIds := make([]string, len(sponsoredBy))
-	for i, sponsored := range sponsoredBy {
-		bioGuideIds[i] = sponsored.BioGuideId
-	}
-
-	// Get the members they work with
-	var worksWith []DB_CongressMember
-	db.Debug().Where("bio_guide_id IN ?", bioGuideIds).Find(&worksWith)
-
 	return c.Render("partials/congress_member_works_with", fiber.Map{
 		"Member":    member,
-		"WorksWith": worksWith,
+		"WorksWith": sponsoredBy,
 	})
 }
 

@@ -7,10 +7,11 @@
 </div>
 
 <div class="col-md-6">
-    <ul class="member-list">
+    <ul class="">
     {{#each WorksWith }}
         <li class="{{ this.Role }}">
             <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} ({{ this.State }} - {{firstChar this.Party }})</a>
+            (Worked on {{this.Count}} bills with {{../Member.Name}})
         </li>
     {{/each}}
     </ul>
