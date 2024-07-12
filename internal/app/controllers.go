@@ -66,6 +66,7 @@ func SetupServer() {
 			"CacheBust": CacheBustTimestamp,
 			"Title":     "DirtyCongress.com",
 			"DEBUG":     IsDebug,
+			"Description": "DirtyCongress.com is a website that provides a searchable database of laws and congress members. It also provides a visualization of the congress sponsorship network."
 		})
 		return c.Next()
 	})
@@ -186,41 +187,23 @@ func Index(c *fiber.Ctx) error {
 func LawIndex(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	// convert to int minus 1
 	page := c.Query("page", "missing")
 	LIMIT := 7
 
 	var laws []GovtRssItem
 	// Pub date before
-	x := db.Order("pub_date DESC").Limit(LIMIT) //.Find(&laws)
+	x := db.Order("pub_date DESC").Limit(LIMIT)
 	lawType := c.Query("type")
 
 	if lawType != "" {
 		x.Where("title LIKE ?", lawType+"%")
 	}
 
-	var lawTypeDisplay string
-	switch lawType {
-	case "H.R.":
-		lawTypeDisplay = "House Bills"
-	case "S.":
-		lawTypeDisplay = "Senate Bills"
-	case "S.J.":
-		lawTypeDisplay = "Senate Joint Resolutions"
-	case "H.J.":
-		lawTypeDisplay = "House Joint Resolutions"
-	case "Public":
-		lawTypeDisplay = "Public Laws"
-	case "Private":
-		lawTypeDisplay = "Private Laws"
-	}
-
 	if page != "missing" {
 		x.Where("pub_date < ?", page).Find(&laws)
 		// we don't use a layout here for htmx.
-		// fuck if I get why I'm using htmx
 		return c.Render("partials/law-list", fiber.Map{
-			"Title":      "Most Recent " + lawTypeDisplay,
+			"Title":      "Most Recent " + GetLawTypeDisplay(lawType),
 			"Laws":       laws,
 			"EnableLoad": true,
 			"LawType":    lawType,
@@ -230,7 +213,7 @@ func LawIndex(c *fiber.Ctx) error {
 	x.Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
-		"Title":   "Most Recent " + lawTypeDisplay,
+		"Title":   "Most Recent " + GetLawTypeDisplay(lawType),
 		"Laws":    laws,
 		"LawType": lawType,
 	}, "layouts/main")

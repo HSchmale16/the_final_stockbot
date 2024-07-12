@@ -18,7 +18,8 @@ function getCongressPersonDetailsUrl(bioGuideId) {
 }
 
 function NodeSizeHandler(d) {
-    return 1.5 * d.Count;
+    // return 1.5 * d.Count;
+    return Math.sqrt(d.Count) + 3;
 }
 
 function drawNetwork(data) {
@@ -58,7 +59,7 @@ function drawNetwork(data) {
         .selectAll()
         .data(nodes)
         .join("circle")
-        .attr("r", d => d.Count * 1.2 + 2)
+        .attr("r", NodeSizeHandler)
         .attr("fill", d => PartyColor(d.Party));
 
 

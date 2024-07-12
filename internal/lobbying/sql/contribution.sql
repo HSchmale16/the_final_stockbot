@@ -1,6 +1,6 @@
 WITH unfolded AS (
 select
-    json_extract(json_item, '$.registrant.name') as registrant_name
+    CAST(json_extract(json_item, '$.registrant.name') AS VARCHAR) as registrant_name
     , json_item->>'filing_year' as filing_year
     , value->>'amount' as amount
     , value->>'honoree_name' as honoree_name

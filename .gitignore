@@ -12,3 +12,4 @@ temp/*
 cpu.pprof
 cpu.pb.gz
 *.gz
+*.duckdb
