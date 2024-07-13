@@ -82,7 +82,7 @@ func renderPieChart(parties map[string]float64, member DB_CongressMember) ([]byt
 		Width:  512,
 		Height: 512,
 		Values: values,
-		Title:  "Which Parties " + member.Name + " works with",
+		//Title:  "Which Parties " + member.Name + " works with",
 	}
 
 	// Render the pie chart as a PNG image
