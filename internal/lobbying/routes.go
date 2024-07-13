@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+	"gorm.io/gorm"
 )
 
 var YearsLoaded = []string{"2018", "2019", "2020", "2021", "2022", "2023"}
@@ -51,10 +52,12 @@ type resultSet struct {
 }
 
 func ExecLobbyistSQL(c *fiber.Ctx) error {
+
 	sql := c.FormValue("sql")
 
 	var x resultSet
 
+	i := 0
 	rows, err := LobbyingDBInstance.DB.Query(sql)
 	if err != nil {
 		fmt.Println(err)
@@ -62,7 +65,6 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 		x.Columns, _ = rows.Columns()
 		defer rows.Close()
 
-		i := 0
 		for rows.Next() {
 			var r row
 
@@ -85,16 +87,38 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 
 			x.Rows = append(x.Rows, r)
 
+			i++
 			if i > 100 {
 				break
 			}
 		}
 	}
 
+	// Do analytics
+	db := c.Locals("db").(*gorm.DB)
+
+	analytics := LobbyingSqlQuery{
+		SqlText:    sql,
+		ErrorText:  shittyString(err),
+		NumResults: i,
+		IpAddr:     c.IP(),
+		UserAgent:  string(c.Context().UserAgent()),
+	}
+
+	db.Save(analytics)
+
 	return c.Render("table", fiber.Map{
 		"Error": err,
 		"Rows":  x,
 	})
+}
+
+func shittyString(err error) *string {
+	if err != nil {
+		x := err.Error()
+		return &x
+	}
+	return nil
 }
 
 func RenderLobbyingYearPage(c *fiber.Ctx) error {
