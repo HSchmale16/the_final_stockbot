@@ -38,7 +38,9 @@ var ContributionType = map[string]string{
 }
 
 func LobbyingSQLView(c *fiber.Ctx) error {
-	return c.Render("lobbying_sql", fiber.Map{},
+	return c.Render("lobbying_sql", fiber.Map{
+		"Title": "Query Facts about Lobbying in Congress - DirtyCongress.com",
+	},
 		"layouts/main")
 }
 
