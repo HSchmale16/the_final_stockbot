@@ -6,6 +6,7 @@ import (
 	"time"
 
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
+	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"gorm.io/driver/sqlite"
@@ -271,6 +272,10 @@ func SetupDB() (*gorm.DB, error) {
 	}
 
 	if err := db.AutoMigrate(fecwrangling.CampaignCanidateLinkage{}); err != nil {
+		return nil, err
+	}
+
+	if err := db.AutoMigrate(lobbying.LobbyingSqlQuery{}); err != nil {
 		return nil, err
 	}
 

@@ -28,8 +28,6 @@ func SetupServer() {
 		panic(err)
 	}
 
-	//engine := handlebars.New("./html_templates", ".hbs")
-
 	app := fiber.New(fiber.Config{
 		Views: GetTemplateEngine(),
 	})

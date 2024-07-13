@@ -2,6 +2,7 @@ package lobbying
 
 import (
 	_ "embed"
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,6 +23,9 @@ func SetupRoutes(app *fiber.App) {
 			"Years": YearsLoaded,
 		}, "layouts/main")
 	})
+
+	app.Get("/lobbying-sql", LobbyingSQLView)
+	app.Post("/lobbying-sql", ExecLobbyistSQL)
 }
 
 var ContributionType = map[string]string{
@@ -30,6 +34,67 @@ var ContributionType = map[string]string{
 	"me":   "Meeting Expenses",
 	"ple":  "Presidential Library Expenses",
 	"pic":  "Presidential Inaugural Committee",
+}
+
+func LobbyingSQLView(c *fiber.Ctx) error {
+	return c.Render("lobbying_sql", fiber.Map{},
+		"layouts/main")
+}
+
+type row struct {
+	Values []string
+}
+
+type resultSet struct {
+	Columns []string
+	Rows    []row
+}
+
+func ExecLobbyistSQL(c *fiber.Ctx) error {
+	sql := c.FormValue("sql")
+
+	var x resultSet
+
+	rows, err := LobbyingDBInstance.DB.Query(sql)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		x.Columns, _ = rows.Columns()
+		defer rows.Close()
+
+		i := 0
+		for rows.Next() {
+			var r row
+
+			// holy shit this is absolutely miserable to get implemented.
+			// I can't believe how difficult this was to get working
+			values := make([]interface{}, len(x.Columns))
+			for i := range values {
+				values[i] = new(interface{})
+			}
+
+			err := rows.Scan(values...)
+			if err != nil {
+				fmt.Println(err)
+				break
+			}
+
+			for _, val := range values {
+				r.Values = append(r.Values, fmt.Sprintf("%v", *val.(*interface{})))
+			}
+
+			x.Rows = append(x.Rows, r)
+
+			if i > 100 {
+				break
+			}
+		}
+	}
+
+	return c.Render("table", fiber.Map{
+		"Error": err,
+		"Rows":  x,
+	})
 }
 
 func RenderLobbyingYearPage(c *fiber.Ctx) error {

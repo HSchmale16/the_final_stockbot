@@ -1,0 +1,26 @@
+<h1>SQL Results</h1>
+
+{{#if Error }}
+    {{ Error }}
+{{/if}}
+
+{{#if Rows }}
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                {{#each Rows.Columns }}
+                    <th>{{ this }}</th>
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#each Rows.Rows }}
+                <tr>
+                    {{#each this.Values }}
+                        <td>{{ this }}</td>
+                    {{/each}}
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+{{/if}}
