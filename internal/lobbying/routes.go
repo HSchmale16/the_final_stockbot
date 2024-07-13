@@ -10,6 +10,7 @@ import (
 )
 
 var YearsLoaded = []string{"2018", "2019", "2020", "2021", "2022", "2023"}
+var LobbyingTypes = []string{"feca", "he", "me", "ple", "pic"}
 var p = message.NewPrinter(language.English)
 
 func SetupRoutes(app *fiber.App) {

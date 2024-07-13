@@ -104,7 +104,7 @@
       become: true
       ansible.builtin.cron:
         name: "Update Web Analytics"
-        minute: "*/30"
+        minute: "*/15"
         job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html"
         user: root
         state: present
