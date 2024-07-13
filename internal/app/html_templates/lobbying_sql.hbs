@@ -2,6 +2,11 @@
     <h1>Lobbying SQL <span class="htmx-indicator">
             <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
         </span></h1>
+
+    <p>
+        On this page you can run limited sql queries to analyize the contributions and filings of various lobbyists. 
+        Off to the side you can view the data dictionary of the available tables.
+    </p>
     <div class="row">
         <div class="col-md-8">
             <form hx-post="/lobbying-sql" hx-target="#results" hx-indicator=".htmx-indicator">

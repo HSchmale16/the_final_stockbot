@@ -105,7 +105,7 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 		UserAgent:  string(c.Context().UserAgent()),
 	}
 
-	db.Save(analytics)
+	db.Create(&analytics)
 
 	return c.Render("table", fiber.Map{
 		"Error": err,
