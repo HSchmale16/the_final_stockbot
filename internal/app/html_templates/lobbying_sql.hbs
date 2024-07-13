@@ -17,30 +17,62 @@
                     <h2 class="accordion-header" id="tableOne">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            Table 1
+                            contributions_etl
                         </button>
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="tableOne"
                         data-bs-parent="#accordionTables">
                         <div class="accordion-body">
+                            <p>The extracted and loaded data of the lobbyist contribution filings.</p>
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Column 1</th>
-                                        <th>Column 2</th>
-                                        <th>Column 3</th>
+                                        <th>Column Name</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Data 1</td>
-                                        <td>Data 2</td>
-                                        <td>Data 3</td>
+                                        <td>uuid</td>
+                                        <td>VARCHAR</td>
+                                        <td>YES</td>
                                     </tr>
                                     <tr>
-                                        <td>Data 4</td>
-                                        <td>Data 5</td>
-                                        <td>Data 6</td>
+                                        <td>registrant_name</td>
+                                        <td>VARCHAR</td>
+                                        <td>YES</td>
+                                    </tr>
+                                    <tr>
+                                        <td>filing_year</td>
+                                        <td>INTEGER</td>
+                                        <td>YES</td>
+                                    </tr>
+                                    <tr>
+                                        <td>amount</td>
+                                        <td>FLOAT</td>
+                                        <td>YES</td>
+                                    </tr>
+                                    <tr>
+                                        <td>honoree_name</td>
+                                        <td>VARCHAR</td>
+                                        <td>YES</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>contribution_type</td>
+                                        <td>VARCHAR</td>
+                                        <td>YES</td>
+                                    </tr>
+                                    <tr>
+                                        <td>payee_name</td>
+                                        <td>VARCHAR</td>
+                                        <td>YES</td>
+                                    </tr>
+                                    <tr>
+                                        <td>contribution_date</td>
+                                        <td>VARCHAR</td>
+                                        <td>YES</td>
                                     </tr>
                                 </tbody>
                             </table>
