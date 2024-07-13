@@ -93,6 +93,7 @@ func MakeSitemap() {
 		for _, ltype := range lobbying.LobbyingTypes {
 			url = SITEURL + "/lobbying/breakdown/" + year + "/" + ltype
 			tmp = fmt.Sprintf(URL_TEMPLATE, url, today.Format("2006-01-02"))
+			file.WriteString(tmp)
 		}
 	}
 }
