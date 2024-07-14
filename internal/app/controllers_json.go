@@ -5,6 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+
+	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 //go:embed sql/congress_network.sql

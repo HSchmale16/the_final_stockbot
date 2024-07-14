@@ -9,6 +9,7 @@ import (
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"github.com/robfig/cron/v3"
 )
@@ -54,7 +55,7 @@ func main() {
 	}
 
 	if loadCclFile != "" {
-		db, err := app.SetupDB()
+		db, err := m.SetupDB()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -68,7 +69,7 @@ func main() {
 	}
 
 	if scanLawText {
-		db, err := app.SetupDB()
+		db, err := m.SetupDB()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -77,7 +78,7 @@ func main() {
 	}
 
 	if loadCongressMembers {
-		db, err := app.SetupDB()
+		db, err := m.SetupDB()
 		if err != nil {
 			log.Fatal(err)
 		}

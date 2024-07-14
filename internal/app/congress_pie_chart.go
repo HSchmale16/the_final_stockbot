@@ -7,6 +7,8 @@ import (
 	"github.com/wcharczuk/go-chart/v2"
 	"github.com/wcharczuk/go-chart/v2/drawing"
 	"gorm.io/gorm"
+
+	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 func SponsorsBillsWithPiChart(c *fiber.Ctx) error {

@@ -1,9 +1,11 @@
-package app
+package m_test
 
 import (
 	"io"
 	"os"
 	"testing"
+
+	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 func TestModsXML(t *testing.T) {

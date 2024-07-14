@@ -12,6 +12,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mmcdole/gofeed"
 	"gorm.io/gorm"
+
+	"github.com/hschmale16/the_final_stockbot/internal/m"
+	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 var RssLinks = []string{
@@ -44,7 +47,7 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 
 	// Search by link
 	var count int64
-	db.Model(&GovtRssItem{}).Where("link = ?", item.Link).Count(&count)
+	db.Model(&m.GovtRssItem{}).Where("link = ?", item.Link).Count(&count)
 
 	log.Println("Count:", count, "Link:", item.Link)
 	if count == 0 {
@@ -81,7 +84,7 @@ func RunFetcherService(ch LawRssItemChannel) {
 		text := downloadLawFullText(item.FullTextUrl)
 		mods := downloadModsXML(item.DescriptiveMetaUrl)
 
-		db.Create(&GovtLawText{
+		db.Create(&m.GovtLawText{
 			GovtRssItemId: item.ID,
 			Text:          text,
 			ModsXML:       mods,
@@ -144,7 +147,7 @@ func FindUntaggedLaws() {
 		return
 	}
 
-	var items []GovtRssItem
+	var items []m.GovtRssItem
 	db.Debug().Where("id NOT IN (SELECT govt_rss_item_id FROM govt_rss_item_tag)").Find(&items)
 
 	fmt.Println("Found", len(items), "untagged items")
@@ -176,7 +179,7 @@ func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 	db.First(&item, "govt_rss_item_id = ?", src.ID)
 
 	var count int64
-	db.Model(&GovtRssItemTag{}).Where("govt_rss_item_id = ?", src.ID).Count(&count)
+	db.Model(&m.GovtRssItemTag{}).Where("govt_rss_item_id = ?", src.ID).Count(&count)
 
 	fmt.Println("Target item already has tags:", count)
 

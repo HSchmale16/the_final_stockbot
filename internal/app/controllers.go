@@ -16,6 +16,7 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
+	. "github.com/hschmale16/the_final_stockbot/internal/m"
 	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
