@@ -1,6 +1,3 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-
-
 function fetchDataForChamber(chamber) {
     // Clear it before generating new element
     document.getElementById("container").innerHTML = "";
