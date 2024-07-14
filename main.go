@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"log"
 	_ "net/http/pprof"
-	"os"
-	"runtime/pprof"
-	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
@@ -100,17 +97,17 @@ func main() {
 		cron.Start()
 	}
 
-	pprofFile, pprofErr := os.Create("cpu.pb.gz")
-	if pprofErr != nil {
-		log.Fatal(pprofErr)
-	}
-	pprof.StartCPUProfile(pprofFile)
+	// pprofFile, pprofErr := os.Create("cpu.pb.gz")
+	// if pprofErr != nil {
+	// 	log.Fatal(pprofErr)
+	// }
+	// pprof.StartCPUProfile(pprofFile)
 
-	time.AfterFunc(10*time.Minute, func() {
-		pprof.StopCPUProfile()
-		pprofFile.Close()
-		log.Println("CPU profiling stopped")
-	})
+	// time.AfterFunc(10*time.Minute, func() {
+	// 	pprof.StopCPUProfile()
+	// 	pprofFile.Close()
+	// 	log.Println("CPU profiling stopped")
+	// })
 
 	fmt.Println("Starting up...")
 

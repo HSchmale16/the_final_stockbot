@@ -3,7 +3,7 @@
 
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <p>
                 On this page you can run limited sql queries to analyize the contributions and filings of various
                 lobbyists. Data retrieved from <a href="https://lda.senate.gov">Lobbying Disclosure Act Website</a>,
@@ -12,13 +12,14 @@
                 This page will display the first 250 records of any query executed.
             </p>
             <form hx-post="/lobbying-sql" hx-target="#results" hx-indicator=".htmx-indicator">
-                <textarea required id="sql" rows="10" cols="80" name="sql"></textarea>
-                <button type="submit">Run</button>
+                <textarea required id="sql" rows="10" cols="60" name="sql"></textarea>
+                <br/>
+                <button type="submit">Run Query</button>
             </form>
         </div>
 
 
-        <div class="col-md-4">
+        <div class="col-md-6">
             <h2>Tables</h2>
 
             <div class="accordion" id="accordionTables">
