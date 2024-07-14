@@ -307,7 +307,9 @@ func LawView(c *fiber.Ctx) error {
 }
 
 func TermsOfService(c *fiber.Ctx) error {
-	return c.Render("tos", fiber.Map{}, "layouts/main")
+	return c.Render("tos", fiber.Map{
+		"Title": "Terms of Service * Privacy Policy",
+	}, "layouts/main")
 }
 
 func CongressMemberList(c *fiber.Ctx) error {
