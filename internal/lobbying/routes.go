@@ -11,6 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	// Maximum number of records able to returned by the SQL interface
+	MAX_SQL_RECORDS = 350
+)
+
 var YearsLoaded = []string{"2018", "2019", "2020", "2021", "2022", "2023"}
 var LobbyingTypes = []string{"feca", "he", "me", "ple", "pic"}
 var p = message.NewPrinter(language.English)
@@ -90,7 +95,7 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 			x.Rows = append(x.Rows, r)
 
 			i++
-			if i > 100 {
+			if i > MAX_SQL_RECORDS {
 				break
 			}
 		}
