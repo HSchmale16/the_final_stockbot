@@ -21,6 +21,8 @@ const (
 
 	POSTAMBLE    = `</urlset>`
 	URL_TEMPLATE = "<url><loc>%s</loc><lastmod>%s</lastmod></url>\n"
+
+	SITEMAP_DT_FORMAT = "2006-01-02T15:04:05-07:00"
 )
 
 // File Location
@@ -62,7 +64,7 @@ func MakeSitemap() {
 
 		// Write the url
 		url := SITEURL + "/law/" + strconv.Itoa(int(govtRssItem.ID))
-		tmp := fmt.Sprintf(URL_TEMPLATE, url, govtRssItem.PubDate.Format("2006-01-02"))
+		tmp := fmt.Sprintf(URL_TEMPLATE, url, govtRssItem.PubDate.Format(SITEMAP_DT_FORMAT))
 		file.WriteString(tmp)
 	}
 
@@ -80,7 +82,7 @@ func MakeSitemap() {
 		// Write the url
 		if congressMember.IsActiveMember() {
 			url := SITEURL + "/congress-member/" + congressMember.BioGuideId
-			tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format("2006-01-02"))
+			tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
 			file.WriteString(tmp)
 		}
 	}
@@ -88,11 +90,11 @@ func MakeSitemap() {
 	// Select the lobbying years
 	for _, year := range lobbying.YearsLoaded {
 		url := SITEURL + "/lobbying/" + year
-		tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format("2006-01-02"))
+		tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
 		file.WriteString(tmp)
 		for _, ltype := range lobbying.LobbyingTypes {
 			url = SITEURL + "/lobbying/breakdown/" + year + "/" + ltype
-			tmp = fmt.Sprintf(URL_TEMPLATE, url, today.Format("2006-01-02"))
+			tmp = fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
 			file.WriteString(tmp)
 		}
 	}
