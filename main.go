@@ -56,7 +56,7 @@ func main() {
 
 		for i := range x {
 			//fmt.Println(i)
-			db.Debug().Create(&i)
+			db.Create(&i)
 		}
 		return
 	}

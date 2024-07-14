@@ -199,6 +199,10 @@ func (d DB_CongressMember) TableName() string {
 	return "congress_member"
 }
 
+func (d DB_CongressMember) TookOfficeOn() string {
+	return d.CongressMemberInfo.Terms[0].Start
+}
+
 func (d DB_CongressMember) Party() string {
 	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].Party
 }

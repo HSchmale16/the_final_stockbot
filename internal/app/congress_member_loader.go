@@ -66,7 +66,7 @@ func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) 
 		}
 
 		fmt.Println(myCongMember.CongressMemberInfo.Terms)
-		tx.Debug().Save(&myCongMember)
+		tx.Save(&myCongMember)
 	}
 	tx.Commit()
 }
@@ -98,7 +98,7 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 	}
 	numCongress := make(map[foo]bool)
 
-	rows, err := db.Debug().Model(&GovtLawText{}).Rows()
+	rows, err := db.Model(&GovtLawText{}).Rows()
 	if err != nil {
 		panic(err)
 	}

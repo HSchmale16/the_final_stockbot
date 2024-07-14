@@ -2,19 +2,50 @@
 
 <div class="col-md-4">
     <div id="works-with-chart">
-        <img class="img-fluid" src="/congress-member/{{ Member.BioGuideId }}/sponsors-bills-with-pi-chart"/>
+        <img class="img-fluid" src="/congress-member/{{ Member.BioGuideId }}/sponsors-bills-with-pi-chart" />
     </div>
 </div>
 
 <div class="col-md-6">
-    <ul class="">
-    {{#each WorksWith }}
+    {{!-- <ul class="">
+        {{#each WorksWith }}
         <li class="{{ this.Role }}">
-            <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} ({{ this.State }} - {{firstChar this.Party }})</a>
+            <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} ({{ this.State }} - {{firstChar this.Party
+                }})</a>
             (Worked on {{this.Count}} bills with {{../Member.Name}})
         </li>
-    {{/each}}
-    </ul>
+        {{/each}}
+    </ul> --}}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>State</th>
+                <th>Party</th>
+                <th>Bills</th>
+                <th>Important Dates</th>
+                <th>Current Member</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each WorksWith }}
+            <tr>
+                <td><a href="/congress-member/{{this.BioGuideId}}">{{this.Name}}</a></td>
+                <td>{{this.State}}</td>
+                <td>{{firstChar this.Party }}</td>
+                <td class="align-right">{{this.Count}}</td>
+                <td>
+                    {{#if this.CongressMemberInfo.Bio.Birthday}}
+                    {{ formatDate this.CongressMemberInfo.Bio.Birthday }}
+                    {{else}}
+                    Not Available
+                    {{/if}} <br/>
+                    <abbr title="Date first took office">{{ formatDate this.TookOfficeOn }}</abbr>
+                </td>
+                <td>{{ this.IsActiveMember }}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
 </div>
-
-

@@ -192,7 +192,7 @@ func LawIndex(c *fiber.Ctx) error {
 
 	var laws []GovtRssItem
 	// Pub date before
-	x := db.Debug().Preload("Sponsors").Order("pub_date DESC").Limit(LIMIT)
+	x := db.Preload("Sponsors").Order("pub_date DESC").Limit(LIMIT)
 	lawType := c.Query("type")
 
 	if lawType != "" {
@@ -302,7 +302,6 @@ func LawView(c *fiber.Ctx) error {
 		"Law":        law,
 		"LawText":    lawText,
 		"RenderMods": strings.HasSuffix(c.Path(), "/mods"),
-		// "Metadata": metadata,
 	}, "layouts/main")
 }
 
@@ -339,7 +338,7 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var member DB_CongressMember
-	db.Debug().Preload("Sponsored").Preload("Sponsored.Sponsors").First(&member, DB_CongressMember{
+	db.Preload("Sponsored").Preload("Sponsored.Sponsors").First(&member, DB_CongressMember{
 		BioGuideId: c.Params("bio_guide_id"),
 	})
 
