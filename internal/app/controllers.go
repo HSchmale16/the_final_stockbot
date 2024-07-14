@@ -305,9 +305,20 @@ func LawView(c *fiber.Ctx) error {
 	var lawText GovtLawText
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
 
+	determineFirstTitle := func(x string) string {
+		// split based on the last instance of of a hyphen
+		// this is because the title is in the format of "H.R. 1234 - Title"
+		// and we want to get the "H.R. 1234" part
+		split := strings.LastIndex(x, " - ")
+		if split != -1 {
+			return x[:split]
+		}
+		return x
+	}
+
 	return c.Render("law_view", fiber.Map{
 		"Title":       html.UnescapeString(law.Title),
-		"Description": "View the sponsors of this bill and the actual primary source text",
+		"Description": "View the sponsors of this " + determineFirstTitle(law.Title) + " and the actual primary source text",
 		"Law":         law,
 		"LawText":     lawText,
 		"RenderMods":  strings.HasSuffix(c.Path(), "/mods"),
