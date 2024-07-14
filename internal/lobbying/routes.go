@@ -103,7 +103,7 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 		SqlText:    sql,
 		ErrorText:  shittyString(err),
 		NumResults: i,
-		IpAddr:     c.Context().RemoteIP().String(),
+		IpAddr:     c.IP(),
 		UserAgent:  string(c.Context().UserAgent()),
 	}
 
