@@ -22,6 +22,10 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const (
+	DOMAIN = "https://www.dirtycongress.com"
+)
+
 func SetupServer() {
 	db, err := SetupDB()
 	if err != nil {
@@ -67,7 +71,7 @@ func SetupServer() {
 			"Title":       "Dirty Congress",
 			"DEBUG":       IsDebug,
 			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
-			"Url":         c.OriginalURL(),
+			"Url":         DOMAIN + c.OriginalURL(),
 		})
 		return c.Next()
 	})
