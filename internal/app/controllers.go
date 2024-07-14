@@ -29,7 +29,9 @@ func SetupServer() {
 	}
 
 	app := fiber.New(fiber.Config{
-		Views:       GetTemplateEngine(),
+		Views: GetTemplateEngine(),
+		// Required if I want to get the ip address of actual requests.
+		// Powered by NGINX
 		ProxyHeader: fiber.HeaderXForwardedFor,
 	})
 
