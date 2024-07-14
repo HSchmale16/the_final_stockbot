@@ -44,7 +44,7 @@ func SponsorsBillsWithPiChart(c *fiber.Ctx) error {
 
 	c.Set("Content-Type", "image/svg+xml")
 
-	b, err := renderPieChart(parties, member)
+	b, err := renderPieChart(parties)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func getColorForParty(party string) drawing.Color {
 	}
 }
 
-func renderPieChart(parties map[string]float64, member DB_CongressMember) ([]byte, error) {
+func renderPieChart(parties map[string]float64) ([]byte, error) {
 	values := make([]chart.Value, 0, len(parties))
 	for k, v := range parties {
 		values = append(values, chart.Value{

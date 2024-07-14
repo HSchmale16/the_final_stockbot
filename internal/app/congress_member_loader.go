@@ -165,11 +165,12 @@ type CongIdentifiers struct {
 }
 
 type Terms struct {
-	Type  string `json:"type"`
-	State string `json:"state"`
-	Start string `json:"start"`
-	End   string `json:"end"`
-	Party string `json:"party"`
+	Type     string `json:"type"`
+	State    string `json:"state"`
+	Start    string `json:"start"`
+	End      string `json:"end"`
+	Party    string `json:"party"`
+	District int    `json:"district"`
 }
 
 func (t Terms) IsSenator() bool {

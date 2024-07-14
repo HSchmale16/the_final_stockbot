@@ -395,7 +395,8 @@ func CongressMemberWorksWith(c *fiber.Ctx) error {
 		Group("db_congress_member_bio_guide_id").
 		Select("congress_member.*, COUNT(*) as Count").
 		Order("Count DESC").
-		Having("COUNT(*) > 1").
+		Limit(30).
+		//Having("COUNT(*) > 1").
 		Scan(&sponsoredBy)
 
 	return c.Render("partials/congress_member_works_with", fiber.Map{
