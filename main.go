@@ -93,7 +93,6 @@ func main() {
 
 		cron := cron.New()
 		cron.AddFunc("@every 4h", triggerRssFetch)
-		triggerRssFetch()
 
 		cron.Start()
 	}
