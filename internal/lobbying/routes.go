@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/text/language"
@@ -58,9 +59,30 @@ type resultSet struct {
 	Rows    []row
 }
 
-func ExecLobbyistSQL(c *fiber.Ctx) error {
+func IsUnsafeSQLForLobbyists(sql string) bool {
+	// Joins cause it to run out of memory for some reason.
+	return strings.Contains(sql, "JOIN") ||
+		strings.Contains(sql, "UNION") ||
+		strings.Contains(sql, "DELETE") ||
+		strings.Contains(sql, "DROP") ||
+		strings.Contains(sql, "TRUNCATE") ||
+		strings.Contains(sql, "ALTER") ||
+		strings.Contains(sql, "CREATE") ||
+		strings.Contains(sql, "INSERT") ||
+		strings.Contains(sql, "UPDATE") ||
+		strings.Contains(sql, "REPLACE") ||
+		strings.Contains(sql, "INTO") ||
+		strings.Contains(sql, "SET") ||
+		strings.Contains(sql, "duckdb_settings()")
+}
 
+func ExecLobbyistSQL(c *fiber.Ctx) error {
 	sql := c.FormValue("sql")
+	sql = strings.TrimSpace(sql)
+
+	if IsUnsafeSQLForLobbyists(sql) {
+		return c.SendString("Invalid SQL: Stop Trying to Hack Me :(")
+	}
 
 	var x resultSet
 
