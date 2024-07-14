@@ -211,6 +211,10 @@ func (d DB_CongressMember) State() string {
 	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].State
 }
 
+func (d DB_CongressMember) District() int {
+	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].District
+}
+
 func (d DB_CongressMember) IsActiveMember() bool {
 	currentTerm := d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1]
 	now := time.Now()

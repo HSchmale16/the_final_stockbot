@@ -4,16 +4,37 @@
 <div class="congress-member">
     <div class="congress-member__header">
         <div class="congress-member__header__image">
-            <img class="img-fluid" src="/congress-member/{{ Member.BioGuideId }}/sponsors-bills-with-pi-chart" alt="Party of Cosponsors with {{ Member.Name }}">
+            <img class="img-fluid" src="/congress-member/{{ Member.BioGuideId }}/sponsors-bills-with-pi-chart"
+                alt="Party of Cosponsors with {{ Member.Name }}">
         </div>
         <div class="congress-member__header__info">
             <h2>{{ Member.Name }}</h2>
-            <p>{{Member.Party}} - {{Member.State}}</p>
+            <p>{{Member.Party}} - {{Member.State}}{{#unless Member.IsSenator }} - District {{ Member.District
+                }}{{/unless}}</p>
         </div>
     </div>
     <div class="congress-member__body">
-        <p>Yet another congress person</p>
-        <small>Image not representive of said politican</small>
+        <table class="table-sm table">
+            <tr>
+                <th scope="row">Born</th>
+                <td>
+                    {{#if Member.CongressMemberInfo.Bio.Birthday}}
+                    {{ formatDate Member.CongressMemberInfo.Bio.Birthday }}
+                    {{else}}
+                    Not Available
+                    {{/if}}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">First Took Office</th>
+                <td>{{ formatDate Member.TookOfficeOn }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Bills Sponsored</th>
+                <td>{{ NumBillsSponsored }}</td>
+            </tr>
+        </table>
+
         <a href="/congress-member/{{Member.BioGuideId}}">Read more</a>
     </div>
 </div>

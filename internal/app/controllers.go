@@ -413,8 +413,12 @@ func EmbedCongressMember(c *fiber.Ctx) error {
 		BioGuideId: c.Params("bio_guide_id"),
 	})
 
+	var numBillsSponsored int64
+	db.Model(&CongressMemberSponsored{}).Where("db_congress_member_bio_guide_id = ?", member.BioGuideId).Count(&numBillsSponsored)
+
 	return c.Render("embed/congress_member", fiber.Map{
-		"Member": member,
-		"Image":  "/static/img/muddy-" + string(member.Party()[0]) + ".jpg",
+		"Member":            member,
+		"Image":             "/static/img/muddy-" + string(member.Party()[0]) + ".jpg",
+		"NumBillsSponsored": numBillsSponsored,
 	})
 }
