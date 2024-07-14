@@ -29,7 +29,8 @@ func SetupServer() {
 	}
 
 	app := fiber.New(fiber.Config{
-		Views: GetTemplateEngine(),
+		Views:       GetTemplateEngine(),
+		ProxyHeader: "X-Forwarded-For",
 	})
 
 	app.Use(helmet.New(helmet.Config{
