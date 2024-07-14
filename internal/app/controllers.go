@@ -82,6 +82,7 @@ func SetupServer() {
 			KeyGenerator: func(c *fiber.Ctx) string {
 				return utils.CopyString(c.Path()) + utils.CopyString(string(c.Context().URI().QueryString()))
 			},
+			Expiration: 5 * time.Minute,
 		}))
 	}
 
