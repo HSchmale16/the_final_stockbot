@@ -13,13 +13,22 @@
     <meta property="og:description" content="{{ Description }}" />
     <meta property="og:url" content="{{ Url }}" />
 
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="dirtycongress.com">
+    <meta property="twitter:url" content="{{ Url}}">
+    <meta name="twitter:title" content="{{ Title}}">
+    <meta name="twitter:description"
+        content="{{ Description}}">
+    <meta name="twitter:image" content="https://dirtycongress.com/static/img/navbar.png">
+
+
     <link rel="stylesheet" href="/static/css/bootstrap.min.css?cache-bust={{ CacheBust }}">
     <link rel="stylesheet" href="/static/css/custom.css?cache-bust={{ CacheBust }}">
     <script src="/static/js/bootstrap.bundle.min.js?cache-bust={{ CacheBust }}"></script>
     <script src="/static/js/htmx.min.js?cache-bust={{ CacheBust }}"></script>
 
-    <meta name='description' content="{{ Description }}"/>
-    <meta http-equiv='content-language' content='en-us'/>
+    <meta name='description' content="{{ Description }}" />
+    <meta http-equiv='content-language' content='en-us' />
 
     {{> 'scripts/google-analytics' }}
 </head>
