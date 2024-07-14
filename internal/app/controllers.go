@@ -176,7 +176,7 @@ func Index(c *fiber.Ctx) error {
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
 	return c.Render("index", fiber.Map{
-		"Title":       "DirtyCongress.com",
+		"Title":       "Dirty Congress - Explore the Laws and Connections within Congress",
 		"TotalTopics": p.Sprintf("%d", articleTags),
 		"TotalTags":   p.Sprintf("%d", totalTags),
 		"TotalLaws":   p.Sprintf("%d", totalLaws),
@@ -235,6 +235,7 @@ func TagIndex(c *fiber.Ctx) error {
 		Find(&items)
 
 	return c.Render("tag_index", fiber.Map{
+		"Title": "View Bills Tagged With " + tag.Name,
 		"Tag":   tag,
 		"Items": items,
 	}, "layouts/main")
@@ -331,6 +332,7 @@ func CongressMemberList(c *fiber.Ctx) error {
 
 	return c.Render("congress_member_list", fiber.Map{
 		"ActiveMembers": activeMembers,
+		"Title":         "Current Congress Members",
 	}, "layouts/main")
 }
 
@@ -343,6 +345,7 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	})
 
 	return c.Render("congress_member_view", fiber.Map{
+		"Title":  member.Name,
 		"Member": member,
 	}, "layouts/main")
 }
