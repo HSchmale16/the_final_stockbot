@@ -49,6 +49,18 @@
       The congress member profiles contain information about the member's background, voting record, committee assignments, sponsored and cosponsored bills, and contact information. The profiles also include visualizations of the member's voting record and bill sponsorship.
     slug: "what-information-is-on-the-congress-member-profiles"
 
+#############################################################
+- category: "Congress Trivia"
+  questions:
+  - question: "What can my congressperson help me with?"
+    answer: >
+      Your congressperson can help you with a variety of issues, including obtaining government benefits, resolving problems with federal agencies, and advocating for legislation that addresses your concerns. Your congressperson can also help you navigate the federal bureaucracy and connect you with resources in your community.
+    slug: "what-can-my-congressperson-help-me-with"
+  - question: "I'm visiting DC soon and want to see the captiol building. Can my congressperson help with this?"
+    answer: >
+      Yes, your congressperson can help you arrange a tour of the Capitol building. You can contact your congressperson's office to request a tour of the Capitol building, the White House, or other government buildings in Washington, D.C.
+    slug: "im-visiting-dc-soon-and-want-to-see-the-capitol-building-can-my-congressperson-help-with-this"
+
 
 #############################################################
 
