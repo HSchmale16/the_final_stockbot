@@ -168,9 +168,14 @@ func (GenerationError) TableName() string {
 	return "generation_error"
 }
 
+/**
+ * SearchQuery is a record of a search query done on the front page
+ */
 type SearchQuery struct {
 	ID         uint
 	CreatedAt  time.Time
+	IpAddr     string
+	UserAgent  string
 	Query      string
 	NumResults int
 }

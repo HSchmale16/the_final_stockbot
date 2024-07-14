@@ -1,6 +1,11 @@
 package lobbying
 
-import "time"
+import (
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+)
 
 type LobbyingSqlQuery struct {
 	ID         uint `gorm:"primaryKey"`
@@ -10,4 +15,18 @@ type LobbyingSqlQuery struct {
 	NumResults int
 	IpAddr     string
 	UserAgent  string
+}
+
+func LogAnalytics(sql string, err error, i int, c *fiber.Ctx) {
+	db := c.Locals("db").(*gorm.DB)
+
+	analytics := LobbyingSqlQuery{
+		SqlText:    sql,
+		ErrorText:  shittyString(err),
+		NumResults: i,
+		IpAddr:     c.IP(),
+		UserAgent:  c.Get("User-Agent"),
+	}
+
+	db.Create(&analytics)
 }

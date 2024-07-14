@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
-	"gorm.io/gorm"
 )
 
 const (
@@ -81,6 +80,7 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 	sql = strings.TrimSpace(sql)
 
 	if IsUnsafeSQLForLobbyists(sql) {
+		LogAnalytics(sql, fmt.Errorf("invalid sql detected by filter"), 0, c)
 		return c.SendString("Invalid SQL: Stop Trying to Hack Me :(")
 	}
 
@@ -123,18 +123,7 @@ func ExecLobbyistSQL(c *fiber.Ctx) error {
 		}
 	}
 
-	// Do analytics
-	db := c.Locals("db").(*gorm.DB)
-
-	analytics := LobbyingSqlQuery{
-		SqlText:    sql,
-		ErrorText:  shittyString(err),
-		NumResults: i,
-		IpAddr:     c.IP(),
-		UserAgent:  string(c.Context().UserAgent()),
-	}
-
-	db.Create(&analytics)
+	LogAnalytics(sql, err, i, c)
 
 	return c.Render("table", fiber.Map{
 		"Error": err,

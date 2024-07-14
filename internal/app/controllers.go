@@ -277,6 +277,8 @@ func TopicSearch(c *fiber.Ctx) error {
 	db.Create(&SearchQuery{
 		Query:      c.FormValue("search"),
 		NumResults: len(results),
+		IpAddr:     c.IP(),
+		UserAgent:  c.Get("User-Agent"),
 	})
 
 	return c.Render("tag_search", fiber.Map{
@@ -294,8 +296,6 @@ func LawView(c *fiber.Ctx) error {
 
 	var lawText GovtLawText
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
-
-	// metadata := ReadLawModsData(lawText.ModsXML)
 
 	return c.Render("law_view", fiber.Map{
 		"Title":      html.UnescapeString(law.Title),
