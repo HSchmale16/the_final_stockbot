@@ -27,8 +27,9 @@ func init() {
 
 func faq(c *fiber.Ctx) error {
 	return c.Render("faq", fiber.Map{
-		"Categories": faqCategories,
-		"Title":      "Frequently Asked Questions - DirtyCongress.com",
+		"Categories":  faqCategories,
+		"Description": "Frequently Asked Questions about DirtyCongress.com",
+		"Title":       "Frequently Asked Questions - DirtyCongress.com",
 	}, "layouts/main")
 }
 

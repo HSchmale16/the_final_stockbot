@@ -66,7 +66,8 @@ func SetupServer() {
 			"CacheBust":   CacheBustTimestamp,
 			"Title":       "Dirty Congress",
 			"DEBUG":       IsDebug,
-			"Description": "DirtyCongress.com is a website that provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
+			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
+			"Url":         c.OriginalURL(),
 		})
 		return c.Next()
 	})
@@ -213,9 +214,10 @@ func LawIndex(c *fiber.Ctx) error {
 	x.Find(&laws)
 
 	return c.Render("law_index", fiber.Map{
-		"Title":   "Most Recent " + GetLawTypeDisplay(lawType),
-		"Laws":    laws,
-		"LawType": lawType,
+		"Title":       "Most Recent " + GetLawTypeDisplay(lawType),
+		"Description": "Understand the bills currently being debated in congress",
+		"Laws":        laws,
+		"LawType":     lawType,
 	}, "layouts/main")
 }
 
@@ -235,9 +237,10 @@ func TagIndex(c *fiber.Ctx) error {
 		Find(&items)
 
 	return c.Render("tag_index", fiber.Map{
-		"Title": "View Bills Tagged With " + tag.Name,
-		"Tag":   tag,
-		"Items": items,
+		"Title":       "View Bills Tagged With " + tag.Name,
+		"Description": "View bills tagged with " + tag.Name + " and see the connections between them",
+		"Tag":         tag,
+		"Items":       items,
 	}, "layouts/main")
 }
 
@@ -299,10 +302,11 @@ func LawView(c *fiber.Ctx) error {
 	db.First(&lawText, "govt_rss_item_id = ?", law.ID)
 
 	return c.Render("law_view", fiber.Map{
-		"Title":      html.UnescapeString(law.Title),
-		"Law":        law,
-		"LawText":    lawText,
-		"RenderMods": strings.HasSuffix(c.Path(), "/mods"),
+		"Title":       html.UnescapeString(law.Title),
+		"Description": "View the sponsors of this bill and the actual primary source text",
+		"Law":         law,
+		"LawText":     lawText,
+		"RenderMods":  strings.HasSuffix(c.Path(), "/mods"),
 	}, "layouts/main")
 }
 
@@ -334,6 +338,7 @@ func CongressMemberList(c *fiber.Ctx) error {
 
 	return c.Render("congress_member_list", fiber.Map{
 		"ActiveMembers": activeMembers,
+		"Description":   "A list of the current congress members",
 		"Title":         "Current Congress Members",
 	}, "layouts/main")
 }
@@ -347,8 +352,9 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	})
 
 	return c.Render("congress_member_view", fiber.Map{
-		"Title":  member.Name,
-		"Member": member,
+		"Title":       member.Name,
+		"Description": "Understand more about how " + member.Name + " is connected to other congress members and the bills they have sponsored",
+		"Member":      member,
 	}, "layouts/main")
 }
 

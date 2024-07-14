@@ -44,9 +44,9 @@ var ContributionType = map[string]string{
 
 func LobbyingSQLView(c *fiber.Ctx) error {
 	return c.Render("lobbying_sql", fiber.Map{
-		"Title": "Query Facts about Lobbying in Congress - DirtyCongress.com",
-	},
-		"layouts/main")
+		"Title":       "Query Facts about Lobbying in Congress - DirtyCongress.com",
+		"Description": "Query the database for information about lobbying in Congress. Understand more about the types of contributions made by lobbyists.",
+	}, "layouts/main")
 }
 
 type row struct {
@@ -174,10 +174,11 @@ func RenderLobbyingYearPage(c *fiber.Ctx) error {
 	}
 
 	return c.Render("lobbying_types", fiber.Map{
-		"Title": "Lobbying Spending for " + c.Params("year"),
-		"Year":  c.Params("year"),
-		"Data":  lobbyingContributions,
-		"Years": YearsLoaded,
+		"Title":       "Lobbying Spending for " + c.Params("year"),
+		"Year":        c.Params("year"),
+		"Description": "Lobbying Spending by type for " + c.Params("year") + " in Congress. Understand more about the types of contributions made by lobbyists.",
+		"Data":        lobbyingContributions,
+		"Years":       YearsLoaded,
 	}, "layouts/main")
 }
 
@@ -219,6 +220,7 @@ func RenderBreakdownPage(c *fiber.Ctx) error {
 
 	return c.Render("lobbying_breakdown", fiber.Map{
 		"Title":       "Lobbying Spending for " + c.Params("year"),
+		"Description": "Lobbying Spending by type for " + c.Params("year") + " in Congress. Understand more about the types of contributions made by lobbyists.",
 		"Year":        c.Params("year"),
 		"TypeDisplay": ContributionType[contributionType],
 		"Type":        contributionType,
