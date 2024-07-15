@@ -16,13 +16,27 @@ func SetupRoutes(app *fiber.App) {
 func CommitteeList(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
+	committeeType := c.Query("type")
+
 	var committees []DB_CongressCommittee
-	db.Preload("Subcommittees").Where("parent_committee_id IS NULL").Find(&committees)
+	x := db.Preload("Subcommittees").
+		Where("parent_committee_id IS NULL")
+
+	if committeeType != "" {
+		x = x.Where("type = ?", committeeType)
+	}
+
+	dbc := x.Find(&committees)
+	if dbc.Error != nil {
+		fmt.Println("Error", dbc.Error)
+		return c.Status(404).SendString("404 Not Found")
+	}
 
 	return c.Render("committee_list", fiber.Map{
-		"Title":       "Committee List",
-		"Description": "List of all committees in the US Congress, understand their scope and membership.",
-		"Committees":  committees,
+		"Title":         "Committee List",
+		"Description":   "List of all committees in the US Congress, understand their scope and membership.",
+		"Committees":    committees,
+		"CommitteeType": committeeType,
 	}, "layouts/main")
 }
 

@@ -1,4 +1,16 @@
 <div class="container">
+    <h1>Committees in the US Congress</h1>
+    <p>Committees are groups of members of Congress that are responsible for specific areas of legislation. They are the places where most of the work of Congress gets done.</p>
+    <p>Committees are divided into two types: standing committees and select committees. Standing committees are permanent committees that are responsible for specific areas of legislation. Select committees are temporary committees that are created to investigate specific issues.</p>
+    <p>Each committee is responsible for a specific area of legislation. For example, the House Committee on Agriculture is responsible for legislation related to agriculture, while the Senate Committee on Foreign Relations is responsible for legislation related to foreign policy.</p>
+
+    <div class="btn-group">
+        {{> 'partials/bar-button-item' URL="/committees" Label="All Committees" T1="" T2=CommitteeType}}
+        {{> 'partials/bar-button-item' URL="/committees?type=" Label="House Committees" T1="house" T2=CommitteeType}}
+        {{> 'partials/bar-button-item' URL="/committees?type=" Label="Senate Committees" T1="senate" T2=CommitteeType}}
+        {{> 'partials/bar-button-item' URL="/committees?type=" Label="Joint Committees" T1="joint" T2=CommitteeType}}
+    </div>
+
     <ul>
         {{#each Committees }}
         <li>
