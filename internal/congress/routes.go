@@ -10,6 +10,20 @@ import (
 
 func SetupRoutes(app *fiber.App) {
 	app.Get("/committee/:thomas_id", CommitteeView)
+	app.Get("/committees", CommitteeList)
+}
+
+func CommitteeList(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var committees []DB_CongressCommittee
+	db.Preload("Subcommittees").Where("parent_committee_id IS NULL").Find(&committees)
+
+	return c.Render("committee_list", fiber.Map{
+		"Title":       "Committee List",
+		"Description": "List of all committees in the US Congress, understand their scope and membership.",
+		"Committees":  committees,
+	}, "layouts/main")
 }
 
 func CommitteeView(c *fiber.Ctx) error {
@@ -28,7 +42,8 @@ func CommitteeView(c *fiber.Ctx) error {
 	fmt.Println("Committee", len(committee.Memberships))
 
 	return c.Render("committee_view", fiber.Map{
-		"Title":     "Committee",
-		"Committee": committee,
+		"Title":       committee.Name,
+		"Description": "View the " + committee.Name + " in the US Congress, understand their scope and membership.",
+		"Committee":   committee,
 	}, "layouts/main")
 }

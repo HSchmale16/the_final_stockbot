@@ -1,7 +1,14 @@
 <div class="container">
     <h1>{{ Committee.Name }}</h1>
 
-    <p>{{ Committee.Jurisdiction }}</p>
+    <blockquote>
+        <p>{{ Committee.Jurisdiction }}</p>
+        {{#if Commmittee.JurisdictionSource }}
+        <footer>
+            ~ <a href="{{ JurisdictionSource }}">source</a>
+        </footer>
+        {{/if}}
+    </blockquote>
 
     {{#if Committee.Memberships }}
     <h2>Membership</h2>
@@ -11,7 +18,7 @@
         <li>
             <a href="/congress-member/{{CongressMember.BioGuideId}}">{{ CongressMember.Name }}</a>
             {{#if Title }}({{ Title }}){{/if}}
-            </li>
+        </li>
         {{/each}}
     </ul>
 
@@ -36,9 +43,9 @@
         <ul>
             {{#each Memberships }}
             <li>
-                {{ CongressMember.Name }} 
+                <a href="/congress-member/{{CongressMember.BioGuideId}}">{{ CongressMember.Name }}</a>
                 {{#if Title }}({{ Title }}){{/if}}
-                </li>
+            </li>
             {{/each}}
         </ul>
 

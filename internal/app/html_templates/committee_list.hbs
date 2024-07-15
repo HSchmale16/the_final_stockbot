@@ -1,0 +1,27 @@
+<div class="container">
+    <ul>
+        {{#each Committees }}
+        <li>
+            <a href="/committee/{{ThomasId}}">{{ Name }}</a>
+            <blockquote>
+                <p>{{ Jurisdiction }}</p>
+                {{#if JurisdictionSource }}
+                <footer>
+                    ~ <a href="{{ JurisdictionSource }}">source</a>
+                </footer>
+                {{/if}}
+            </blockquote>
+
+            {{#if Subcommittees}}
+            <ul>
+                {{#each Subcommittees }}
+                <li>
+                    <a href="/committee/{{ThomasId}}">{{ Name }}</a>
+                </li>
+                {{/each}}
+            </ul>
+            {{/if}}
+        </li>
+        {{/each}}
+    </ul>
+</div>
