@@ -137,6 +137,40 @@ func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
 	}
 }
 
+func FindUntaggedLaws() {
+	db, err := SetupDB()
+	if err != nil {
+		fmt.Println("Failed to setup database:", err)
+		return
+	}
+
+	var items []GovtRssItem
+	db.Debug().Where("id NOT IN (SELECT govt_rss_item_id FROM govt_rss_item_tag)").Find(&items)
+
+	fmt.Println("Found", len(items), "untagged items")
+
+	ch := make(chan GovtRssItem, 100)
+	defer close(ch)
+	go ProcessLawItemsFromChannel(ch)
+
+	for _, item := range items {
+		ch <- item
+	}
+}
+
+func ProcessLawItemsFromChannel(ch chan GovtRssItem) {
+	db, err := SetupDB()
+	if err != nil {
+		fmt.Println("Failed to setup database:", err)
+		return
+	}
+
+	for item := range ch {
+		fmt.Println("RE-Processing item:", item.ID)
+		ProcessLawTextForTags(item, db)
+	}
+}
+
 func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 	var item GovtLawText
 	db.First(&item, "govt_rss_item_id = ?", src.ID)

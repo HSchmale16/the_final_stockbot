@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	_ "net/http/pprof"
+	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
@@ -45,6 +46,11 @@ func main() {
 	if doSitemap {
 		app.MakeSitemap()
 		return
+	}
+
+	if reprocessId != 0 {
+		app.FindUntaggedLaws()
+		time.Sleep(10 * time.Second)
 	}
 
 	if loadCclFile != "" {
@@ -93,6 +99,7 @@ func main() {
 
 		cron := cron.New()
 		cron.AddFunc("@every 4h", triggerRssFetch)
+		cron.AddFunc("@every 12h", app.FindUntaggedLaws)
 
 		cron.Start()
 	}
