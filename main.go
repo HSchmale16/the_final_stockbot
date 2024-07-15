@@ -99,7 +99,8 @@ func main() {
 
 		cron := cron.New()
 		cron.AddFunc("@every 4h", triggerRssFetch)
-		cron.AddFunc("@every 12h", app.FindUntaggedLaws)
+		//cron.AddFunc("@every 12h", app.FindUntaggedLaws)
+		app.FindUntaggedLaws()
 
 		cron.Start()
 	}
