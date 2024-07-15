@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/utils"
 
+	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
@@ -129,6 +130,7 @@ func SetupServer() {
 
 	faq.SetupRoutes(app)
 	lobbying.SetupRoutes(app)
+	congress.SetupRoutes(app)
 
 	app.Listen(":8080")
 }
@@ -364,9 +366,12 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var member DB_CongressMember
-	db.Preload("Sponsored").Preload("Sponsored.Sponsors").First(&member, DB_CongressMember{
-		BioGuideId: c.Params("bio_guide_id"),
-	})
+	db.Debug().
+		Preload("Sponsored.Sponsors").
+		Preload("Committees.Committee").
+		First(&member, DB_CongressMember{
+			BioGuideId: c.Params("bio_guide_id"),
+		})
 
 	return c.Render("congress_member_view", fiber.Map{
 		"Title":       member.Name,

@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-type CongressCommittee struct {
+type XML_CongressCommittee struct {
 	Name    string `xml:"name"`
 	Chamber string `xml:"chamber,attr"`
 }
@@ -35,7 +35,7 @@ type ModsAction struct {
 type LawModsData struct {
 	OfficialTitle      string
 	Actions            []ModsAction
-	CongressCommittees []CongressCommittee
+	CongressCommittees []XML_CongressCommittee
 	CongressMembers    []CongressMember
 }
 
@@ -84,7 +84,7 @@ func ReadLawModsData(xmlString string) LawModsData {
 				modsData.CongressMembers = append(modsData.CongressMembers, member)
 			}
 			if se.Name.Local == "congCommittee" {
-				var committee CongressCommittee
+				var committee XML_CongressCommittee
 				decoder.DecodeElement(&committee, &se)
 				modsData.CongressCommittees = append(modsData.CongressCommittees, committee)
 			}

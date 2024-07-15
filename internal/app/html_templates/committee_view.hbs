@@ -1,0 +1,50 @@
+<div class="container">
+    <h1>{{ Committee.Name }}</h1>
+
+    <p>{{ Committee.Jurisdiction }}</p>
+
+    {{#if Committee.Memberships }}
+    <h2>Membership</h2>
+
+    <ul>
+        {{#each Committee.Memberships }}
+        <li>
+            <a href="/congress-member/{{CongressMember.BioGuideId}}">{{ CongressMember.Name }}</a>
+            {{#if Title }}({{ Title }}){{/if}}
+            </li>
+        {{/each}}
+    </ul>
+
+    {{/if}}
+
+
+
+
+
+    {{#if Committee.Subcommittees }}
+    <h2>Subcommittees</h2>
+    {{/if}}
+
+
+    {{#each Committee.Subcommittees }}
+    <div class="subcommittee">
+        <h3>{{ Name }} ({{ ThomasId }})</h3>
+
+        {{#if Memberships }}
+        <h4>Membership</h4>
+
+        <ul>
+            {{#each Memberships }}
+            <li>
+                {{ CongressMember.Name }} 
+                {{#if Title }}({{ Title }}){{/if}}
+                </li>
+            {{/each}}
+        </ul>
+
+        {{/if}}
+
+
+    </div>
+    {{/each}}
+</div>

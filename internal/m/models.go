@@ -192,7 +192,8 @@ type DB_CongressMember struct {
 	UpdatedAt          time.Time
 	CongressMemberInfo US_CongressLegislator
 	Name               string
-	Sponsored          []GovtRssItem `gorm:"many2many:congress_member_sponsored;"`
+	Sponsored          []GovtRssItem            `gorm:"many2many:congress_member_sponsored;"`
+	Committees         []DB_CommitteeMembership `gorm:"foreignKey:CongressMemberId"`
 }
 
 func (d DB_CongressMember) TableName() string {
@@ -265,7 +266,8 @@ func SetupDB() (*gorm.DB, error) {
 
 	// Globally mode
 	db, err := gorm.Open(sqlite.Open("congress.sqlite"), &gorm.Config{
-		Logger: newLogger,
+		Logger:      newLogger,
+		PrepareStmt: true,
 	})
 	if err != nil {
 		return nil, err
@@ -289,6 +291,15 @@ func SetupDB() (*gorm.DB, error) {
 	}
 
 	if err := db.AutoMigrate(lobbying.LobbyingSqlQuery{}); err != nil {
+		return nil, err
+	}
+
+	// // This is very confusing as to why this needs to be done.
+	// if err := db.SetupJoinTable(&DB_CongressCommittee{}, "Memberships", &DB_CommitteeMembership{}); err != nil {
+	// 	return nil, err
+	// }
+
+	if err := db.AutoMigrate(&DB_CongressCommittee{}, &DB_CommitteeMembership{}); err != nil {
 		return nil, err
 	}
 
