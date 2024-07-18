@@ -1,6 +1,7 @@
 package m
 
 import (
+	"sort"
 	"time"
 )
 
@@ -47,6 +48,42 @@ type DB_CongressCommittee struct {
 
 func (DB_CongressCommittee) TableName() string {
 	return "congress_committee"
+}
+
+func (c *DB_CongressCommittee) SortMembers() {
+	// Sort the members by rank
+	sort.Slice(c.Memberships, func(i, j int) bool {
+		return c.Memberships[i].Rank < c.Memberships[j].Rank
+	})
+}
+
+func (c DB_CongressCommittee) ComputeParties() SponsorshipMap {
+	// log.Println(c)
+	sponsorship := make(SponsorshipMap)
+
+	for _, membership := range c.Memberships {
+		p := membership.CongressMember.Party()
+		entry, ok := sponsorship[p]
+		if ok {
+			entry.Num++
+		} else {
+			entry.Num = 1
+		}
+		sponsorship[p] = entry
+	}
+
+	// Compute Sum
+	sum := 0.0
+	for _, v := range sponsorship {
+		sum += v.Num
+	}
+
+	// Normalize
+	for k, v := range sponsorship {
+		sponsorship[k] = stupidPair{v.Num, v.Num / sum * 100}
+	}
+
+	return sponsorship
 }
 
 type DB_CommitteeMembership struct {

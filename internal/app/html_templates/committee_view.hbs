@@ -13,10 +13,12 @@
     {{#if Committee.Memberships }}
     <h2>Membership</h2>
 
+    {{> 'partials/committee-party-bar' Committee=Committee }}
+
     <ul>
         {{#each Committee.Memberships }}
         <li>
-            <a href="/congress-member/{{CongressMember.BioGuideId}}">{{ CongressMember.Name }}</a>
+            <a href="/congress-member/{{CongressMember.BioGuideId}}">{{> 'partials/member-name' Member=CongressMember }}</a>
             {{#if Title }}({{ Title }}){{/if}}
         </li>
         {{/each}}
@@ -39,11 +41,12 @@
 
         {{#if Memberships }}
         <h4>Membership</h4>
+        {{> 'partials/committee-party-bar' Committee=this }}
 
         <ul>
             {{#each Memberships }}
             <li>
-                <a href="/congress-member/{{CongressMember.BioGuideId}}">{{ CongressMember.Name }}</a>
+                <a href="/congress-member/{{CongressMember.BioGuideId}}">{{> 'partials/member-name' Member=CongressMember }}</a>
                 {{#if Title }}({{ Title }}){{/if}}
             </li>
             {{/each}}

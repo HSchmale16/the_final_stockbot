@@ -53,11 +53,8 @@
         </div>    
     </div>
 
-    {{!-- <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/finances" hx-trigger="revealed">
-        <h3>Finances</h3>
-    </div> --}}
 
-    <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/works_with" hx-trigger="revealed">
+    <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/works_with" hx-trigger="load">
         <h3>Works With</h3>
     </div>
 

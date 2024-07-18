@@ -44,16 +44,23 @@ func CommitteeView(c *fiber.Ctx) error {
 	var committee DB_CongressCommittee
 	db := c.Locals("db").(*gorm.DB)
 
-	dbc := db.Debug().
+	dbc := db.
 		Preload("Memberships.CongressMember").
 		Preload("Subcommittees.Memberships.CongressMember").
 		First(&committee, "thomas_id = ?", c.Params("thomas_id"))
+
+	// The preloading is being stupid if we try to sort up there.
+	// So we'll just define a function over it and live with it.
+	// There's no more than 20ish members so NBD
+	committee.SortMembers()
+	for i, _ := range committee.Subcommittees {
+		committee.Subcommittees[i].SortMembers()
+	}
+
 	if dbc.Error != nil {
 		fmt.Println("Error", dbc.Error)
 		return c.Status(404).SendString("404 Not Found")
 	}
-
-	fmt.Println("Committee", len(committee.Memberships))
 
 	return c.Render("committee_view", fiber.Map{
 		"Title":       committee.Name,

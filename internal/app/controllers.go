@@ -366,7 +366,7 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var member DB_CongressMember
-	db.Debug().
+	db.
 		Preload("Sponsored.Sponsors").
 		Preload("Committees.Committee").
 		First(&member, DB_CongressMember{
