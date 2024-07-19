@@ -13,8 +13,9 @@ import (
 )
 
 type XML_CongressCommittee struct {
-	Name    string `xml:"name"`
-	Chamber string `xml:"chamber,attr"`
+	Name        string `xml:"name"`
+	Chamber     string `xml:"chamber,attr"`
+	AuthorityId string `xml:"authorityId,attr"`
 }
 
 type CongressMember struct {

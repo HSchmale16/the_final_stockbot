@@ -43,7 +43,9 @@ type DB_CongressCommittee struct {
 
 	Subcommittees     []DB_CongressCommittee   `gorm:"foreignKey:ParentCommitteeId"`
 	ParentCommitteeId *string                  `gorm:"index"`
+	ParentCommittee   *DB_CongressCommittee    `gorm:"foreignKey:ParentCommitteeId"`
 	Memberships       []DB_CommitteeMembership `gorm:"foreignKey:CommitteeId"`
+	GovtRssItems      []GovtRssItem            `gorm:"many2many:db_congress_committee_govt_rss_items;"`
 }
 
 func (DB_CongressCommittee) TableName() string {

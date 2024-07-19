@@ -32,8 +32,9 @@ func TestModsXML(t *testing.T) {
 			Text: "Mr. Burchett (for himself, Mr. Moskowitz, Mr. Lawler, and Mr. Gottheimer) submitted the following resolution; which was referred to the Committee on Foreign Affairs",
 		}},
 		CongressCommittees: []XML_CongressCommittee{{
-			Name:    "Foreign Affairs",
-			Chamber: "H",
+			Name:        "Foreign Affairs",
+			Chamber:     "H",
+			AuthorityId: "hsfa00",
 		}},
 		CongressMembers: []CongressMember{
 			{Party: "R", State: "TN", BioGuideId: "B001309", Role: "SPONSOR", Name: "Burchett, Tim", Chamber: "H", Congress: "118"},

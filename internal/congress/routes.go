@@ -49,6 +49,14 @@ func CommitteeView(c *fiber.Ctx) error {
 		Preload("Subcommittees.Memberships.CongressMember").
 		First(&committee, "thomas_id = ?", c.Params("thomas_id"))
 
+	if committee.Name == "" {
+		return c.Status(404).SendString("404 Not Found")
+	}
+	if dbc.Error != nil {
+		fmt.Println("Error", dbc.Error)
+		return c.Status(404).SendString("404 Not Found")
+	}
+
 	// The preloading is being stupid if we try to sort up there.
 	// So we'll just define a function over it and live with it.
 	// There's no more than 20ish members so NBD
@@ -57,10 +65,10 @@ func CommitteeView(c *fiber.Ctx) error {
 		committee.Subcommittees[i].SortMembers()
 	}
 
-	if dbc.Error != nil {
-		fmt.Println("Error", dbc.Error)
-		return c.Status(404).SendString("404 Not Found")
+	if committee.ParentCommitteeId != nil {
+		db.First(&committee.ParentCommittee, "thomas_id = ?", committee.ParentCommitteeId)
 	}
+	db.Limit(5).Order("pub_date desc").Model(&committee).Association("GovtRssItems").Find(&committee.GovtRssItems)
 
 	return c.Render("committee_view", fiber.Map{
 		"Title":       committee.Name,

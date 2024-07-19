@@ -25,9 +25,10 @@ type GovtRssItem struct {
 	Metadata           LawModsData
 
 	// many to many relationship of tags through GovtRssItemTag
-	Tags       []Tag               `gorm:"many2many:govt_rss_item_tag;"`
-	Categories []Tag               `gorm:"many2many:rss_category"`
-	Sponsors   []DB_CongressMember `gorm:"many2many:congress_member_sponsored;"`
+	Tags       []Tag                  `gorm:"many2many:govt_rss_item_tag;"`
+	Categories []Tag                  `gorm:"many2many:rss_category"`
+	Sponsors   []DB_CongressMember    `gorm:"many2many:congress_member_sponsored;"`
+	Committees []DB_CongressCommittee `gorm:"many2many:db_congress_committee_govt_rss_items;"`
 }
 
 func (GovtRssItem) TableName() string {

@@ -33,6 +33,16 @@
             {{/each}}
         </ul>
         {{/if}}
+
+        {{#if Law.Committees }}
+        <h3>Congress Committees</h3>
+
+        <ul>
+            {{#each Law.Committees }}
+            <li><a href="/committee/{{ ThomasId }}">{{ Name }}</a></li>
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
 
     <hr />
