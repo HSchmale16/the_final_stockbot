@@ -61,7 +61,7 @@ func CommitteeView(c *fiber.Ctx) error {
 	// So we'll just define a function over it and live with it.
 	// There's no more than 20ish members so NBD
 	committee.SortMembers()
-	for i, _ := range committee.Subcommittees {
+	for i := range committee.Subcommittees {
 		committee.Subcommittees[i].SortMembers()
 	}
 
