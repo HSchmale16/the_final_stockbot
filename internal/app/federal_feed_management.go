@@ -152,7 +152,7 @@ func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
 			continue
 		}
 
-		db.Debug().Model(&dbCommittee).Association("GovtRssItems").Append(&law.GovtRssItem)
+		db.Debug().Model(&dbCommittee).Association("GovtRssItems").Append(item)
 	}
 }
 
