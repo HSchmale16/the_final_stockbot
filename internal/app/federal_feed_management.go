@@ -138,6 +138,22 @@ func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
 
 		//fmt.Println("SCANNED SPONSORS ADDED: ", result.RowsAffected)
 	}
+
+	for _, committee := range modsData.CongressCommittees {
+		fmt.Println(committee)
+
+		committee.AuthorityId = strings.TrimSuffix(committee.AuthorityId, "00")
+
+		// Find the committee
+		var dbCommittee DB_CongressCommittee
+		err := db.Debug().Where("LOWER(thomas_id) = ?", committee.AuthorityId).First(&dbCommittee)
+		if err.Error != nil {
+			log.Printf("Could not find committee %s\n", committee.AuthorityId)
+			continue
+		}
+
+		db.Debug().Model(&dbCommittee).Association("GovtRssItems").Append(&law.GovtRssItem)
+	}
 }
 
 func FindUntaggedLaws() {

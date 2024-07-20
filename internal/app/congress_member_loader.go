@@ -13,7 +13,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"gorm.io/gorm"
 
@@ -117,21 +116,6 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 
 		ScanLawSponsors(modsData, law.GovtRssItem, db)
 
-		for _, committee := range modsData.CongressCommittees {
-			fmt.Println(committee)
-
-			committee.AuthorityId = strings.TrimSuffix(committee.AuthorityId, "00")
-
-			// Find the committee
-			var dbCommittee DB_CongressCommittee
-			err := db.Debug().Where("LOWER(thomas_id) = ?", committee.AuthorityId).First(&dbCommittee)
-			if err.Error != nil {
-				log.Printf("Could not find committee %s\n", committee.AuthorityId)
-				continue
-			}
-
-			db.Debug().Model(&dbCommittee).Association("GovtRssItems").Append(&law.GovtRssItem)
-		}
 	}
 	var x int64
 	db.Model(&CongressMemberSponsored{}).Count(&x)
