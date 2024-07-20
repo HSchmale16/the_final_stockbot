@@ -29,8 +29,8 @@
 
 </div>
 
-<script src="/static/js/d3.v7.min.js?cache-bust={{ CacheBust }}"></script>
-<script type="module" src="/static/viz-js/congress-network.js?cache-bust={{ CacheBust }}"></script>
+<script src="/static/js/d3.v7.min.js?cache-bust={{ CacheBust }}" defer></script>
+<script type="module" src="/static/viz-js/congress-network.js?cache-bust={{ CacheBust }}" defer></script>
 <script>
     window.onload = () => {
         fetchDataForChamber('H');
