@@ -19,7 +19,9 @@
           - bash-completion
           - htop
           - rsync
-          - golang
+          - snapd
+          # No longer needed due to snap installation of go
+          # - golang
           - nginx
           - git
           - git-lfs
