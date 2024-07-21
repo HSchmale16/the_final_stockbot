@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"golang.org/x/exp/slices"
 )
@@ -12,15 +14,16 @@ func DoTagUpdates() {
 	}
 
 	var tags []m.Tag
-	db.Limit(60).Order("RANDOM()").Find(&tags)
+	db.Limit(20).Order("RANDOM()").Find(&tags)
 
 	for _, tag := range tags {
+		fmt.Println(tag)
 		if tag.CssColor == "bg-secondary" {
 			cat := GetAiDescription(tag.Name)
 			tag.CssColor = cat
 		}
 
-		db.Debug().Save(&tag)
+		db.Save(&tag)
 	}
 }
 
