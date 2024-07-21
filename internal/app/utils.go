@@ -19,6 +19,8 @@ func GetLawTypeDisplay(lawType string) string {
 		lawTypeDisplay = "Public Laws"
 	case "Private":
 		lawTypeDisplay = "Private Laws"
+	default:
+		lawTypeDisplay = "Everything"
 	}
 
 	return lawTypeDisplay
