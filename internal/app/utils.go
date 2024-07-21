@@ -20,7 +20,7 @@ func GetLawTypeDisplay(lawType string) string {
 	case "Private":
 		lawTypeDisplay = "Private Laws"
 	default:
-		lawTypeDisplay = "Everything"
+		lawTypeDisplay = "Laws and Bills"
 	}
 
 	return lawTypeDisplay

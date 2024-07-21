@@ -1,6 +1,8 @@
 <div class="tags">
     {{#each Tags }} 
-        <span class="tag"><a href="/tag/{{ TagId }}">{{ Name }}</a></span>
+        <span class="badge {{ CssColor }}">
+            <a href="/tag/{{ TagId }}">{{ Name }}</a>
+        </span>
     {{/each}}
     {{#unless Tags}}
         <span class="no-tags">No tags available</span>

@@ -1,5 +1,7 @@
 <div class="container">
     <h1>Tag Index - {{ Tag.Name }}</h1>
+    
+    {{> partials/tag_wiki }}
     <ul>
         {{#each Items }}
         <li>
@@ -13,12 +15,6 @@
                 {{/each}}
                 <a href="/law/{{ ID }}">Read more</a>
             </p>
-
-            {{!-- <div class="tags">
-                {{#each Tags }}
-                <span class="tag"><a href="/tag/{{ ID }}">{{ Name }}</a></span>
-                {{/each}}
-            </div> --}}
         </li>
         {{/each}}
     </ul>

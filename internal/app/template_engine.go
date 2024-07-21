@@ -42,6 +42,10 @@ func GetTemplateEngine() fiber.Views {
 		return ""
 	})
 
+	engine.AddFunc("eq", func(a, b string) bool {
+		return a == b
+	})
+
 	engine.AddFunc("formatDate", func(date string) string {
 		// parse the date from isoformat 2023-11-08 00:22:00 +0000 UTC to Jan 2, 2006
 		date = date[:10]

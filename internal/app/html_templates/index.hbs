@@ -33,11 +33,9 @@
         </span>
     </h3>
     <p>Search for the topics most important to you!</p>
-    <form>
-    <input class="form-control" style="width:100%" type="search" name="search"
+    <input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
         placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
-        hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
-    </form>
+        hx-trigger="input changed delay:350ms, search, load" hx-target="#search-results" hx-indicator=".htmx-indicator">
 
     <div id="search-results"></div>
 

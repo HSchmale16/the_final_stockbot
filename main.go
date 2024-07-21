@@ -28,8 +28,10 @@ var loadCclFile = ""
 var doSenateLobbyingMain = false
 var committeesFile = ""
 var committeeMembershipsFile = ""
+var script = false
 
 func init() {
+	flag.BoolVar(&script, "script", false, "Run a script")
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
 	flag.BoolVar(&disableFetcherService, "disable-fetcher", false, "Disable the fetcher service")
 	flag.BoolVar(&disableWebServer, "disable-web", false, "Disable the web server")
@@ -45,6 +47,12 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	if script {
+		// Run a random task
+		app.DoTagUpdates()
+		return
+	}
 
 	if doSenateLobbyingMain {
 		senatelobbying.LoadFilings()
@@ -101,6 +109,11 @@ func main() {
 		}
 		app.LOAD_MEMBERS_JSON(db, congMemberFile)
 		return
+	}
+
+	_, err := m.SetupDB()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if !disableFetcherService {

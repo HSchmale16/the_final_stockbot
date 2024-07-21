@@ -122,6 +122,9 @@ type Tag struct {
 	// ShortLine is a short version of the tag name
 	ShortLine string
 
+	// Colorize the tags returned
+	CssColor string `gorm:"default:'bg-secondary'"`
+
 	// If true do not show by default in the tag list per bill
 	Hidden bool
 }

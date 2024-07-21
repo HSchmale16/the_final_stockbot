@@ -75,7 +75,7 @@
             </h2>
             <div id="collapseTags" class="accordion-collapse collapse" aria-labelledby="attribution"
                 data-bs-parent="#accordionExample">
-                <div class="accordion-body"  hx-get="/law/{{ Law.ID }}/tags" hx-trigger="revealed" hx-swap="afterend">
+                <div class="accordion-body"  hx-get="/law/{{ Law.ID }}/tags" hx-trigger="load" hx-swap="afterend">
                 </div>
             </div>
         </div>

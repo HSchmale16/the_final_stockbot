@@ -92,6 +92,10 @@ func SetupServer() {
 	app.Get("/", Index)
 	app.Get("/tags", TagList)
 	app.Get("/tag/:tag_id", TagIndex)
+	app.Add("GET", "/htmx/tag/:tag_id/edit", GetEditTagView)
+	app.Add("PUT", "/htmx/tag/:tag_id/edit", PutTagUpdate)
+	app.Add("GET", "/htmx/tag/:tag_id/wiki", GetTagWiki)
+
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/law/:law_id", LawView)
 	app.Get("/law/:law_id/mods", LawView)
@@ -190,6 +194,7 @@ func Index(c *fiber.Ctx) error {
 		"TotalTags":   p.Sprintf("%d", totalTags),
 		"TotalLaws":   p.Sprintf("%d", totalLaws),
 		"Laws":        recentLaws,
+		"SearchValue": c.FormValue("search"),
 	}, "layouts/main")
 }
 
@@ -236,12 +241,11 @@ func TagIndex(c *fiber.Ctx) error {
 	db.First(&tag, c.Params("tag_id"))
 
 	var items []GovtRssItem
-	db.Model(&GovtRssItem{}).
+	db.Debug().Model(&GovtRssItem{}).
 		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").
 		Where("govt_rss_item_tag.tag_id = ?", tag.ID).
 		Order("pub_date DESC").
 		Limit(100).
-		Preload(clause.Associations).
 		Find(&items)
 
 	return c.Render("tag_index", fiber.Map{
@@ -256,20 +260,22 @@ func TopicSearch(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var results []struct {
-		TagId int64
-		Name  string
-		Count int64
+		TagId     int64
+		Name      string
+		CssColor  string
+		ShortLine string
+		Count     int64
 	}
 
 	db.Model(&GovtRssItemTag{}).
-		Select("tag_id, Name, COUNT(*) as count").
+		Select("tag_id, Name, css_color as CssColor, short_line as ShortLine, COUNT(*) as count").
 		Joins("JOIN tag ON tag.id = tag_id").
 		Joins("Join govt_rss_item ON govt_rss_item.id = govt_rss_item_id").
 		Where("LOWER(tag.name) LIKE LOWER(?)", "%"+strings.ToLower(c.FormValue("search"))+"%").
 		Where("govt_rss_item.pub_date > ?", "2023").
 		Group("tag_id").
 		Order("COUNT(*) DESC").
-		Limit(500).
+		Limit(250).
 		Scan(&results)
 
 	var minCount, maxCount int64
