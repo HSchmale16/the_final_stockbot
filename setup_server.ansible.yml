@@ -26,6 +26,7 @@
           - graphviz
           - certbot
           - goaccess
+          - prometheus
         state: present
         update_cache: true
     - name: Configure Firewall
@@ -41,6 +42,13 @@
         rule: allow
         port: "443"
         comment: "Allow HTTPS traffic"
+        state: enabled
+    - name: More Firewall
+      become: true
+      community.general.ufw:
+        rule: allow
+        port: "9090"
+        comment: "Allow Prometheus Access traffic"
         state: enabled
 
     - name: Configure Firewall
