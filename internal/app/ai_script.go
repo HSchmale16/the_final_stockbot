@@ -14,7 +14,7 @@ func DoTagUpdates() {
 	}
 
 	var tags []m.Tag
-	db.Limit(20).Order("RANDOM()").Find(&tags)
+	db.Limit(23).Where("css_color = ?", "bg-secondary").Order("RANDOM()").Find(&tags)
 
 	for _, tag := range tags {
 		fmt.Println(tag)
