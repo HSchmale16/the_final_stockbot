@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"golang.org/x/exp/slices"
 )
@@ -17,14 +15,28 @@ func DoTagUpdates() {
 	db.Limit(23).Where("css_color = ?", "bg-secondary").Order("RANDOM()").Find(&tags)
 
 	for _, tag := range tags {
-		fmt.Println(tag)
 		if tag.CssColor == "bg-secondary" {
 			cat := GetAiDescription(tag.Name)
 			tag.CssColor = cat
 		}
 
+		if tag.ShortLine == "" {
+			tag.ShortLine = GetAiOneLine(tag.Name)
+		}
+
 		db.Save(&tag)
 	}
+}
+
+func GetAiOneLine(name string) string {
+	SYS := `The user will provide a tag. You must describe what it means and provide a very short description about what it is. Keep it extremely short.`
+
+	x, err := CallGroqChatApi(Gemma_7b, SYS, name)
+	if err != nil {
+		panic(err)
+	}
+
+	return x.Choices[0].Message.Content
 }
 
 func GetAiDescription(name string) string {
