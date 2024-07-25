@@ -92,9 +92,9 @@ func SetupServer() {
 	app.Get("/", Index)
 	app.Get("/tags", TagList)
 	app.Get("/tag/:tag_id", TagIndex)
-	app.Add("GET", "/htmx/tag/:tag_id/edit", GetEditTagView)
-	app.Add("PUT", "/htmx/tag/:tag_id/edit", PutTagUpdate)
-	app.Add("GET", "/htmx/tag/:tag_id/wiki", GetTagWiki)
+	// app.Add("GET", "/htmx/tag/:tag_id/edit", GetEditTagView)
+	// app.Add("PUT", "/htmx/tag/:tag_id/edit", PutTagUpdate)
+	// app.Add("GET", "/htmx/tag/:tag_id/wiki", GetTagWiki)
 
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/law/:law_id", LawView)
