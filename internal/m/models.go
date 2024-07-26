@@ -12,6 +12,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/plugin/prometheus"
 )
 
 type GovtRssItem struct {
@@ -276,6 +277,18 @@ func SetupDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	db.Use(prometheus.New(prometheus.Config{
+		DBName:          "congress", // use `DBName` as metrics label
+		RefreshInterval: 15,         // Refresh metrics interval (default 15 seconds)
+		StartServer:     true,       // start http server to expose metrics
+		HTTPServerPort:  2112,       // configure http server port, default port 8080 (if you have configured multiple instances, only the first `HTTPServerPort` will be used to start server)
+		MetricsCollector: []prometheus.MetricsCollector{
+			&prometheus.MySQL{
+				VariableNames: []string{"Threads_running"},
+			},
+		}, // user defined metrics
+	}))
 
 	// Auto migrate models
 	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}, &LawOffset{}); err != nil {

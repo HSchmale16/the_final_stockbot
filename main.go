@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	_ "net/http/pprof"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron/v3"
 )
 
@@ -139,11 +137,11 @@ func main() {
 	fmt.Println("Starting up...")
 
 	if !disableWebServer {
-		go func() {
-			fmt.Println("Setting up Metrics Server")
-			http.Handle("/metrics", promhttp.Handler())
-			http.ListenAndServe(":2112", nil)
-		}()
+		// go func() {
+		// 	fmt.Println("Setting up Metrics Server")
+		// 	http.Handle("/metrics", promhttp.Handler())
+		// 	http.ListenAndServe(":2112", nil)
+		// }()
 		app.SetupServer()
 
 	}
