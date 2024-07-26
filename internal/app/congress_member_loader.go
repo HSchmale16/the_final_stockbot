@@ -110,6 +110,9 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 		db.Model(&law).Association("GovtRssItem").Find(&law.GovtRssItem)
 
 		modsData := ReadLawModsData(law.ModsXML)
+		law.GovtRssItem.Metadata = modsData
+		db.Save(&law.GovtRssItem)
+
 		for _, member := range modsData.CongressMembers {
 			numCongress[foo{member.BioGuideId, law.GovtRssItemId}] = true
 		}
