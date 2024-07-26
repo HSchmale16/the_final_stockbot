@@ -256,6 +256,7 @@ func TagIndex(c *fiber.Ctx) error {
 
 	var items []GovtRssItem
 	db.Debug().Model(&GovtRssItem{}).
+		Preload("Sponsors").
 		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").
 		Where("govt_rss_item_tag.tag_id = ?", tag.ID).
 		Order("pub_date DESC").
