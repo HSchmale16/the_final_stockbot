@@ -2,7 +2,7 @@
   changed_when: true
   become: true
   ansible.builtin.command:
-    cmd: /snap/bin/go build -buildvcs=false
+    cmd: /snap/bin/go build -tags "sqlite_fts5" -buildvcs=false
     chdir: ~{{ service_user_name }}/the_final_stockbot
   notify:
     - Reload systemd

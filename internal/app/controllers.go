@@ -133,6 +133,19 @@ func SetupServer() {
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
 
+	// Helper to double check the sqlite pragmas
+	app.Get("/meta/sqlite_info", func(c *fiber.Ctx) error {
+		db := c.Locals("db").(*gorm.DB)
+
+		var data []struct {
+			CompileOptions string
+		}
+
+		db.Raw("Pragma compile_options").Scan(&data)
+
+		return c.JSON(data)
+	})
+
 	faq.SetupRoutes(app)
 	lobbying.SetupRoutes(app)
 	congress.SetupRoutes(app)
