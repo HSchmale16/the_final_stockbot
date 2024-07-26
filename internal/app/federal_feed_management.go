@@ -198,6 +198,10 @@ func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 
 	fmt.Println("Target item already has tags:", count)
 
+	if src.Metadata.IsAppropriation {
+		CreateTagsOnItem([]string{"Appropriation"}, src, 0, db)
+	}
+
 	textOffset := 0
 	for _, chunk := range ChunkTextIntoTokenBlocks(item.Text, 1000, 500) {
 		var response GroqChatCompletion

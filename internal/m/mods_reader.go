@@ -38,6 +38,8 @@ type LawModsData struct {
 	Actions            []ModsAction
 	CongressCommittees []XML_CongressCommittee
 	CongressMembers    []CongressMember
+	IsAppropriation    bool
+	IsPrivate          bool
 }
 
 func (l *LawModsData) Scan(value interface{}) error {
@@ -98,7 +100,9 @@ func ReadLawModsData(xmlString string) LawModsData {
 				// read char data from element
 				decoder.DecodeElement(&modsData.OfficialTitle, &se)
 			}
-
+			if se.Name.Local == "isAppropriation" {
+				decoder.DecodeElement(&modsData.IsAppropriation, &se)
+			}
 		}
 	}
 	return modsData

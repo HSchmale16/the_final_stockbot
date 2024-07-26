@@ -115,6 +115,9 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 		}
 
 		ScanLawSponsors(modsData, law.GovtRssItem, db)
+		if law.GovtRssItem.Metadata.IsAppropriation {
+			CreateTagsOnItem([]string{"Appropriation"}, law.GovtRssItem, 0, db)
+		}
 
 	}
 	var x int64

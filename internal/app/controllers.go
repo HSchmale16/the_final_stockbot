@@ -182,7 +182,7 @@ func TagList(c *fiber.Ctx) error {
 		Name  string
 		Count int64
 	}
-	db.Raw("SELECT tag.id, tag.name, COUNT(*) as count FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id GROUP BY tag.id ORDER BY count DESC LIMIT 500").Scan(&tags)
+	db.Raw("SELECT tag.id, tag.name, COUNT(*) as count FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id GROUP BY tag.id ORDER BY count DESC LIMIT 1000").Scan(&tags)
 
 	return c.Render("tag_list", fiber.Map{
 		"Tags": tags,
