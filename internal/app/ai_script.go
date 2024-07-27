@@ -12,7 +12,7 @@ func DoTagUpdates() {
 	}
 
 	var tags []m.Tag
-	db.Limit(18).Where("css_color = ?", "bg-secondary").Order("RANDOM()").Find(&tags)
+	db.Limit(18).Where("css_color = ?", "bg-secondary").Or("short_line = ?", "").Order("RANDOM()").Find(&tags)
 
 	for _, tag := range tags {
 		if tag.CssColor == "bg-secondary" {
