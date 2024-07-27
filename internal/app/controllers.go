@@ -197,17 +197,33 @@ func Index(c *fiber.Ctx) error {
 	db.Model(&Tag{}).Count(&totalTags)
 	db.Model(&GovtRssItem{}).Count(&totalLaws)
 
-	var recentLaws []GovtRssItem = make([]GovtRssItem, 0, 10)
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(10).Find(&recentLaws)
+	var Approprations, Senate, Public, House, HouseRes, SenateRes []GovtRssItem
+
+	db.Preload("Sponsors").Order("pub_date DESC").Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").Limit(5).Find(&Approprations, "tag_id = ?", 377)
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&House, "title LIKE ?", "H.R.%")
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&Senate, "title LIKE ?", "S. %")
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&Public, "title LIKE ?", "Public Law %")
+
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&HouseRes, "title LIKE ?", "H. Res.%")
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&SenateRes, "title LIKE ?", "S. Res.%")
+
+	// var recentLaws []GovtRssItem = make([]GovtRssItem, 0, 10)
+	// db.Preload("Sponsors").Order("pub_date DESC").Limit(10).Find(&recentLaws)
 
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
 	return c.Render("index", fiber.Map{
-		"Title":       "Dirty Congress - Explore the Laws and Connections within Congress",
-		"TotalTopics": p.Sprintf("%d", articleTags),
-		"TotalTags":   p.Sprintf("%d", totalTags),
-		"TotalLaws":   p.Sprintf("%d", totalLaws),
-		"Laws":        recentLaws,
+		"Title":         "Dirty Congress - Explore the Laws and Connections within Congress",
+		"TotalTopics":   p.Sprintf("%d", articleTags),
+		"TotalTags":     p.Sprintf("%d", totalTags),
+		"TotalLaws":     p.Sprintf("%d", totalLaws),
+		"Approprations": Approprations,
+		"House":         House,
+		"Senate":        Senate,
+		"Public":        Public,
+		"HouseRes":      HouseRes,
+		"SenateRes":     SenateRes,
+		// "Laws":        recentLaws,
 		"SearchValue": c.FormValue("search"),
 	}, "layouts/main")
 }

@@ -1,8 +1,8 @@
 <div class="container">
     <h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
     <p>
-        There is a constant outflow of bills from congress. 
-        Most of them innocent enough, but when you put the pieces together you can see posturing and blathering. 
+        There is a constant outflow of bills from congress.
+        Most of them innocent enough, but when you put the pieces together you can see posturing and blathering.
         Is this really what our politicans are supposed to do? To act like children or is it to govern and fix the
         problems in our communities?
     </p>
@@ -29,19 +29,52 @@
     <h3>
         Search Topics
         <span class="htmx-indicator">
-            <img src="/static/img/bars.svg" alt="Loading Icon"/> Searching...
+            <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
         </span>
     </h3>
     <p>Search for the topics most important to you!</p>
     <input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
         placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
-        hx-trigger="input changed delay:350ms, search, load" hx-target="#search-results" hx-indicator=".htmx-indicator">
+        hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
 
     <div id="search-results"></div>
 
     <hr />
 
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Recent Appropriations</h3>
+            {{> 'partials/law-list' Laws=Approprations }}
+        </div>
+        <div class="col-md-4">
+            <h3>Recent Public Laws</h3>
+            {{> 'partials/law-list' Laws=Public }}
+        </div>
+        <div class="col-md-4">
+            <h3>Recent House Bills</h3>
+            {{> 'partials/law-list' Laws=House }}
+        </div>
+
+        <div class="col-md-4">
+            <h3>Recent Senate Bills</h3>
+            {{> 'partials/law-list' Laws=Senate }}
+        </div>
+
+        <div class="col-md-4">
+            <h3>Recent House Resolutions</h3>
+            {{> 'partials/law-list' Laws=HouseRes }}
+        </div>
+
+        <div class="col-md-4">
+            <h3>Recent Senate Resolutions</h3>
+            {{> 'partials/law-list' Laws=SenateRes }}
+        </div>
+    </div>
+
+
+    {{!--
+
     <h3>Recent Bills and Laws</h3>
-    {{> 'partials/law-list' EnableLoad=true}}
+    {{> 'partials/law-list' EnableLoad=true}} --}}
 
 </div>
