@@ -152,7 +152,10 @@ func RenderLobbyingYearPage(c *fiber.Ctx) error {
 
 	var lobbyingContributions []Row
 
-	year2, _ := strconv.Atoi(year)
+	year2, err := strconv.Atoi(year)
+	if err != nil {
+		return c.Status(404).SendString("Invalid year")
+	}
 
 	rows, err := LobbyingDBInstance.DB.Query("SELECT contribution_type, Count(*) as Count, SUM(CAST(amount AS float)) Amount FROM contributions_etl WHERE filing_year = ? GROUP BY contribution_type ORDER BY Amount DESC", year2)
 
