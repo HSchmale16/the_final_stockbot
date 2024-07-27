@@ -265,7 +265,7 @@ func TagIndex(c *fiber.Ctx) error {
 
 	return c.Render("tag_index", fiber.Map{
 		"Title":       "View Bills Tagged With " + tag.Name,
-		"Description": "View bills tagged with " + tag.Name + " " + tag.ShortLine,
+		"Description": "View bills tagged with " + tag.Name + " --- " + tag.ShortLine,
 		"Tag":         tag,
 		"Items":       items,
 	}, "layouts/main")
