@@ -18,10 +18,10 @@ var LobbyingDBInstance LobbyingDB = LobbyingDB{}
 
 func init() {
 	// why do I have to open read only I don't understand?
-	// db, err := sql.Open("duckdb", "lobbying.duckdb?access_mode=read_only&threads=4")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	db, err := sql.Open("duckdb", "lobbying.duckdb?access_mode=read_only&threads=4")
+	if err != nil {
+		panic(err)
+	}
 
-	// LobbyingDBInstance.DB = db
+	LobbyingDBInstance.DB = db
 }
