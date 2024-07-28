@@ -331,7 +331,7 @@ func TopicSearch(c *fiber.Ctx) error {
 
 	search := c.FormValue("search")
 	search += "*"
-	db.Debug().Select("rowid, title").Table("fts_law_title").Where("fts_law_title MATCH ?", search).Limit(5).Scan(&ftsResults)
+	db.Debug().Select("rowid, title").Table("fts_law_title").Where("fts_law_title MATCH ?", search).Order("pub_date DESC").Limit(5).Scan(&ftsResults)
 
 	db.Create(&SearchQuery{
 		Query:      c.FormValue("search"),
