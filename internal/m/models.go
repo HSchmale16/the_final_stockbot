@@ -314,6 +314,7 @@ func SetupDB() (*gorm.DB, error) {
 
 	// Check if some full text search tables exist
 	if !db.Migrator().HasTable("fts_law_title") {
+		log.Print("Creating FTS table")
 		if err := db.Exec("CREATE VIRTUAL TABLE fts_law_title USING fts5(title pub_date, content='govt_rss_item', content_rowid='id');").Error; err != nil {
 			return nil, err
 		}
