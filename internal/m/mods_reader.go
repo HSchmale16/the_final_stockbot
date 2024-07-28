@@ -38,8 +38,17 @@ type LawModsData struct {
 	Actions            []ModsAction
 	CongressCommittees []XML_CongressCommittee
 	CongressMembers    []CongressMember
+	BillReferences     []BillReference
 	IsAppropriation    bool
 	IsPrivate          bool
+}
+
+type BillReference struct {
+	Congress  string `xml:"congress,attr"`
+	Context   string `xml:"context,attr"`
+	LawNumber string `xml:"number,attr"`
+	Priority  string `xml:"priority,attr"`
+	Type      string `xml:"type,attr"`
 }
 
 func (l *LawModsData) Scan(value interface{}) error {
@@ -102,6 +111,14 @@ func ReadLawModsData(xmlString string) LawModsData {
 			}
 			if se.Name.Local == "isAppropriation" {
 				decoder.DecodeElement(&modsData.IsAppropriation, &se)
+			}
+			if se.Name.Local == "isPrivate" {
+				decoder.DecodeElement(&modsData.IsPrivate, &se)
+			}
+			if se.Name.Local == "bill" {
+				var bill BillReference
+				decoder.DecodeElement(&bill, &se)
+				modsData.BillReferences = append(modsData.BillReferences, bill)
 			}
 		}
 	}

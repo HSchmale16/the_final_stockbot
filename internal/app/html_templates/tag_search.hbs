@@ -1,3 +1,11 @@
+<ul>
+    {{#each FtsLaws }}
+        <li>
+            <a href="/law/{{ RowId }}">{{{ Title }}}</a>
+        </li>
+    {{/each}}
+</ul>
+
 <div class="tags">
     {{#each Tags }} 
         <span class="badge {{ CssColor }}">

@@ -323,6 +323,16 @@ func TopicSearch(c *fiber.Ctx) error {
 		}
 	}
 
+	// Try Searching Using the FTS Title Table
+	var ftsResults []struct {
+		RowId int64 `gorm:"column:rowid"`
+		Title string
+	}
+
+	search := c.FormValue("search")
+	search += "*"
+	db.Debug().Select("rowid, title").Table("fts_law_title").Where("fts_law_title MATCH ?", search).Limit(5).Scan(&ftsResults)
+
 	db.Create(&SearchQuery{
 		Query:      c.FormValue("search"),
 		NumResults: len(results),
@@ -332,6 +342,7 @@ func TopicSearch(c *fiber.Ctx) error {
 
 	return c.Render("tag_search", fiber.Map{
 		"Tags":     results,
+		"FtsLaws":  ftsResults,
 		"MinCount": minCount,
 		"MaxCount": maxCount,
 	})

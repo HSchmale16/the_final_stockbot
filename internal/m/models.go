@@ -183,6 +183,7 @@ type SearchQuery struct {
 	UserAgent  string
 	Query      string
 	NumResults int
+	FtsResults int
 }
 
 func (SearchQuery) TableName() string {
@@ -311,10 +312,15 @@ func SetupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	// // This is very confusing as to why this needs to be done.
-	// if err := db.SetupJoinTable(&DB_CongressCommittee{}, "Memberships", &DB_CommitteeMembership{}); err != nil {
-	// 	return nil, err
-	// }
+	// Check if some full text search tables exist
+	if !db.Migrator().HasTable("fts_law_title") {
+		if err := db.Exec("CREATE VIRTUAL TABLE fts_law_title USING fts5(title, content='govt_rss_item', content_rowid='id');").Error; err != nil {
+			return nil, err
+		}
+		if err := db.Exec("CREATE TRIGGER trg_fts_law_title AFTER INSERT ON govt_rss_item BEGIN INSERT INTO fts_law_title(rowid, title) VALUES (new.id, new.title); END;").Error; err != nil {
+			return nil, err
+		}
+	}
 
 	if err := db.AutoMigrate(&DB_CongressCommittee{}, &DB_CommitteeMembership{}); err != nil {
 		return nil, err
