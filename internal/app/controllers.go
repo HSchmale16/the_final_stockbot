@@ -198,8 +198,10 @@ func TagDataList(c *fiber.Ctx) error {
 	db.Debug().
 		Where("name LIKE ?", "%"+c.FormValue("search")+"%").
 		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id").
+		Joins("Join congress_member_sponsored ON congress_member_sponsored.govt_rss_item_id = govt_rss_item_tag.govt_rss_item_id").
 		Group("tag.id").
 		Order("Count(*) DESC").
+		Having("COUNT(*) > 1").
 		Limit(10).
 		Find(&tags)
 

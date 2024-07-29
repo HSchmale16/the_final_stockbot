@@ -3,11 +3,11 @@
     <div class="col">
         <div class="btn-group" role="group">
             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
-                onchange="fetchDataForChamber('H')">
+                onchange="setChamber('H')">
             <label class="btn btn-outline-primary" for="btnradio1">House</label>
 
             <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
-                onchange="fetchDataForChamber('S')">
+                onchange="setChamber('S')">
             <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
         </div>
     </div>
@@ -50,8 +50,17 @@
         var tagSearch = document.getElementById("cnTopic")
         tagSearch.addEventListener("change", function (event) {
             console.log(event.target.value);
-            fetchDataForChamber("H", event.target.value);
+            fetchDataForChamber(selectedChamber, event.target.value);
         });
+    }
+
+    var selectedChamber = "H";
+
+    function setChamber(chamber) {
+        selectedChamber = chamber; 
+        // retrieve tag id
+        var tagSearch = document.getElementById("cnTopic")
+        fetchDataForChamber(selectedChamber, tagSearch.value);
     }
 </script>
 
