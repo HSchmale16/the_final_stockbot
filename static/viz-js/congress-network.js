@@ -139,7 +139,7 @@ function drawNetwork(data) {
 
         if (searchTerm !== "") {
             // Find and highlight the node that matches the search term
-            d3.selectAll('circle').filter(d => d.Name.toLowerCase().includes(searchTerm))
+            d3.selectAll('circle').filter(d => d.RenderName.toLowerCase().includes(searchTerm))
                 .attr('r', 10) // Increase size
                 .attr('fill', 'green'); // Change color
         }

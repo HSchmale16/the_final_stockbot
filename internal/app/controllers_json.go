@@ -47,6 +47,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 
 	type Node struct {
 		BioGuideId string
+		RenderName string
 		Name       string
 		State      string
 		Party      string
@@ -61,6 +62,7 @@ func CongressNetwork(c *fiber.Ctx) error {
 		nodes[i].State = person.CongressMemberInfo.Terms[0].State
 		nodes[i].Party = person.CongressMemberInfo.Terms[0].Party
 		nodes[i].Count = person.Count
+		nodes[i].RenderName = person.Name + " (" + person.State() + "-" + person.Party() + ")"
 	}
 
 	return c.JSON(fiber.Map{
