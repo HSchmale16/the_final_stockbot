@@ -2,6 +2,8 @@ package app
 
 import (
 	_ "embed"
+	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -11,6 +13,9 @@ import (
 
 //go:embed sql/congress_network.sql
 var congress_network_sql string
+
+//go:embed sql/congress_network_tag.sql
+var congress_network_tag_sql string
 
 func CongressNetwork(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
@@ -23,7 +28,19 @@ func CongressNetwork(c *fiber.Ctx) error {
 		Value  int    `json:"value"`
 	}
 
-	db.Raw(congress_network_sql, chamber).Scan(&edges)
+	tag_id := c.FormValue("tag_id")
+	if tag_id != "" {
+		log.Print("Using tag_id")
+		tag_id_num, err := strconv.Atoi(tag_id)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "tag_id must be an integer",
+			})
+		}
+		db.Raw(congress_network_tag_sql, chamber, tag_id_num).Scan(&edges)
+	} else {
+		db.Raw(congress_network_sql, chamber).Scan(&edges)
+	}
 
 	// Distinctify the people in source and target
 	var node_names = make(map[string]bool)

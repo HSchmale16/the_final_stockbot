@@ -16,6 +16,19 @@
             <div class="input-group-text">Congress Person</div>
             <input class="form-control w-80" type="text" id="search" placeholder="Search for your Congress Person">
         </div>
+        <div class="input-group">
+            <div class="input-group-text">Topic
+                <span class="htmx-indicator">
+                    <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
+                </span>
+            </div>
+            <input class="form-control w-80" list="topicOptions" type="text" id="cnTopic" placeholder="Search for a topic"
+                autocomplete="on"
+                name="search" hx-get="/htmx/tag-datalist" hx-trigger="input changed delay:350ms, search"
+                hx-target="#topicOptions" hx-indicator=".htmx-indicator">
+            <datalist id="topicOptions">
+            </datalist>
+        </div>
     </div>
 
 </div>
@@ -34,6 +47,11 @@
 <script>
     window.onload = () => {
         fetchDataForChamber('H');
+        var tagSearch = document.getElementById("cnTopic")
+        tagSearch.addEventListener("change", function (event) {
+            console.log(event.target.value);
+            fetchDataForChamber("H", event.target.value);
+        });
     }
 </script>
 

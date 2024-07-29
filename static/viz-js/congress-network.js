@@ -1,14 +1,18 @@
-function fetchDataForChamber(chamber) {
+function fetchDataForChamber(chamber, tagId="") {
     // Clear it before generating new element
+
+
     document.getElementById("container").innerHTML = "";
 
     // load the data
-    fetch("/json/congress-network?" + new URLSearchParams({ chamber: chamber }))
+    fetch("/json/congress-network?" + new URLSearchParams({ chamber: chamber, tag_id: tagId }))
         .then(response => response.json())
         .then(data => {
             drawNetwork(data);
         });
 }
+
+
 
 function getCongressPersonDetailsUrl(bioGuideId) {
     return `/congress-member/${bioGuideId}/embed`;

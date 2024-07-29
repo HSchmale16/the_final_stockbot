@@ -97,6 +97,7 @@ func SetupServer() {
 	// app.Add("GET", "/htmx/tag/:tag_id/wiki", GetTagWiki)
 
 	app.Get("/htmx/topic-search", TopicSearch)
+	app.Get("/htmx/tag-datalist", TagDataList)
 	app.Get("/law/:law_id", LawView)
 	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
@@ -187,6 +188,24 @@ func TagList(c *fiber.Ctx) error {
 	return c.Render("tag_list", fiber.Map{
 		"Tags": tags,
 	}, "layouts/main")
+}
+
+func TagDataList(c *fiber.Ctx) error {
+	// HERE
+	var tags []Tag
+
+	db := c.Locals("db").(*gorm.DB)
+	db.Debug().
+		Where("name LIKE ?", "%"+c.FormValue("search")+"%").
+		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id").
+		Group("tag.id").
+		Order("Count(*) DESC").
+		Limit(10).
+		Find(&tags)
+
+	return c.Render("htmx/tag_datalist", fiber.Map{
+		"Tags": tags,
+	})
 }
 
 func Index(c *fiber.Ctx) error {
