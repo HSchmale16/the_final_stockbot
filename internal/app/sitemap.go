@@ -53,7 +53,7 @@ func MakeSitemap() {
 
 	SITEURL := "https://www.dirtycongress.com"
 
-	rows, err := db.Model(&GovtRssItem{}).Select("id, title, link, pub_date").Rows()
+	rows, err := db.Model(&GovtRssItem{}).Select("id, title, link, pub_date").Order("pub_date DESC").Rows()
 	// Gorm Scan Rows
 	if err != nil {
 		panic(err)
