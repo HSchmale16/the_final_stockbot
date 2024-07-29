@@ -2,6 +2,7 @@
     {{#each FtsLaws }}
         <li>
             <a href="/law/{{ RowId }}?utm_source=topic_search">{{{ Title }}}</a>
+            <small>{{ formatDate PubDate }}</small>
         </li>
     {{/each}}
 </ul>

@@ -325,13 +325,14 @@ func TopicSearch(c *fiber.Ctx) error {
 
 	// Try Searching Using the FTS Title Table
 	var ftsResults []struct {
-		RowId int64 `gorm:"column:rowid"`
-		Title string
+		RowId   int64 `gorm:"column:rowid"`
+		Title   string
+		PubDate string
 	}
 
 	search := c.FormValue("search")
 	search += "*"
-	db.Debug().Select("rowid, title").Table("fts_law_title").Where("fts_law_title MATCH ?", search).Order("pub_date DESC").Limit(5).Scan(&ftsResults)
+	db.Select("rowid, title, pub_date").Table("fts_law_title").Where("fts_law_title MATCH ?", search).Order("pub_date DESC").Limit(5).Scan(&ftsResults)
 
 	db.Create(&SearchQuery{
 		Query:      c.FormValue("search"),
