@@ -16,3 +16,6 @@ cpu.pprof
 cpu.pb.gz
 *.gz
 *.duckdb
+
+#
+node_modules

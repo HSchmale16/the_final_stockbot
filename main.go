@@ -15,6 +15,8 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
+//go:generate npm run build
+
 var reprocessId int = 0
 var disableFetcherService = false
 var disableWebServer = false

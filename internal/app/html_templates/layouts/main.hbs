@@ -22,9 +22,11 @@
     <meta name="twitter:image" content="https://dirtycongress.com/static/img/navbar.png">
 
 
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css?cache-bust={{ CacheBust }}">
-    <link rel="stylesheet" href="/static/css/custom.css?cache-bust={{ CacheBust }}">
-    <script src="/static/js/bootstrap.bundle.min.js?cache-bust={{ CacheBust }}" defer></script>
+    {{!-- <link rel="stylesheet" href="/static/css/bootstrap.min.css?cache-bust={{ CacheBust }}"> --}}
+    {{!-- <link rel="stylesheet" href="/static/css/custom.css?cache-bust={{ CacheBust }}"> --}}
+    {{!-- <script src="/static/js/bootstrap.bundle.min.js?cache-bust={{ CacheBust }}" defer></script> --}}
+    
+    <link rel="stylesheet" href="/static/css/tailwind.css?cache-bust={{ CacheBust }}">
     <script src="/static/js/htmx.min.js?cache-bust={{ CacheBust }}" defer></script>
 
     <meta name='description' content="{{ Description }}" />
@@ -33,7 +35,7 @@
     {{> 'scripts/google-analytics' }}
 </head>
 
-<body class="d-flex flex-column h-100">
+<body class="flex items-center">
     {{> 'page-parts/header' }}
     <main>
         {{ embed }}

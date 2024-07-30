@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container mx-auto">
     <h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
     <p>
         There is a constant outflow of bills from congress.
@@ -12,16 +12,10 @@
     <h3>Interesting Bedfellows Plotting Together</h3>
     {{> 'partials/congress-network' }}
 
-    <div class="row">
-        <div class="col-4">
-            {{> 'partials/gauge' title="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
-        </div>
-        <div class="col-4">
-            {{> 'partials/gauge' title="Total Tags Applied" value=TotalTopics }}
-        </div>
-        <div class="col-4">
-            {{> 'partials/gauge' title="Total Laws Indexed" value=TotalLaws }}
-        </div>
+    <div class="mt-12">
+        {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
+        {{> 'partials/gauge' cardTitle="Total Tags Applied" value=TotalTopics }}
+        {{> 'partials/gauge' cardTitle="Total Laws Indexed" value=TotalLaws }}
     </div>
 
     <hr />
@@ -51,31 +45,31 @@
         Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
     </p>
 
-    <div class="row">
-        <div class="col-md-4">
+    <div class="grid grid-cols-3 gap-4">
+        <div >
             <h3>Recent Appropriations</h3>
             {{> 'partials/law-list' Laws=Approprations }}
         </div>
-        <div class="col-md-4">
+        <div >
             <h3>Recent Public Laws</h3>
             {{> 'partials/law-list' Laws=Public }}
         </div>
-        <div class="col-md-4">
+        <div >
             <h3>Recent House Bills</h3>
             {{> 'partials/law-list' Laws=House }}
         </div>
 
-        <div class="col-md-4">
+        <div >
             <h3>Recent Senate Bills</h3>
             {{> 'partials/law-list' Laws=Senate }}
         </div>
 
-        <div class="col-md-4">
+        <div >
             <h3>Recent House Resolutions</h3>
             {{> 'partials/law-list' Laws=HouseRes }}
         </div>
 
-        <div class="col-md-4">
+        <div >
             <h3>Recent Senate Resolutions</h3>
             {{> 'partials/law-list' Laws=SenateRes }}
         </div>
