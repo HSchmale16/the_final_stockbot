@@ -20,8 +20,6 @@
           - htop
           - rsync
           - snapd
-          # No longer needed due to snap installation of go
-          # - golang
           - nginx
           - git
           - git-lfs
@@ -29,6 +27,7 @@
           - certbot
           - goaccess
           - prometheus
+          - nodejs-npm
         state: present
         update_cache: true
     - name: Configure Firewall

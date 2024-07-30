@@ -1,84 +1,85 @@
-<div class="container mx-auto">
-    <h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
-    <p>
-        There is a constant outflow of bills from congress.
-        Most of them innocent enough, but when you put the pieces together you can see posturing and blathering.
-        Is this really what our politicans are supposed to do? To act like children or is it to govern and fix the
-        problems in our communities?
-    </p>
-    <p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on
-        topics have changed.</p>
+<h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
+<p>
+    There is a constant outflow of bills from congress.
+    Most of them innocent enough, but when you put the pieces together you can see posturing and blathering.
+    Is this really what our politicans are supposed to do? To act like children or is it to govern and fix the
+    problems in our communities?
+</p>
+<p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on
+    topics have changed.</p>
 
-    <h3>Interesting Bedfellows Plotting Together</h3>
-    {{> 'partials/congress-network' }}
+<h3>Interesting Bedfellows Plotting Together</h3>
+{{> 'partials/congress-network' }}
 
-    <div class="mt-12">
-        {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
-        {{> 'partials/gauge' cardTitle="Total Tags Applied" value=TotalTopics }}
-        {{> 'partials/gauge' cardTitle="Total Laws Indexed" value=TotalLaws }}
+<div class="mt-12">
+    <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+
+    {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
+    {{> 'partials/gauge' cardTitle="Total Tags Applied" value=TotalTopics }}
+    {{> 'partials/gauge' cardTitle="Total Laws Indexed" value=TotalLaws }}
     </div>
-
-    <hr />
-
-    <h3>
-        Search Topics &amp; Bills
-        <span class="htmx-indicator">
-            <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
-        </span>
-    </h3>
-    <p>Search for the topics most important to you! Also search for the bills that matter to your community by title</p>
-    <input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
-        placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
-        hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
-
-    <div id="search-results"></div>
-
-    <hr />
-
-    <h2>View Recent Proposals &amp; Actions by Congress</h2>
-    <p>
-        View the most recent activities and conversations by various topics. Below we have broken out the most recent public laws, and 
-        appropration bills. We also have the most recent bills and resolutions from the House and Senate.
-    </p>
-
-    <p>
-        Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
-    </p>
-
-    <div class="grid grid-cols-3 gap-4">
-        <div >
-            <h3>Recent Appropriations</h3>
-            {{> 'partials/law-list' Laws=Approprations }}
-        </div>
-        <div >
-            <h3>Recent Public Laws</h3>
-            {{> 'partials/law-list' Laws=Public }}
-        </div>
-        <div >
-            <h3>Recent House Bills</h3>
-            {{> 'partials/law-list' Laws=House }}
-        </div>
-
-        <div >
-            <h3>Recent Senate Bills</h3>
-            {{> 'partials/law-list' Laws=Senate }}
-        </div>
-
-        <div >
-            <h3>Recent House Resolutions</h3>
-            {{> 'partials/law-list' Laws=HouseRes }}
-        </div>
-
-        <div >
-            <h3>Recent Senate Resolutions</h3>
-            {{> 'partials/law-list' Laws=SenateRes }}
-        </div>
-    </div>
-
-
-    {{!--
-
-    <h3>Recent Bills and Laws</h3>
-    {{> 'partials/law-list' EnableLoad=true}} --}}
-
 </div>
+
+<hr />
+
+<h3>
+    Search Topics &amp; Bills
+    <span class="htmx-indicator">
+        <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
+    </span>
+</h3>
+<p>Search for the topics most important to you! Also search for the bills that matter to your community by title</p>
+<input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
+    placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
+    hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
+
+<div id="search-results"></div>
+
+<hr />
+
+<h2>View Recent Proposals &amp; Actions by Congress</h2>
+<p>
+    View the most recent activities and conversations by various topics. Below we have broken out the most recent public
+    laws, and
+    appropration bills. We also have the most recent bills and resolutions from the House and Senate.
+</p>
+
+<p>
+    Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
+</p>
+
+<div class="grid grid-cols-3 gap-4">
+    <div>
+        <h3>Recent Appropriations</h3>
+        {{> 'partials/law-list' Laws=Approprations }}
+    </div>
+    <div>
+        <h3>Recent Public Laws</h3>
+        {{> 'partials/law-list' Laws=Public }}
+    </div>
+    <div>
+        <h3>Recent House Bills</h3>
+        {{> 'partials/law-list' Laws=House }}
+    </div>
+
+    <div>
+        <h3>Recent Senate Bills</h3>
+        {{> 'partials/law-list' Laws=Senate }}
+    </div>
+
+    <div>
+        <h3>Recent House Resolutions</h3>
+        {{> 'partials/law-list' Laws=HouseRes }}
+    </div>
+
+    <div>
+        <h3>Recent Senate Resolutions</h3>
+        {{> 'partials/law-list' Laws=SenateRes }}
+    </div>
+</div>
+
+
+{{!--
+
+<h3>Recent Bills and Laws</h3>
+{{> 'partials/law-list' EnableLoad=true}} --}}
