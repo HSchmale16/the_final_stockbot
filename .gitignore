@@ -7,6 +7,7 @@ the_final_stockbot
 DOWNLOAD_MODELS/*
 *.json
 static/*.xml
+static/css/tailwind.css
 
 # Stupid Air Puts Things into temp
 tmp/*
