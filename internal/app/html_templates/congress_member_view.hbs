@@ -1,9 +1,7 @@
-<div class="container">
+<div class="prose-xl">
     <h1>{{ Member.Name }}</h1>
 
-
-
-    <div class="row">
+    <div class="grid grid-cols-2">
         <div class="col-md-4">
             <h3>Bio Information</h3>
             Born: {{#if Member.CongressMemberInfo.Bio.Birthday}}
@@ -36,7 +34,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-8 prose-xl">
             <h3>Sponsored Bills</h3>
             {{#each Member.Sponsored }}
                 <div class="card">
