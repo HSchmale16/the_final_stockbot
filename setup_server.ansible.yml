@@ -27,7 +27,7 @@
           - certbot
           - goaccess
           - prometheus
-          - nodejs-npm
+          - node-npm
         state: present
         update_cache: true
     - name: Configure Firewall
@@ -89,7 +89,7 @@
       ansible.builtin.git:
         repo: https://github.com/HSchmale16/the_final_stockbot
         dest: ~{{ service_user_name }}/the_final_stockbot
-        version: master
+        version: tailwind
       register: stockbot_git
       notify:
         - Build my application
