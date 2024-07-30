@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tailwindcss build -o static/css/tailwind.css --watch",
-    "build": "tailwindcss build -o static/css/tailwind.css --minify"
+    "watch": "tailwindcss build -o static/css/tailwind.css -i base.css --watch",
+    "build": "tailwindcss build -o static/css/tailwind.css -i base.css --minify"
   },
   "author": "",
   "license": "ISC",

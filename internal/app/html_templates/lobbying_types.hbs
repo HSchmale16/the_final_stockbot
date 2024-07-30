@@ -1,4 +1,4 @@
-<div class="container">
+<div class="prose-xl">
     <h1>Lobbyist Contributions in {{ Year }}</h1>
 
     <p>
@@ -6,36 +6,37 @@
         people might be dirty?
     </p>
 
-    <div class="col-lg-8">
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th scope="col">Contribution Type</th>
-                    <th class="align-right" scope="col">Amount</th>
-                    <th class="align-right" scope="col">Number of Contributions</th>
 
-                </tr>
-            </thead>
-            <tbody>
-                {{#each Data }}
-                <tr>
-                    <td>{{ this.ContributionTypeDisplay }}</td>
-                    <td class="align-right">{{ this.AmountStr }}</td>
-                    <td class="align-right">
-                        <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Contribution Type</th>
+                <th class="align-right" scope="col">Amount</th>
+                <th class="align-right" scope="col">Number of Contributions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {{#each Data }}
+            <tr>
+                <td>{{ this.ContributionTypeDisplay }}</td>
+                <td class="align-right">{{ this.AmountStr }}</td>
+                <td class="align-right">
+                    <a href="/lobbying/breakdown/{{Year}}/{{ this.ContributionType }}">{{ this.Count }}</a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
 
     <p>
-        The different types of contributions by lobbyists vary. They can be in the form of money or gifts to specific institutions or individuals.
+        The different types of contributions by lobbyists vary. They can be in the form of money or gifts to specific
+        institutions or individuals.
     </p>
 
-    <p>Federal Elections Campaign Act contributions are the most common type of contribution. The largest contributions are to specific PACs.</p>
+    <p>Federal Elections Campaign Act contributions are the most common type of contribution. The largest contributions
+        are to specific PACs.</p>
 
 
-    
+
 </div>

@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  a {
+    @apply text-blue-600 underline
+  }
+}
+
+
+@layer components {
+  .table-row-striped {
+    @apply odd:bg-gray-100 even:bg-white border-b
+  }
+}
