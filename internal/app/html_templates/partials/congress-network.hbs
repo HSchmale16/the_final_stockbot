@@ -1,4 +1,4 @@
-<div class="row g-2 align-items-center">
+<div class="grid grid-cols-4">
     {{!-- Radio Buttons for House or Senate per bootstrap --}}
     <div class="col">
         <div class="btn-group" role="group">
@@ -11,33 +11,30 @@
             <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
         </div>
     </div>
-    <div class="col">
-        <div class="input-group">
-            <div class="input-group-text">Congress Person</div>
-            <input class="form-control w-80" type="text" id="search" placeholder="Search for your Congress Person">
+    <div class="input-group">
+        <div class="input-group-text">Congress Person</div>
+        <input class="form-control w-80" type="text" id="search" placeholder="Search for your Congress Person">
+    </div>
+    <div class="input-group">
+        <div class="input-group-text">
+            <a id="tagLink" href="#" title="Go see the selected topic">Topic</a>
+            <span class="htmx-indicator">
+                <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
+            </span>
         </div>
-        <div class="input-group">
-            <div class="input-group-text">
-                <a id="tagLink" href="#" title="Go see the selected topic">Topic</a>
-                <span class="htmx-indicator">
-                    <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
-                </span>
-            </div>
-            <input class="form-control w-80" list="topicOptions" type="text" id="cnTopic" placeholder="Search for a topic"
-                autocomplete="on"
-                name="search" hx-get="/htmx/tag-datalist" hx-trigger="input changed delay:350ms, search"
-                hx-target="#topicOptions" hx-indicator=".htmx-indicator">
-            <datalist id="topicOptions">
-            </datalist>
-        </div>
+        <input class="form-control w-80" list="topicOptions" type="text" id="cnTopic" placeholder="Search for a topic"
+            autocomplete="on" name="search" hx-get="/htmx/tag-datalist" hx-trigger="input changed delay:350ms, search"
+            hx-target="#topicOptions" hx-indicator=".htmx-indicator">
+        <datalist id="topicOptions">
+        </datalist>
     </div>
 
 </div>
 
-<div class="row">
-    <div class="col-md-3" id="tooltip">
+<div class="grid xl:grid-cols-4">
+    <div class="" id="tooltip">
     </div>
-    <div class="col-md-9">
+    <div class="col-span-3">
         <div id="container"></div>
     </div>
 
@@ -64,7 +61,7 @@
     var selectedChamber = "H";
 
     function setChamber(chamber) {
-        selectedChamber = chamber; 
+        selectedChamber = chamber;
         // retrieve tag id
         var tagSearch = document.getElementById("cnTopic")
         fetchDataForChamber(selectedChamber, selectedTagId);

@@ -1,22 +1,25 @@
-<h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
-<p>
-    There is a constant outflow of bills from congress.
-    Most of them innocent enough, but when you put the pieces together you can see posturing and blathering.
-    Is this really what our politicans are supposed to do? To act like children or is it to govern and fix the
-    problems in our communities?
-</p>
-<p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on
-    topics have changed.</p>
+<div class="prose-xl">
+    <h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
+    <p>
+        There is a constant outflow of bills from congress.
+        Most of them innocent enough, but when you put the pieces together you can see posturing and blathering.
+        Is this really what our politicans are supposed to do? To act like children or is it to govern and fix the
+        problems in our communities?
+    </p>
+    <p>Now is the time to inform yourself and search by topics. See what was published in the past, and how trends on
+        topics have changed.</p>
 
-<h3>Interesting Bedfellows Plotting Together</h3>
+    <h3>Interesting Bedfellows Plotting Together</h3>
+</div>
+
 {{> 'partials/congress-network' }}
 
 <div class="mt-12">
     <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
 
-    {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
-    {{> 'partials/gauge' cardTitle="Total Tags Applied" value=TotalTopics }}
-    {{> 'partials/gauge' cardTitle="Total Laws Indexed" value=TotalLaws }}
+        {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags titleColor="#FF0000"}}
+        {{> 'partials/gauge' cardTitle="Total Tags Applied" value=TotalTopics }}
+        {{> 'partials/gauge' cardTitle="Total Laws Indexed" value=TotalLaws }}
     </div>
 </div>
 
@@ -48,7 +51,7 @@
     Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
 </p>
 
-<div class="grid lg:grid-cols-3 gap-4 lg:prose-xl">
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10 prose-xl">
     <div>
         <h3>Recent Appropriations</h3>
         {{> 'partials/law-list' Laws=Approprations }}

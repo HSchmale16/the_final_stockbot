@@ -18,6 +18,9 @@ const (
 <url><loc>https://www.dirtycongress.com/help/faq</loc></url>
 <url><loc>https://www.dirtycongress.com/tos</loc></url>
 <url><loc>https://www.dirtycongress.com/laws</loc></url>
+<url><loc>https://www.dirtycongress.com/congress-members</loc></url>
+<url><loc>https://www.dirtycongress.com/lobbying</loc></url>
+<url><loc>https://www.dirtycongress.com/laws</loc></url>
 `
 
 	POSTAMBLE    = `</urlset>`

@@ -50,12 +50,16 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 
 	log.Println("Count:", count, "Link:", item.Link)
 	if count == 0 {
-		for _, tagName := range item.Category {
-			tag := GetTag(db, tagName)
-			newItem.Categories = append(newItem.Categories, tag)
-		}
+		// for _, tagName := range item.Category {
+		// 	tag := GetTag(db, tagName)
+		// 	newItem.Categories = append(newItem.Categories, tag)
+		// }
 
-		db.Create(&newItem)
+		fmt.Println(newItem)
+		x := db.Debug().Create(&newItem)
+		if x.Error != nil {
+			log.Fatal("Failed to create item:", x.Error)
+		}
 
 		return true, newItem
 	}
@@ -151,7 +155,9 @@ func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
 			continue
 		}
 
-		db.Debug().Model(&dbCommittee).Association("GovtRssItems").Append(&item)
+		fmt.Println(item)
+
+		//db.Debug().Model(&dbCommittee).Association("GovtRssItems").Append(&item)
 	}
 }
 

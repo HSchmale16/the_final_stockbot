@@ -1,1 +1,8 @@
-<a class="btn btn-outline-primary {{isEqualApplyClass T1 T2 "active"}}" href="{{URL}}{{ T1 }}">{{ Label }}</a>
+<a class="w-full flex justify-center font-medium rounded-l px-5 py-2 {{eqTernary T1 T2 "border-t border-b bg-gray-900 text-white  border-gray-900 hover:bg-gray-800" "border bg-white text-gray-800 border-gray-200 hover:bg-gray-100"}}"  
+    href="{{URL}}{{ T1 }}"
+    aria-current="{{ eqTernary T1 T2 "page" "false" }}">
+        {{ Label }}
+</a>
+
+
+ {{!-- {{isEqualApplyClass T1 T2 "active"}} --}}

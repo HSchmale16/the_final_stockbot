@@ -132,6 +132,7 @@ func main() {
 		cron.AddFunc("@every 4h", triggerRssFetch)
 		//cron.AddFunc("@every 12h", app.FindUntaggedLaws)
 		app.FindUntaggedLaws()
+		triggerRssFetch()
 
 		cron.Start()
 	}

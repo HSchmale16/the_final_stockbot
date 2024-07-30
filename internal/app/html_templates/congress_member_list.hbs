@@ -1,49 +1,40 @@
-<div class="container">
-    <h1>Active Members of Congress</h1>
+<h1>Active Members of Congress</h1>
 
-    {{!-- <div class="row">
+
+
+<table class="table-auto w-full">
+    <thead class="">
+        <tr>
+            <th>Role</th>
+            <th>Name</th>
+            <th>State</th>
+            <th>First Took Office</th>
+            <th>Party</th>
+        </tr>
+    </thead>
+    <tbody>
         {{#each ActiveMembers}}
-        <li class="{{ this.Role }}">
-            <a href="/congress-member/{{this.BioGuideId}}">{{this.Name}} ({{ this.State }} - {{firstChar this.Party
-                }})</a>
-        </li>
+        <tr class="odd:bg-gray-100 even:bg-white border-b">
+            <td class="px-4 py-2">
+                {{#if this.IsSenator }}
+                <span class="px-2 py-1 text-xs font-bold text-white bg-blue-500 rounded">Senator</span>
+                {{else}}
+                <span class="px-2 py-1 text-xs font-bold text-white bg-gray-500 rounded">Representative</span>
+                {{/if}}
+            </td>
+            <td class="px-4 py-2"><a href="/congress-member/{{this.BioGuideId}}"
+                    class="text-blue-500 hover:underline">{{this.Name}}</a></td>
+            <td class="px-4 py-2">{{ this.State }}
+                {{#unless this.IsSenator }}
+                {{ this.District }}
+                {{/unless}}
+            </td>
+            <td class="px-4 py-2">{{ formatDate this.TookOfficeOn }}</td>
+            <td class="px-4 py-2">{{firstChar this.Party }}</td>
+        </tr>
         {{/each}}
-    </div> --}}
-
-    <div class="row">
-        <table class="table table-striped sortable">
-            <thead>
-                <tr>
-                    <th>Role</th>
-                    <th>Name</th>
-                    <th>State</th>
-                    <th>First Took Office</th>
-                    <th>Party</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each ActiveMembers}}
-                <tr>
-                    <td>
-                        {{#if this.IsSenator }}
-                        <span class="badge bg-primary">Senator</span>
-                        {{else}}
-                        <span class="badge bg-secondary">Representative</span>
-                        {{/if}}
-                    </td>
-                    <td><a href="/congress-member/{{this.BioGuideId}}">{{this.Name}}</a></td>
-                    <td>{{ this.State }}
-                        {{#unless this.IsSenator }}
-                        {{ this.District }}
-                        {{/unless}}
-                    </td>
-                    <td>{{ formatDate this.TookOfficeOn }}</td>
-                    <td>{{firstChar this.Party }}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
+    </tbody>
+</table>
 </div>
 
 <script src="/static/js/sorttable.js"></script>

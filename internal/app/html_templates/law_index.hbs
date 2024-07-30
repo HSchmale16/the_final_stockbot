@@ -1,24 +1,24 @@
-<div class="prose">
+<div>
     <h1>{{ Title }}</h1>
 
-    <div class="col">
-        <div class="btn-group" role="group">
-            {{> 'partials/bar-button-item' URL="/laws" Label="All Laws"     T1=""       T2=LawType }}
+    <div class="grid grid-cols-4 gap-10">
+        <div class="flex w-full md:max-w-xl mx-4 rounded shadow"> 
+            {{> 'partials/bar-button-item' URL="/laws" Label="All Laws" T1="" T2=LawType }}
         </div>
-        <div class="btn-group" role="group">
-            {{> 'partials/bar-button-item' URL="/laws?type=" Label="House Bills"  T1="H.R."   T2=LawType}}
+        <div class="flex w-full md:max-w-xl mx-4 rounded shadow"> 
+            {{> 'partials/bar-button-item' URL="/laws?type=" Label="House Bills" T1="H.R." T2=LawType}}
             {{> 'partials/bar-button-item' URL="/laws?type=" Label="House Resolutions" T1="H. Res." T2=LawType}}
-            {{> 'partials/bar-button-item' URL="/laws?type=" Label="House Joint Resolutions"  T1="H.J."   T2=LawType}}
+            {{> 'partials/bar-button-item' URL="/laws?type=" Label="House Joint Resolutions" T1="H.J." T2=LawType}}
         </div>
 
-        <div class="btn-group" role="group">
-            {{> 'partials/bar-button-item' URL="/laws?type=" Label="Senate Bills" T1="S."     T2=LawType}}
+        <div class="flex w-full md:max-w-xl mx-4 rounded shadow"> 
+            {{> 'partials/bar-button-item' URL="/laws?type=" Label="Senate Bills" T1="S." T2=LawType}}
             {{> 'partials/bar-button-item' URL="/laws?type=" Label="Senate Resolutions" T1="S. Res." T2=LawType}}
-            {{> 'partials/bar-button-item' URL="/laws?type=" Label="Senate Joint Resolutions" T1="S.J."     T2=LawType}}
+            {{> 'partials/bar-button-item' URL="/laws?type=" Label="Senate Joint Resolutions" T1="S.J." T2=LawType}}
         </div>
 
-        <div class="btn-group" role="group">
-            {{> 'partials/bar-button-item' URL="/laws?type=" Label="Public Laws"  T1="Public" T2=LawType}}
+        <div class="flex w-full md:max-w-xl mx-4 rounded shadow"> 
+            {{> 'partials/bar-button-item' URL="/laws?type=" Label="Public Laws" T1="Public" T2=LawType}}
         </div>
     </div>
 
