@@ -1,35 +1,3 @@
-{{!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="/">
-            <img src="/static/img/navbar.png" alt="DirtyCongress.com" class="d-inline-block align-text-top" />
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/laws">Laws</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/congress-members">Members of Congress</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/committees">Committees</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/lobbying">Lobbying</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/help/faq">FAQs</a>
-                </li>
-                
-            </ul>
-        </div>
-    </div>
-</nav> --}}
-
 <nav class="bg-white border border-gray-200 dark:border-gray-700 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-800 shadow">
   <div class="container flex flex-wrap justify-between items-center mx-auto">
     <a href="/" class="flex items-center">
@@ -65,8 +33,8 @@
         <li>
           <a
             href="/laws"
-            class="block py-2 pr-4 pl-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white"
-            aria-current="page"
+            class="{{ eqTernaryShort Url2 "/laws" "nav-item-selected" "nav-item"}}"
+            aria-current="{{ eqTernaryShort Url2 "/laws" "page" "false"}}"
           >
             Laws
           </a>
@@ -74,7 +42,8 @@
         <li>
           <a
             href="/congress-members"
-            class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+            class="{{ eqTernaryShort Url2 "/congress-members" "nav-item-selected" "nav-item"}}"
+            aria-current="{{ eqTernaryShort Url2 "/congress-members" "page" "false"}}"
           >
             Congress Members
           </a>
@@ -82,7 +51,8 @@
         <li>
           <a
             href="/committees"
-            class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+            class="{{ eqTernaryShort Url2 "/committees" "nav-item-selected" "nav-item"}}"
+            aria-current="{{ eqTernaryShort Url2 "/committees" "page" "false"}}"
           >
             Committees
           </a>
@@ -90,7 +60,8 @@
         <li>
           <a
             href="/lobbying"
-            class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+            class="{{ eqTernaryShort Url2 "/lobbying" "nav-item-selected" "nav-item"}}"
+            aria-current="{{ eqTernaryShort Url2 "/lobbying" "page" "false"}}"
           >
             Lobbying
           </a>
@@ -98,7 +69,8 @@
         <li>
           <a
             href="/help/faq"
-            class="block py-2 pr-4 pl-3 text-gray-700 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+            class="{{ eqTernaryShort Url2 "/help/faq" "nav-item-selected" "nav-item"}}"
+            aria-current="{{ eqTernaryShort Url2 "/help/faq" "page" "false"}}"
           >
             FAQ
           </a>

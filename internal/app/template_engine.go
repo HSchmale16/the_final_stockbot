@@ -82,9 +82,24 @@ func GetTemplateEngine() fiber.Views {
 		return string(s[0])
 	})
 
+	engine.AddFunc("eqTernaryShort", eqTernaryShort)
+
 	for k := range engine.Templates {
 		fmt.Println(k)
 	}
 
 	return engine
+}
+
+/**
+ * Compares 2 a and b strings up to the length of the shortest string. If they match return c else d
+ */
+func eqTernaryShort(a, b, c, d string) string {
+	length := min(len(a), len(b))
+	for i := 0; i < length; i++ {
+		if a[i] != b[i] {
+			return d
+		}
+	}
+	return c
 }

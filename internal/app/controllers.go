@@ -74,6 +74,7 @@ func SetupServer() {
 			"DEBUG":       IsDebug,
 			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
 			"Url":         DOMAIN + c.OriginalURL(),
+			"Url2":        c.OriginalURL(),
 		})
 		return c.Next()
 	})
