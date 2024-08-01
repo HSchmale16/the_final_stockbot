@@ -117,35 +117,3 @@ div.ad p {
 	"bg-unknown",
 	"bg-secondary",
 */
-
-.bg-person {
-    background-color: #007bff;
-}
-
-.bg-law {
-    background-color: #28a745;
-}
-
-.bg-agency {
-    background-color: #dc3545;
-}
-
-.bg-organization {
-    background-color: #ffc107;
-}
-
-.bg-geography {
-    background-color: #17a2b8;
-}
-
-.bg-country {
-    background-color: #73a9d8;
-}
-
-.bg-unknown {
-    background-color: #6c757d;
-}
-
-.bg-secondary {
-    background-color: #6c757d;
-}

@@ -7,13 +7,14 @@
     {{/each}}
 </ul>
 
-<div class="tags">
+<div class="tag-cloud">
     {{#each Tags }} 
-        <span class="badge {{ CssColor }}">
-            <a href="/tag/{{ TagId }}">{{ Name }}</a>
-        </span>
+        <a href="/tag/{{ TagId }}" class="inline-block mt-2 text-sm font-medium text-gray-700 {{ CssColor }} rounded-full px-3 py-1 hover:bg-gray-300 text-white no-underline">{{ Name }}</a>
     {{/each}}
     {{#unless Tags}}
         <span class="no-tags">No tags available</span>
     {{/unless}}
 </div>
+
+
+

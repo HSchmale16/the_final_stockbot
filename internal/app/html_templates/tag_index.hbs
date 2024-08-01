@@ -6,20 +6,5 @@
     {{> 'partials/law-list' Laws=Items }}
 
 
-    {{!-- <ul>
-        {{#each Items }}
-        <li>
-            <h2><a href="/law/{{ ID }}?tagId={{ Tag.ID }}">{{{ Title }}}</a></h2>
-            <small>Published on {{formatDate PubDate }} | Loaded On {{ formatDate CreatedAt }}</small>
-            <p>
-                {{ Metadata.OfficialTitle }} <br />
-                {{#each Metadata.Actions }}
-                <strong>{{ Date }}:</strong> {{ Text }}<br />
-                <br />
-                {{/each}}
-                <a href="/law/{{ ID }}">Read more</a>
-            </p>
-        </li>
-        {{/each}}
-    </ul> --}}
+
 </div>

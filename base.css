@@ -21,4 +21,45 @@
   .nav-item {
     @apply block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700
   }
+
+  .badge {
+    @apply px-2 py-1 text-xs font-bold text-white rounded
+  }
+
+  .badge a {
+    @apply text-white no-underline
+  }
+}
+
+
+.bg-person {
+  background-color: #007bff;
+}
+
+.bg-law {
+  background-color: #28a745;
+}
+
+.bg-agency {
+  background-color: #dc3545;
+}
+
+.bg-organization {
+  background-color: #ffc107;
+}
+
+.bg-geography {
+  background-color: #17a2b8;
+}
+
+.bg-country {
+  background-color: #73a9d8;
+}
+
+.bg-unknown {
+  background-color: #6c757d;
+}
+
+.bg-secondary {
+  background-color: #6c757d;
 }
