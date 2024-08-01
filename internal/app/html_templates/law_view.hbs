@@ -1,7 +1,7 @@
 <div class="container">
-    <h1>{{{ Law.Title }}}</h1>
 
-    <div class="bill-metadata">
+    <div class="prose-xl">
+        <h1>{{{ Law.Title }}}</h1>
         <h2>Bill Metadata</h2>
 
         <p><b>Publish Date:</b> {{ formatDate Law.PubDate }}</p>
@@ -47,39 +47,47 @@
 
     <hr />
 
-    <div class="accordion" id="accordionExample">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="attribution">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapse{{@index}}" aria-expanded="true" aria-controls="collapse{{@index}}">
-                    Bill Text
-                </button>
-            </h2>
-            <div id="collapse{{@index}}" class="accordion-collapse collapse" aria-labelledby="attribution"
-                data-bs-parent="#accordionExample">
-                <div class="accordion-body">
+    <ul class="max-w-6xl mx-auto mt-20 divide-y  shadow shadow-blue-600 rounded-xl">
+        <li>
+            <details class="group">
+                <summary class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
+                    <svg class="w-15 h-5 text-gray-500 transition group-open:rotate-90"
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
+                        </path>
+                    </svg>
+                    <span>Bill Text</span>
+                </summary>
+                <article>
                     {{#if RenderMods }}
                     <pre>{{ LawText.ModsXML }}</pre>
                     {{else}}
                     <pre>{{ LawText.Text }}</pre>
                     {{/if}}
+                </article>
+            </details>
+        </li>
+        <li>
+            <details class="group">
+                <summary class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
+                    <svg class="w-15 h-5 text-gray-500 transition group-open:rotate-90"
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
+                        </path>
+                    </svg>
+                    <span>Bill Tags</span>
+                </summary>
+                {{!-- tags are dynamically loaded --}}
+                <div class="accordion-body" hx-get="/law/{{ Law.ID }}/tags" hx-trigger="load" hx-swap="afterend">
                 </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="attribution">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapseTags" aria-expanded="true" aria-controls="collapseTags">
-                    Bill Tags
-                </button>
-            </h2>
-            <div id="collapseTags" class="accordion-collapse collapse" aria-labelledby="attribution"
-                data-bs-parent="#accordionExample">
-                <div class="accordion-body"  hx-get="/law/{{ Law.ID }}/tags" hx-trigger="load" hx-swap="afterend">
-                </div>
-            </div>
-        </div>
-    </div>
+            </details>
+        </li>
+    </ul>
+
 
 
     <div class="related-laws row" hx-get="/htmx/law/{{ Law.ID }}/related_laws" hx-trigger="revealed" hx-swap="afterend">
