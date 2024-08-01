@@ -99,9 +99,10 @@ func eqTernaryShort(a, b, c, d string) string {
 
 	if a == b {
 		return c
-	} else if length == 1 {
+	} else if length < 2 {
 		return d
 	}
+
 	for i := 0; i < length; i++ {
 		if a[i] != b[i] {
 			return d
