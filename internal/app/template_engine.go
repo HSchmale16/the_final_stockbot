@@ -96,6 +96,12 @@ func GetTemplateEngine() fiber.Views {
  */
 func eqTernaryShort(a, b, c, d string) string {
 	length := min(len(a), len(b))
+
+	if a == b {
+		return c
+	} else if length == 1 {
+		return d
+	}
 	for i := 0; i < length; i++ {
 		if a[i] != b[i] {
 			return d
