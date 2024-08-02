@@ -13,33 +13,36 @@
             </p>
             <form hx-post="/lobbying-sql" hx-target="#results" hx-indicator=".htmx-indicator">
                 <textarea required id="sql" rows="10" cols="60" name="sql"></textarea>
-                <br/>
+                <br />
                 <button type="submit">Run Query</button>
             </form>
-        </div>
-
-
-        <div class="col-md-6">
+            <div class="col-md-6">
+            </div>
             <h2>Tables</h2>
 
-            <div class="accordion" id="accordionTables">
-                <div class="accordion-item">
-                    <!-- filings_etl -->
-                    <h2 class="accordion-header" id="tableOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            contributions_etl - What kind of contributions and how much
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="tableOne"
-                        data-bs-parent="#accordionTables">
+            <ul class="max-w-6xl mx-auto mt-20 divide-y  shadow shadow-blue-600 rounded-xl">
+                <li>
+                    <details class="group">
+                        <summary
+                            class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
+                            <svg class="w-15 h-5 text-gray-500 transition group-open:rotate-90"
+                                xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
+                                </path>
+                            </svg>
+                            <h2 class="accordion-header" id="tableOne">
+                                contributions_etl - What kind of contributions and how much
+                            </h2>
+                        </summary>
                         <div class="accordion-body">
                             <p>The extracted and loaded data of the lobbyist contribution filings.
                                 Each contribution is unfolded from the original report which could hold many
                                 contributions</p>
-                            <table class="table">
+                            <table class="table-auto border border-slate-500 max-w-xl">
                                 <thead>
-                                    <tr>
+                                    <tr class="border-b">
                                         <th>Column Name</th>
                                         <th>Type</th>
                                         <th>Description</th>
@@ -90,20 +93,26 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </details>
                     <!-- end filings-etl -->
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="tableTwo">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            filings_etl - Various lobbyist filings about issues worked
-                        </button>
-                    </h2>
-                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="tableTwo"
-                        data-bs-parent="#accordionTables">
+                </li>
+                <li>
+                    <details class="group">
+                        <summary
+                            class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
+                            <svg class="w-15 h-5 text-gray-500 transition group-open:rotate-90"
+                                xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
+                                </path>
+                            </svg>
+                            <h2 class="accordion-header" id="tableTwo">
+                                filings_etl - Various lobbyist filings about issues worked
+                            </h2>
+                        </summary>
                         <div class="accordion-body">
-                            <table class="table">
+                            <table class="table-auto border border-slate-500 max-w-xl">
                                 <thead>
                                     <tr>
                                         <th>Column Name</th>
@@ -112,12 +121,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr class="border">
                                         <td>uuid</td>
                                         <td>BLOB</td>
                                         <td>The UUID of the filing</td>
                                     </tr>
-                                    <tr>
+                                    <tr class="border">
                                         <td>filing_year</td>
                                         <td>BIGINT</td>
                                         <td>YES</td>
@@ -187,9 +196,10 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </details>
+                </li>
+
+            </ul>
         </div>
     </div>
 
