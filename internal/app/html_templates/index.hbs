@@ -51,34 +51,13 @@
     Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
 </p>
 
-<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10 prose-xl">
-    <div>
-        <h3>Recent Appropriations</h3>
-        {{> 'partials/law-list' Laws=Approprations }}
-    </div>
-    <div>
-        <h3>Recent Public Laws</h3>
-        {{> 'partials/law-list' Laws=Public }}
-    </div>
-    <div>
-        <h3>Recent House Bills</h3>
-        {{> 'partials/law-list' Laws=House }}
-    </div>
-
-    <div>
-        <h3>Recent Senate Bills</h3>
-        {{> 'partials/law-list' Laws=Senate }}
-    </div>
-
-    <div>
-        <h3>Recent House Resolutions</h3>
-        {{> 'partials/law-list' Laws=HouseRes }}
-    </div>
-
-    <div>
-        <h3>Recent Senate Resolutions</h3>
-        {{> 'partials/law-list' Laws=SenateRes }}
-    </div>
+<div class="md:columns-3 prose-xl">
+    {{> 'partials/law-col' Title="Recent Appropriations" Laws=Approprations}}
+    {{> 'partials/law-col' Title="Public Laws" Laws=PublicLaws}}
+    {{> 'partials/law-col' Title="House Bills" Laws=House}}
+    {{> 'partials/law-col' Title="Senate Bills" Laws=Senate}}
+    {{> 'partials/law-col' Title="House Resolutions" Laws=HouseRes}}
+    {{> 'partials/law-col' Title="Senate Resolutions" Laws=SenateRes}}
 </div>
 
 

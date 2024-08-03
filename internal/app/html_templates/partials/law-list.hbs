@@ -7,19 +7,15 @@
 {{> 'partials/ad-roll' }}
 
 {{#each Laws }}
-<div class="prose-xl" {{#if EnableLoad }}{{#if @last}} hx-get="/laws?page={{ PubDate }}&type={{ LawType }}" hx-trigger="revealed" hx-swap="afterend" {{/if}}{{/if}}>
+<div class="prose-xl" {{#if EnableLoad }}{{#if @last}} hx-get="/laws?page={{ PubDate }}&type={{ LawType }}"
+    hx-trigger="revealed" hx-swap="afterend" {{/if}}{{/if}}>
     <h2><a href="/law/{{ ID }}">{{{ Title }}}</a></h2>
     {{> 'partials/sponsorship-bar' Law=this }}
     <small>Published on {{formatDate PubDate }} | Loaded On {{ formatDate CreatedAt }}</small>
-    <p>
-        {{ Metadata.OfficialTitle }} <br />
-        {{#each Metadata.Actions }}
-            <strong>{{ Date }}:</strong> {{ Text }}<br />
-            <br />
-        {{/each}}
-
-    </p>
-
+    <p>{{ Metadata.OfficialTitle }}</p>
+    {{#each Metadata.Actions }}
+    <p><strong>{{ Date }}:</strong> {{ Text }}</p>
+    {{/each}}
 </div>
 {{/each}}
 
