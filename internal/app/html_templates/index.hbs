@@ -56,11 +56,23 @@
     </p>
 
     <div class="md:columns-3">
-        {{> 'partials/law-col' Title="Recent Appropriations" Laws=Approprations}}
-        {{> 'partials/law-col' Title="Public Laws" Laws=PublicLaws}}
-        {{> 'partials/law-col' Title="House Bills" Laws=House}}
-        {{> 'partials/law-col' Title="Senate Bills" Laws=Senate}}
-        {{> 'partials/law-col' Title="House Resolutions" Laws=HouseRes}}
-        {{> 'partials/law-col' Title="Senate Resolutions" Laws=SenateRes}}
+        {{> 'partials/law-col' 
+            Title="Recent Appropriations" 
+            Laws=Approprations 
+            Desc="These are the most recent spending bills. How the money flows is where you find the dirt."}}
+        {{> 'partials/law-col' Title="Public Laws" 
+            Laws=PublicLaws
+            Desc="These are the most recent laws that have been passed. These are laws that affect everyone and are not specific to any one group." }}
+        {{> 'partials/law-col' Title="House Bills" 
+            Laws=House
+            Desc="These are the most recent bills that have been proposed in the House."}}
+
+            
+        {{> 'partials/law-col' Title="Senate Bills" Laws=Senate
+            Desc="These are the most recent bills that have been proposed in the Senate."}}
+        {{> 'partials/law-col' Title="House Resolutions" Laws=HouseRes
+            Desc="These are the most recent resolutions that have been proposed in the House."}}
+        {{> 'partials/law-col' Title="Senate Resolutions" Laws=SenateRes
+            Desc="These are the most recent resolutions that have been proposed in the Senate."}}
     </div>
 </div>

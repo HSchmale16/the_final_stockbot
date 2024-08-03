@@ -221,13 +221,15 @@ func Index(c *fiber.Ctx) error {
 
 	var Approprations, Senate, Public, House, HouseRes, SenateRes []GovtRssItem
 
-	db.Preload("Sponsors").Order("pub_date DESC").Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").Limit(5).Find(&Approprations, "tag_id = ?", 377)
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&House, "title LIKE ?", "H.R.%")
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&Senate, "title LIKE ?", "S. %")
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&Public, "title LIKE ?", "Public Law %")
+	billLimit := 7
 
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&HouseRes, "title LIKE ?", "H. Res.%")
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(5).Find(&SenateRes, "title LIKE ?", "S. Res.%")
+	db.Preload("Sponsors").Order("pub_date DESC").Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").Limit(billLimit).Find(&Approprations, "tag_id = ?", 377)
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&House, "title LIKE ?", "H.R.%")
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&Senate, "title LIKE ?", "S. %")
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&Public, "title LIKE ?", "Public Law %")
+
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&HouseRes, "title LIKE ?", "H. Res.%")
+	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&SenateRes, "title LIKE ?", "S. Res.%")
 
 	// var recentLaws []GovtRssItem = make([]GovtRssItem, 0, 10)
 	// db.Preload("Sponsors").Order("pub_date DESC").Limit(10).Find(&recentLaws)
