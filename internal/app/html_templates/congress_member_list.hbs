@@ -1,8 +1,8 @@
-<h1>Active Members of Congress</h1>
+<h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">Active Members of Congress</h1>
 
 
 
-<table class="table-auto w-full">
+<table class="table-auto w-full sortable">
     <thead class="">
         <tr>
             <th>Role</th>
@@ -29,7 +29,7 @@
                 {{ this.District }}
                 {{/unless}}
             </td>
-            <td class="px-4 py-2">{{ formatDate this.TookOfficeOn }}</td>
+            <td class="px-4 py-2" sorttable_customkey="{{ this.TookOfficeOn }}">{{ formatDate this.TookOfficeOn }}</td>
             <td class="px-4 py-2">{{firstChar this.Party }}</td>
         </tr>
         {{/each}}
