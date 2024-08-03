@@ -1,14 +1,10 @@
-<div class="grid grid-cols-4">
+<div class="grid grid-cols-4 container mx-auto">
     {{!-- Radio Buttons for House or Senate per bootstrap --}}
     <div class="col">
         <div class="btn-group" role="group">
-            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
-                onchange="setChamber('H')">
-            <label class="btn btn-outline-primary" for="btnradio1">House</label>
+            <button type="button" class="btn btn-outline-primary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-blue-200 shadow-md" onclick="setChamber('H')" aria-pressed="{{selectedChamber 'H'}}">House</button>
 
-            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
-                onchange="setChamber('S')">
-            <label class="btn btn-outline-primary" for="btnradio2">Senate</label>
+            <button type="button" class="btn btn-outline-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-blue-200 shadow-md" onclick="setChamber('S')" aria-pressed="{{selectedChamber 'S'}}">Senate</button>
         </div>
     </div>
     <div class="input-group">
@@ -19,7 +15,7 @@
         <div class="input-group-text">
             <a id="tagLink" href="#" title="Go see the selected topic">Topic</a>
             <span class="htmx-indicator">
-                <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
+                <img class="m-0 inline" src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
             </span>
         </div>
         <input class="form-control w-80" list="topicOptions" type="text" id="cnTopic" placeholder="Search for a topic"

@@ -9,7 +9,7 @@
 
 <div class="tag-cloud">
     {{#each Tags }} 
-        <a href="/tag/{{ TagId }}" class="inline-block mt-2 text-sm font-medium text-gray-700 {{ CssColor }} rounded-full px-3 py-1 hover:bg-gray-300 text-white no-underline">{{ Name }}</a>
+        <a href="/tag/{{ TagId }}?utm_source=topic_search" class="inline-block mt-2 text-sm font-medium text-gray-700 {{ CssColor }} rounded-full px-3 py-1 hover:bg-gray-300 text-white no-underline">{{ Name }}</a>
     {{/each}}
     {{#unless Tags}}
         <span class="no-tags">No tags available</span>

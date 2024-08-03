@@ -236,7 +236,6 @@ func Index(c *fiber.Ctx) error {
 
 	return c.Render("index", fiber.Map{
 		"Title":         "Dirty Congress - Explore the Laws and Connections within Congress",
-		"FullBody":      true,
 		"TotalTopics":   p.Sprintf("%d", articleTags),
 		"TotalTags":     p.Sprintf("%d", totalTags),
 		"TotalLaws":     p.Sprintf("%d", totalLaws),
