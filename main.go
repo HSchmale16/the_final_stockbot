@@ -137,16 +137,10 @@ func main() {
 		cron.Start()
 	}
 
-	fmt.Println("Starting up...")
-
 	if !disableWebServer {
-		// go func() {
-		// 	fmt.Println("Setting up Metrics Server")
-		// 	http.Handle("/metrics", promhttp.Handler())
-		// 	http.ListenAndServe(":2112", nil)
-		// }()
+		fmt.Println("Starting up...")
 		app.SetupServer()
-
+		fmt.Println("The FUCK")
 	}
 	fmt.Println("Done!")
 }

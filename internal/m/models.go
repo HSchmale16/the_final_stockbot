@@ -7,9 +7,11 @@ import (
 
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
+	_ "github.com/ncruces/go-sqlite3/embed"
+	"github.com/ncruces/go-sqlite3/gormlite"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gorm.io/driver/sqlite"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/plugin/prometheus"
@@ -271,7 +273,11 @@ func SetupDB() (*gorm.DB, error) {
 	)
 
 	// Globally mode
-	db, err := gorm.Open(sqlite.Open("congress.sqlite"), &gorm.Config{
+	// db, err := gorm.Open(sqlite.Open("congress.sqlite"), &gorm.Config{
+	// 	Logger:      newLogger,
+	// 	PrepareStmt: true,
+	// })
+	db, err := gorm.Open(gormlite.Open("congress.sqlite"), &gorm.Config{
 		Logger:      newLogger,
 		PrepareStmt: true,
 	})

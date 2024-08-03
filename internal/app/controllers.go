@@ -2,6 +2,7 @@ package app
 
 import (
 	"html"
+	"log"
 	"os"
 	"sort"
 	"strings"
@@ -92,9 +93,6 @@ func SetupServer() {
 	app.Get("/", Index)
 	app.Get("/tags", TagList)
 	app.Get("/tag/:tag_id", TagIndex)
-	// app.Add("GET", "/htmx/tag/:tag_id/edit", GetEditTagView)
-	// app.Add("PUT", "/htmx/tag/:tag_id/edit", PutTagUpdate)
-	// app.Add("GET", "/htmx/tag/:tag_id/wiki", GetTagWiki)
 
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/htmx/tag-datalist", TagDataList)
@@ -151,7 +149,10 @@ func SetupServer() {
 	// lobbying.SetupRoutes(app)
 	congress.SetupRoutes(app)
 
-	app.Listen(":8080")
+	err = app.Listen(":8080")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func RelatedLaws(c *fiber.Ctx) error {
