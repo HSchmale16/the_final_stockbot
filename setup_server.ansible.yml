@@ -89,7 +89,7 @@
       ansible.builtin.git:
         repo: https://github.com/HSchmale16/the_final_stockbot
         dest: ~{{ service_user_name }}/the_final_stockbot
-        version: tailwind
+        version: master
       register: stockbot_git
       notify:
         - Build my application
