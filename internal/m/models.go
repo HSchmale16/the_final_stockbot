@@ -136,6 +136,21 @@ func (Tag) TableName() string {
 	return "tag"
 }
 
+type TagUse struct {
+	ID        uint
+	CreatedAt time.Time
+	TagId     uint
+	IpAddr    string
+	UserAgent string
+	UseType   string
+
+	Tag Tag `gorm:"foreignKey:TagId"`
+}
+
+func (TagUse) TableName() string {
+	return "tag_use"
+}
+
 /** GovtRssItemTag is a many-to-many relationship between GovtRssItem and Tag */
 type GovtRssItemTag struct {
 	CreatedAt  time.Time
@@ -306,7 +321,7 @@ func SetupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressMember{}, &CongressMemberSponsored{}); err != nil {
+	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressMember{}, &CongressMemberSponsored{}, &TagUse{}); err != nil {
 		return nil, err
 	}
 

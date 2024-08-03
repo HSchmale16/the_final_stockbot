@@ -5,6 +5,17 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+var TagCssColorTypes = []string{
+	"bg-person",
+	"bg-law",
+	"bg-agency",
+	"bg-organization",
+	"bg-geography",
+	"bg-country",
+	"bg-unknown",
+	"bg-secondary",
+}
+
 func DoTagUpdates() {
 	db, err := m.SetupDB()
 	if err != nil {

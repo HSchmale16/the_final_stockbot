@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
@@ -38,6 +39,14 @@ func CongressNetwork(c *fiber.Ctx) error {
 			})
 		}
 		db.Raw(congress_network_tag_sql, chamber, tag_id_num).Scan(&edges)
+
+		// log usage of special congress network views
+		db.Create(&m.TagUse{
+			TagId:     uint(tag_id_num),
+			IpAddr:    c.IP(),
+			UserAgent: c.Get("User-Agent"),
+			UseType:   "cn", // congress network usage
+		})
 	} else {
 		db.Raw(congress_network_sql, chamber).Scan(&edges)
 	}
