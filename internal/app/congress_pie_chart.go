@@ -4,23 +4,22 @@ import (
 	"bytes"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"github.com/wcharczuk/go-chart/v2"
 	"github.com/wcharczuk/go-chart/v2/drawing"
 	"gorm.io/gorm"
-
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 func SponsorsBillsWithPiChart(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var member DB_CongressMember
-	db.First(&member, DB_CongressMember{
+	var member m.DB_CongressMember
+	db.First(&member, m.DB_CongressMember{
 		BioGuideId: c.Params("bio_guide_id"),
 	})
 
 	// Get the bills they sponsored
-	var sponsored []CongressMemberSponsored
+	var sponsored []m.CongressMemberSponsored
 	db.Where("db_congress_member_bio_guide_id = ?", member.BioGuideId).Find(&sponsored)
 
 	bills := make([]uint, len(sponsored))
@@ -30,13 +29,13 @@ func SponsorsBillsWithPiChart(c *fiber.Ctx) error {
 
 	var sponsoredBy []string
 	db.
-		Model(&CongressMemberSponsored{}).
+		Model(&m.CongressMemberSponsored{}).
 		Distinct("db_congress_member_bio_guide_id").
 		Where("govt_rss_item_id IN ?", bills).
 		Find(&sponsoredBy)
 
 	// Get the members they work with
-	var worksWith []DB_CongressMember
+	var worksWith []m.DB_CongressMember
 	db.Where("bio_guide_id IN ?", sponsoredBy).Find(&worksWith)
 
 	parties := make(map[string]float64)

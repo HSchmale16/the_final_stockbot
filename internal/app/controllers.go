@@ -16,7 +16,6 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
-	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
 	. "github.com/hschmale16/the_final_stockbot/internal/m"
 	"golang.org/x/text/message"
 
@@ -149,7 +148,7 @@ func SetupServer() {
 	})
 
 	faq.SetupRoutes(app)
-	lobbying.SetupRoutes(app)
+	// lobbying.SetupRoutes(app)
 	congress.SetupRoutes(app)
 
 	app.Listen(":8080")
