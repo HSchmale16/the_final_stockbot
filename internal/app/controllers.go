@@ -206,6 +206,13 @@ func TagDataList(c *fiber.Ctx) error {
 		Limit(10).
 		Find(&tags)
 
+	db.Create(&SearchQuery{
+		Query:      c.FormValue("search"),
+		NumResults: len(tags),
+		IpAddr:     c.IP(),
+		UserAgent:  c.Get("User-Agent"),
+	})
+
 	return c.Render("htmx/tag_datalist", fiber.Map{
 		"Tags": tags,
 	})
@@ -247,8 +254,7 @@ func Index(c *fiber.Ctx) error {
 		"PublicLaws":    Public,
 		"HouseRes":      HouseRes,
 		"SenateRes":     SenateRes,
-		// "Laws":        recentLaws,
-		"SearchValue": c.FormValue("search"),
+		"SearchValue":   c.FormValue("search"),
 	}, "layouts/main")
 }
 
