@@ -38,7 +38,7 @@
 
 <body>
     {{> 'page-parts/header' }}
-    <main class="container mx-auto">
+    <main class="{{#unless FullBody}}container mx-auto{{/unless}}">
         {{ embed }}
     </main>
     {{> 'page-parts/footer' }}

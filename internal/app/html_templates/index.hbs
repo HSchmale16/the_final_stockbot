@@ -1,4 +1,4 @@
-<div class="prose-xl">
+<div class="container mx-auto prose-xl">
     <h1>Watch Our Congress! Help Keep Them Clean and Accountable!</h1>
     <p>
         There is a constant outflow of bills from congress.
@@ -14,7 +14,7 @@
 
 {{> 'partials/congress-network' }}
 
-<div class="mt-12">
+<div class="mt-12 container mx-auto">
     <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
 
         {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags Img="/static/img/chat-balloons.png"}}
@@ -25,43 +25,42 @@
 
 <hr />
 
-<h3>
-    Search Topics &amp; Bills
-    <span class="htmx-indicator">
-        <img src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
-    </span>
-</h3>
-<p>Search for the topics most important to you! Also search for the bills that matter to your community by title</p>
-<input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
-    placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
-    hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
+<div class="container mx-auto prose-xl" id="search-section">
+    <h3>
+        Search Topics &amp; Bills
+        <span class="htmx-indicator">
+            <img class="inline m-1" src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
+        </span>
+    </h3>
+    <p>Search for the topics most important to you! Also search for the bills that matter to your community by title</p>
+    <input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
+        placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
+        hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
 
-<div id="search-results"></div>
+    <div class="w-11/12 mx-auto" id="search-results"></div>
 
-<hr />
-
-<h2>View Recent Proposals &amp; Actions by Congress</h2>
-<p>
-    View the most recent activities and conversations by various topics. Below we have broken out the most recent public
-    laws, and
-    appropration bills. We also have the most recent bills and resolutions from the House and Senate.
-</p>
-
-<p>
-    Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
-</p>
-
-<div class="md:columns-3 prose-xl">
-    {{> 'partials/law-col' Title="Recent Appropriations" Laws=Approprations}}
-    {{> 'partials/law-col' Title="Public Laws" Laws=PublicLaws}}
-    {{> 'partials/law-col' Title="House Bills" Laws=House}}
-    {{> 'partials/law-col' Title="Senate Bills" Laws=Senate}}
-    {{> 'partials/law-col' Title="House Resolutions" Laws=HouseRes}}
-    {{> 'partials/law-col' Title="Senate Resolutions" Laws=SenateRes}}
+    <hr />
 </div>
 
+<div class="container mx-auto prose-xl">
+    <h2>View Recent Proposals &amp; Actions by Congress</h2>
+    <p>
+        View the most recent activities and conversations by various topics. Below we have broken out the most recent
+        public
+        laws, and
+        appropration bills. We also have the most recent bills and resolutions from the House and Senate.
+    </p>
 
-{{!--
+    <p>
+        Find out what matters congress is discussing and how it fits into your life and even the bigger picture.
+    </p>
 
-<h3>Recent Bills and Laws</h3>
-{{> 'partials/law-list' EnableLoad=true}} --}}
+    <div class="md:columns-3">
+        {{> 'partials/law-col' Title="Recent Appropriations" Laws=Approprations}}
+        {{> 'partials/law-col' Title="Public Laws" Laws=PublicLaws}}
+        {{> 'partials/law-col' Title="House Bills" Laws=House}}
+        {{> 'partials/law-col' Title="Senate Bills" Laws=Senate}}
+        {{> 'partials/law-col' Title="House Resolutions" Laws=HouseRes}}
+        {{> 'partials/law-col' Title="Senate Resolutions" Laws=SenateRes}}
+    </div>
+</div>
