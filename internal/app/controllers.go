@@ -242,7 +242,7 @@ func Index(c *fiber.Ctx) error {
 		"Approprations": Approprations,
 		"House":         House,
 		"Senate":        Senate,
-		"Public":        Public,
+		"PublicLaws":    Public,
 		"HouseRes":      HouseRes,
 		"SenateRes":     SenateRes,
 		// "Laws":        recentLaws,
