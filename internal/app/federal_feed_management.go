@@ -346,7 +346,7 @@ func HandleLawRss(rssLink string, ch LawRssItemChannel) {
 		// }
 		// fmt.Println(FullTextUrl, DescriptiveUrl)
 
-		datetime, err := ParseDateTimeRssRobustly(item.Published)
+		datetime, err := henry_groq.ParseDateTimeRssRobustly(item.Published)
 		if err != nil {
 			fmt.Println("Failed to parse datetime:", err)
 			return

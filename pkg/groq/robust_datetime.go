@@ -1,4 +1,4 @@
-package app
+package henry_groq
 
 import (
 	"errors"
@@ -15,6 +15,8 @@ var datetimeLayouts = []string{
 	"2006-01-02T15:04:05.000Z07:00",   // ISO8601 with milliseconds
 	"Mon, 02 Jan 2006 15:04:05 -0700", // RSS 2.0 spec
 	"Mon, 02 Jan 2006 15:04:05 MST",   // RSS 2.0 spec alternative
+	"2006-01-02",
+	"01/02/2006",
 }
 
 // parseDatetime attempts to parse a datetime string using known layouts

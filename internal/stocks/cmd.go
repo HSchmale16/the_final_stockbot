@@ -2,6 +2,7 @@ package stocks
 
 import (
 	"archive/zip"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -167,7 +168,49 @@ Parse it into the following structure:
 		panic(err)
 	}
 
-	fmt.Println(resp.Choices[0].Message.Content)
+	//fmt.Println(resp.Choices[0].Message.Content)
+
+	// Grab all content between the triple backticks
+	content := resp.Choices[0].Message.Content
+	// Find first ```
+	start := strings.Index(content, "```")
+	// Find second ```
+	end := strings.LastIndex(content, "```")
+	// Grab the content between the two backticks
+	jsonContent := strings.TrimLeft(content[start+3:end], "json")
+
+	var output GroqTranactionOutput
+	err = json.Unmarshal([]byte(jsonContent), &output)
+	if err != nil {
+		fmt.Println(jsonContent)
+		panic(err)
+	}
+
+	for _, transaction := range output.Transactions {
+		var trans FinTransaction
+		// Parse to a time.Time
+		tm, err := henry_groq.ParseDateTimeRssRobustly(transaction.Date)
+		if err != nil {
+			panic(err)
+		}
+		trans.Date = tm
+		trans.Stock = transaction.Stock
+		trans.Company = transaction.Company
+		trans.Description = transaction.Description
+		trans.AmountCategory = transaction.Amount
+		trans.FilingStatus = transaction.FilingStatus
+		trans.CapGainsGreater200 = transaction.CapGainsGreaterThan200
+		trans.FinDisclosureDocumentID = t.ID
+
+		db.Create(&trans)
+		if db.Error != nil {
+			panic(db.Error)
+		}
+	}
+
+	t.Processed = true
+	db.Save(&t)
+
 }
 
 func ProcessBatchOfDocuments(db *gorm.DB) {
@@ -182,5 +225,19 @@ func ProcessBatchOfDocuments(db *gorm.DB) {
 			}
 			return nil
 		})
+}
 
+type GroqTranactionOutput struct {
+	IPO          bool
+	Transactions []Transaction
+}
+
+type Transaction struct {
+	Date                   string
+	Stock                  string
+	Company                string
+	Description            string
+	Amount                 string
+	FilingStatus           string `json:"filing_status"`
+	CapGainsGreaterThan200 bool   `json:"cap_gains_greater_than_200"`
 }
