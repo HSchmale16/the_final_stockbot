@@ -95,7 +95,7 @@ func CallGroqChatApi(model Model, systemPrompt, userData string) (GroqChatComple
 				"content": userData,
 			},
 		},
-		"max_tokens": 2048,
+		"max_tokens": 4096,
 		// "response_format": map[string]interface{}{
 		// 	"type": "json_object",
 		// },
