@@ -22,7 +22,7 @@ type FinDisclosureDocument struct {
 	MemberId sql.NullString
 	Filing
 
-	Processed bool
+	Processed string // status of processing
 
 	Member DB_CongressMember
 }

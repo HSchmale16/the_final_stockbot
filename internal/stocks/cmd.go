@@ -135,6 +135,12 @@ func ProcessTransactionsForTarget(t FinDisclosureDocument, db *gorm.DB) {
 	text := string(textBytes)
 	// Do something with the parsed text
 	fmt.Println(text)
+	if len(text) < 200 {
+		// Update status to hand-written
+		t.Processed = "H"
+		db.Save(&t)
+		return
+	}
 
 	model := henry_groq.Llama3_1_Vers
 
@@ -208,14 +214,14 @@ Parse it into the following structure:
 		}
 	}
 
-	t.Processed = true
+	t.Processed = "T"
 	db.Save(&t)
 
 }
 
 func ProcessBatchOfDocuments(db *gorm.DB) {
 	var docs []FinDisclosureDocument
-	db.Debug().Where("processed = ?", false).
+	db.Debug().Where("processed = ?", "0").
 		Where("filing_type = ?", "P").
 		Where("member_id is not NULL").
 		FindInBatches(&docs, 5, func(tx *gorm.DB, batch int) error {
