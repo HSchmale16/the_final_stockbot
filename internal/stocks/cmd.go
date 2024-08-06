@@ -142,7 +142,7 @@ func ProcessTransactionsForTarget(t FinDisclosureDocument, db *gorm.DB) {
 
 	Ensure any json printed is in the code block backticks.
 
-The most important items to extract are the transaction date, the stock, the description and the amount.
+The most important items to extract are the transaction date, the stock, the description and the amount. There might be 2 dates in a single transaction. We only care about the earlier date. 
 
 Parse it into the following structure:
 
