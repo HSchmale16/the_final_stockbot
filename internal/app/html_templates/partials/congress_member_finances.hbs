@@ -1,7 +1,23 @@
 <h3>Finances</h3>
 
-<ul>
-    {{#each Orgs }}
-    <li>{{ this }}</li>
-    {{/each}}
-</ul>
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Filing Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each Disclosures }}
+        <tr>
+            <td>{{Year}}</td>
+            <td>{{FilingType}}</td>
+            <td>
+                <a href="https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/{{ Year }}/{{ DocId }}.pdf">
+                    {{ DocId }}
+                </a>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

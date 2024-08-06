@@ -28,6 +28,7 @@
           - goaccess
           - prometheus
           - node-npm
+          - poppler-utils
         state: present
         update_cache: true
     - name: Configure Firewall

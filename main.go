@@ -11,6 +11,7 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/stocks"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"github.com/robfig/cron/v3"
 )
@@ -29,8 +30,10 @@ var doSenateLobbyingMain = false
 var committeesFile = ""
 var committeeMembershipsFile = ""
 var script = false
+var file = ""
 
 func init() {
+	flag.StringVar(&file, "file", "", "some file to load")
 	flag.BoolVar(&script, "script", false, "Run a script")
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
 	flag.BoolVar(&disableFetcherService, "disable-fetcher", false, "Disable the fetcher service")
@@ -48,9 +51,16 @@ func init() {
 func main() {
 	flag.Parse()
 
+	db, err := m.SetupDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if script {
 		// Run a random task
-		app.DoTagUpdates()
+		//app.DoTagUpdates()
+		//stocks.LoadDocuments(file)
+		stocks.ProcessBatchOfDocuments(db)
 		return
 	}
 
@@ -80,10 +90,6 @@ func main() {
 	}
 
 	if loadCclFile != "" {
-		db, err := m.SetupDB()
-		if err != nil {
-			log.Fatal(err)
-		}
 		x := fecwrangling.LoadLinkageZipFile(loadCclFile)
 
 		for i := range x {
@@ -94,26 +100,13 @@ func main() {
 	}
 
 	if scanLawText {
-		db, err := m.SetupDB()
-		if err != nil {
-			log.Fatal(err)
-		}
 		app.LOAD_Members_Mods_2_RSS(db)
 		return
 	}
 
 	if loadCongressMembers {
-		db, err := m.SetupDB()
-		if err != nil {
-			log.Fatal(err)
-		}
 		app.LOAD_MEMBERS_JSON(db, congMemberFile)
 		return
-	}
-
-	_, err := m.SetupDB()
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	if !disableFetcherService {

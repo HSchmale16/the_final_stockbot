@@ -1,8 +1,8 @@
-<div class="grid grid-cols-4 container mx-auto">
+<div class="grid md:grid-cols-4 container mx-auto">
     {{!-- Radio Buttons for House or Senate per bootstrap --}}
     <div class="col">
         <div class="btn-group" role="group">
-            <button type="button" class="btn text-xl p-2 btn-outline-primary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-blue-200 shadow-md btn-lg" onclick="setChamber('H')" aria-pressed="{{selectedChamber 'H'}}">House</button>
+            <button type="button" class="btn text-xl p-2 btn-outline-primary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-blue-200 shadow-md btn-lg" onclick="setChamber('H')" aria-pressed="{{selectedChamber 'H'}}" aria-selected="true">House</button>
 
             <button type="button" class="btn text-xl p-2 btn-outline-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-blue-200 shadow-md btn-lg" onclick="setChamber('S')" aria-pressed="{{selectedChamber 'S'}}">Senate</button>
         </div>

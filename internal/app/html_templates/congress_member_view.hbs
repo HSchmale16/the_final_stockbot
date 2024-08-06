@@ -2,7 +2,7 @@
     <h1>{{ Member.Name }}</h1>
 
     <div class="grid grid-cols-2">
-        <div class="col-md-4">
+        <div class="">
             <h3>Bio Information</h3>
             Born: {{#if Member.CongressMemberInfo.Bio.Birthday}}
                 {{ formatDate Member.CongressMemberInfo.Bio.Birthday }}
@@ -10,7 +10,7 @@
                 Not Available
             {{/if}}
         </div>
-        <div class="col-md-8">
+        <div class="">
             <h3>Terms</h3>
             <ul>
             {{#each Member.CongressMemberInfo.Terms }}
@@ -31,6 +31,10 @@
             <li><a href="/committee/{{ Committee.ThomasId}}">{{ Committee.Name }}</a></li>
             {{/each}}
         </ul>
+    </div>
+
+    <div class="row" hx-get="/congress-member/{{ Member.BioGuideId }}/finances" hx-trigger="load">
+
     </div>
 
     <div class="row">

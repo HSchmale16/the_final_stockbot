@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	henry_groq "github.com/hschmale16/the_final_stockbot/pkg/groq"
 	"golang.org/x/exp/slices"
 )
 
@@ -42,7 +43,7 @@ func DoTagUpdates() {
 func GetAiOneLine(name string) string {
 	SYS := `The user will provide a tag. You must describe what it means and provide a very short description about what it is. Keep it extremely short.`
 
-	x, err := CallGroqChatApi(Gemma_7b, SYS, name)
+	x, err := henry_groq.CallGroqChatApi(henry_groq.Gemma_7b, SYS, name)
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +67,7 @@ Print only the category.
 For example, israel is a country
 The president is a person.`
 
-	x, err := CallGroqChatApi(Gemma_7b, SYS, name)
+	x, err := henry_groq.CallGroqChatApi(henry_groq.Gemma_7b, SYS, name)
 	if err != nil {
 		panic(err)
 	}

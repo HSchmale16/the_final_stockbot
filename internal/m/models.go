@@ -282,8 +282,8 @@ func SetupDB() (*gorm.DB, error) {
 			SlowThreshold:             100 * time.Millisecond, // Slow SQL threshold
 			LogLevel:                  logger.Silent,          // Log level
 			IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
-			ParameterizedQueries:      true,                   // Don't include params in the SQL log
-			Colorful:                  false,                  // Disable color
+			ParameterizedQueries:      false,                  // Don't include params in the SQL log
+			Colorful:                  true,                   // Disable color
 		},
 	)
 
@@ -333,6 +333,14 @@ func SetupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	// Register additional models
+	for i, m := range additionalModels {
+		log.Printf("Registering model %d: %T", i, m)
+		if err := db.Debug().AutoMigrate(m); err != nil {
+			return nil, err
+		}
+	}
+
 	// Check if some full text search tables exist
 	if !db.Migrator().HasTable("fts_law_title") {
 		log.Print("Creating FTS table")
@@ -358,4 +366,14 @@ func GetTag(db *gorm.DB, tagName string) Tag {
 	// fmt.Println("Tag:", tagName, " --> ", tag)
 
 	return tag
+}
+
+var additionalModels = make([]interface{}, 0)
+
+func RegisterModels(models ...interface{}) {
+	additionalModels = append(additionalModels, models...)
+
+	for i, m := range additionalModels {
+		log.Printf("Registering model %d: %T", i, m)
+	}
 }

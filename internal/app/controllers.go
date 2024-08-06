@@ -18,6 +18,7 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	. "github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/stocks"
 	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
@@ -148,6 +149,7 @@ func SetupServer() {
 	faq.SetupRoutes(app)
 	// lobbying.SetupRoutes(app)
 	congress.SetupRoutes(app)
+	stocks.SetupRoutes(app)
 
 	err = app.Listen(":8080")
 	if err != nil {

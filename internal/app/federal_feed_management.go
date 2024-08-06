@@ -14,6 +14,7 @@ import (
 	"gorm.io/gorm"
 
 	. "github.com/hschmale16/the_final_stockbot/internal/m"
+	henry_groq "github.com/hschmale16/the_final_stockbot/pkg/groq"
 )
 
 var RssLinks = []string{
@@ -210,11 +211,11 @@ func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 
 	textOffset := 0
 	for _, chunk := range ChunkTextIntoTokenBlocks(item.Text, 1000, 500) {
-		var response GroqChatCompletion
+		var response henry_groq.GroqChatCompletion
 		var err error
 		for i := 0; i < 3; i++ {
-			model := Llama3_8B
-			response, err = CallGroqChatApi(model, GetPrompt().PromptText, chunk)
+			model := henry_groq.Llama3_8B
+			response, err = henry_groq.CallGroqChatApi(model, GetPrompt().PromptText, chunk)
 			if err == nil {
 				break
 			}

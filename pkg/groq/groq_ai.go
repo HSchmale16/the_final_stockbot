@@ -1,4 +1,4 @@
-package app
+package henry_groq
 
 import (
 	"bytes"
@@ -12,10 +12,11 @@ import (
 type Model string
 
 const (
-	Llama3_70B   Model = "llama3-70b-8192"
-	Llama3_8B    Model = "llama3-8b-8192"
-	Mixtral_8x7b Model = "mixtral-8x7b-32768"
-	Gemma_7b     Model = "gemma-7b-it"
+	Llama3_70B    Model = "llama3-70b-8192"
+	Llama3_1_Vers Model = "llama-3.1-70b-versatile"
+	Llama3_8B     Model = "llama3-8b-8192"
+	Mixtral_8x7b  Model = "mixtral-8x7b-32768"
+	Gemma_7b      Model = "gemma-7b-it"
 
 	// Begin Vultr Models
 	Mistral_7b_Q5  Model = "mistral-7b-Q5_K_M.gguf"
