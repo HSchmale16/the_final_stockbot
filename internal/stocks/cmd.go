@@ -150,6 +150,8 @@ func ProcessTransactionsForTarget(t FinDisclosureDocument, db *gorm.DB) {
 
 The most important items to extract are the transaction date, the stock, the description and the amount. There might be 2 dates in a single transaction. We only care about the earlier date. 
 
+Keep descriptions relatively short. No more than 80 characters.
+
 Parse it into the following structure:
 
 {
