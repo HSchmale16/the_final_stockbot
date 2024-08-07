@@ -23,6 +23,23 @@ func init() {
 func SetupRoutes(app *fiber.App) {
 	// Setup the routes
 	app.Get("/htmx/congress-member/:id/travel", GetTravelDisclosures)
+	app.Get("/htmx/recent-gift-travel", GetRecentGiftTravel)
+}
+
+func GetRecentGiftTravel(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	// Get the travel disclosures
+	var disclosures []DB_TravelDisclosure
+	db.
+		Order("departure_date DESC").
+		Preload("Member").
+		Limit(10).
+		Find(&disclosures)
+
+	return c.Render("recent_gift_travel", fiber.Map{
+		"GiftTravel": disclosures,
+	})
 }
 
 func GetTravelDisclosures(c *fiber.Ctx) error {

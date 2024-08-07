@@ -1,0 +1,22 @@
+<table>
+    <thead>
+        <tr>
+            <th>Congress Member</th>
+            <th>Destination</th>
+            <th>Departure Date</th>
+            <th>Return Date</th>
+            <th>Sponsor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each GiftTravel }}
+        <tr>
+            <td><a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a></td>
+            <td>{{ this.Destination }}</td>
+            <td>{{ formatDate this.DepartureDate }}</td>
+            <td>{{ formatDate this.ReturnDate }}</td>
+            <td>{{ this.TravelSponsor }}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
