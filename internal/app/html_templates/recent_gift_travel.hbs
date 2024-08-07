@@ -10,7 +10,7 @@
     </thead>
     <tbody>
         {{#each GiftTravel }}
-        <tr>
+        <tr class="table-row-striped">
             <td><a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a></td>
             <td>{{ this.Destination }}</td>
             <td>{{ formatDate this.DepartureDate }}</td>
