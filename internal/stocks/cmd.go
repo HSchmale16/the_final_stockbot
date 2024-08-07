@@ -185,6 +185,13 @@ Parse it into the following structure:
 	// Find second ```
 	end := strings.LastIndex(content, "```")
 	// Grab the content between the two backticks
+	if end <= start || (end-start) < 100 {
+		// Update status to hand-written
+		t.Processed = "H"
+		db.Save(&t)
+		return
+	}
+
 	jsonContent := strings.TrimLeft(content[start+3:end], "json")
 
 	var output GroqTranactionOutput
