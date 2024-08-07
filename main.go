@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	_ "net/http/pprof"
 	"time"
@@ -11,8 +12,9 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
-	"github.com/hschmale16/the_final_stockbot/internal/stocks"
+	"github.com/hschmale16/the_final_stockbot/internal/travel"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
+	"github.com/hschmale16/the_final_stockbot/pkg/utils"
 	"github.com/robfig/cron/v3"
 )
 
@@ -60,7 +62,10 @@ func main() {
 		// Run a random task
 		//app.DoTagUpdates()
 		//stocks.LoadDocuments(file)
-		stocks.ProcessBatchOfDocuments(db)
+		// stocks.ProcessBatchOfDocuments(db)
+		utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
+			travel.LoadXml(rc, db)
+		})
 		return
 	}
 

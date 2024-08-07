@@ -1,0 +1,27 @@
+<h2>Gifted Travel</h2>
+
+<p>
+    Congress members can be gifted travel to learn about the topics important to their constituints. 
+    This can also be an obvious source of corruption, and an opportunity for some quid pro quo.
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Departure Date</th>
+            <th>Return Date</th>
+            <th>Destination</th>
+            <th>Sponsor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each GiftTravel }}
+        <tr>
+            <td>{{ formatDate DepartureDate }}</td>
+            <td>{{ formatDate ReturnDate }}</td>
+            <td>{{ Destination }}</td>
+            <td>{{ TravelSponsor }}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

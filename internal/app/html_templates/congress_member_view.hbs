@@ -32,6 +32,7 @@
             {{/each}}
         </ul>
     </div>
+    <div class="row" hx-get="/htmx/congress-member/{{ Member.BioGuideId }}/travel" hx-trigger="load"></div>
 
     {{!-- <div class="row" hx-get="/congress-member/{{ Member.BioGuideId }}/finances" hx-trigger="load"></div> --}}
 

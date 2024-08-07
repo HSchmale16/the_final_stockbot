@@ -1,7 +1,6 @@
 package stocks
 
 import (
-	"archive/zip"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -15,29 +14,6 @@ import (
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"gorm.io/gorm"
 )
-
-func LoadDocuments(filePath string) {
-	// Open the zip file
-	r, err := zip.OpenReader(filePath)
-	if err != nil {
-		panic(err)
-	}
-	defer r.Close()
-
-	// Iterate through the files in the archive, find the xml file and open it
-	for _, f := range r.File {
-		if strings.HasSuffix(f.Name, ".xml") {
-			rc, err := f.Open()
-			if err != nil {
-				panic(err)
-			}
-			defer rc.Close()
-
-			// Do something with the xml file
-			ReadDocumentUploads(rc)
-		}
-	}
-}
 
 func ReadDocumentUploads(rc io.ReadCloser) {
 	decoder := xml.NewDecoder(rc)
