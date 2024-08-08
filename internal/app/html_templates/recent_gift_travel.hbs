@@ -4,7 +4,7 @@
     <div class="prose">
         <h3>Top Destinations</h3>
         <p>
-            It's funny what the actual top destinations are for congress people to get gifted travel to. 
+            It's funny what the actual top destinations are for congress people to get gifted travel to.
             Very rarely into their own states and often to a party!
         </p>
         <ol>
@@ -19,10 +19,23 @@
 
 
     <div class="col-span-3">
+        <blockquote>
+            <p>
+                In accordance with House Rule 25 of the 115th Congress, Members, officers, and staff must file reports
+                which detail travel-related expenses reimbursed by non-government sources and charitable contributions
+                made in lieu of honoraria (a payment for services that do not have a set fee).
+            </p>
+
+            <p>Section 304 of the Honest Leadership and Open Government Act of 2007 requires the Office of the Clerk to
+                make travel disclosure reports received during the past six years available to the public on the
+                internet.
+            </p>
+        </blockquote>
         <table>
             <thead>
                 <tr>
                     <th>Congress Member</th>
+                    <th>Document Filer</th>
                     <th>Destination</th>
                     <th>Departure Date</th>
                     <th>Return Date</th>
@@ -36,6 +49,9 @@
                         <a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a> -
                         {{ firstChar this.Member.Party }} -
                         {{ this.Member.State }}
+                    </td>
+                    <td>
+                        {{ FilerName }}
                     </td>
                     <td>{{ this.Destination }}</td>
                     <td>{{ formatDate this.DepartureDate }}</td>

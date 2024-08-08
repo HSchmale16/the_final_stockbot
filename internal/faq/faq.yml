@@ -143,3 +143,12 @@
     answer: |
       You can find out who your senators are by visiting the <a href="https://www.senate.gov/states/statesmap.htm">Senate State Map</a> website and selecting your state from the map image.
     slug: "how-do-i-find-out-who-my-senators-are"
+  - question: "What are the gift rules for senators?"
+    slug: "what-are-the-gift-rules-for-senators"
+    answer: >
+      The Senate has strict rules governing the acceptance of gifts by senators. Senators are prohibited
+      from accepting gifts from lobbyists, foreign agents, or anyone seeking official action from the Senate. 
+      Senators are also prohibited from accepting gifts that are worth more than $50, with some exceptions.
+      Senators are required to disclose any gifts that they receive that are worth more than $335.
+      The gift rules are intended to prevent conflicts of interest and ensure that senators act in the best interests of the public.
+      You can find out more from the <a href="https://www.ethics.senate.gov/public/index.cfm/gifts">official senate ethics website</a>.

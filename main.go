@@ -64,7 +64,8 @@ func main() {
 		//stocks.LoadDocuments(file)
 		// stocks.ProcessBatchOfDocuments(db)
 		utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
-			travel.LoadXml(rc, db)
+			travel.LoadHouseXml(rc, db)
+			// travel.LoadSenateXml(rc, db)
 		})
 		return
 	}

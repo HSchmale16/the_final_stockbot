@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"strconv"
 )
 
 type US_CongressLegislator struct {
@@ -18,6 +19,47 @@ type US_CongressLegislator struct {
 		Gender   string `json:"gender"`
 	} `json:"bio"`
 	Terms []Terms `json:"terms"`
+}
+
+func (l US_CongressLegislator) ServedDuringYear(year int) bool {
+	for _, term := range l.Terms {
+		start, err := parseYear(term.Start)
+		if err != nil {
+			continue
+		}
+		end, err := parseYear(term.End)
+		if err != nil {
+			continue
+		}
+		if start <= year && year <= end {
+			return true
+		}
+	}
+	return false
+}
+
+func (l US_CongressLegislator) ServedAsDuringYear(role string, year int) bool {
+	for _, term := range l.Terms {
+		start, err := parseYear(term.Start)
+		if err != nil {
+			continue
+		}
+		end, err := parseYear(term.End)
+		if err != nil {
+			continue
+		}
+		if start <= year && year <= end && term.Type == role {
+			return true
+		}
+	}
+	return false
+}
+
+/**
+ * Grabs the year from a date string formatted as YYYY-MM-DD
+ */
+func parseYear(date string) (int, error) {
+	return strconv.Atoi(date[:4])
 }
 
 // Implement the scanner interface for US_CongressLegislators

@@ -5,11 +5,25 @@
     This can also be an obvious source of corruption, and an opportunity for some quid pro quo.
 </p>
 
+<blockquote>
+    <p>
+        In accordance with House Rule 25 of the 115th Congress, Members, officers, and staff must file reports
+        which detail travel-related expenses reimbursed by non-government sources and charitable contributions
+        made in lieu of honoraria (a payment for services that do not have a set fee).
+    </p>
+
+    <p>Section 304 of the Honest Leadership and Open Government Act of 2007 requires the Office of the Clerk to
+        make travel disclosure reports received during the past six years available to the public on the
+        internet.
+    </p>
+</blockquote>
+
 {{#if GiftTravel}}
 
 <table>
     <thead>
         <tr>
+            <th>Filer Name</th>
             <th>Departure Date</th>
             <th>Return Date</th>
             <th>Destination</th>
@@ -19,9 +33,12 @@
     <tbody>
         {{#each GiftTravel }}
         <tr class="table-row-striped">
+            <td>{{ FilerName }}</td>
             <td>{{ formatDate DepartureDate }}</td>
             <td>{{ formatDate ReturnDate }}</td>
-            <td>{{ Destination }}</td>
+            <td>
+                <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
+            </td>
             <td>{{ TravelSponsor }}</td>
             {{!-- <td>{{ FilingType }}</td> --}}
         </tr>

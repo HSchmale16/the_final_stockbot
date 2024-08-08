@@ -4,11 +4,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"net/url"
+	"log"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
 )
@@ -19,79 +19,6 @@ We are wrangling the travel disclosures of the congress critters.
 
 func init() {
 	m.RegisterModels(&DB_TravelDisclosure{})
-}
-
-func SetupRoutes(app *fiber.App) {
-	// Setup the routes
-	app.Get("/htmx/congress-member/:id/travel", GetTravelDisclosures)
-	app.Get("/htmx/recent-gift-travel", GetRecentGiftTravel)
-	app.Get("/travel-by-destination/:destination", GetTravelByDestination)
-}
-
-func GetTravelByDestination(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	destination, err := url.PathUnescape(c.Params("destination"))
-	if err != nil {
-		return c.Status(400).SendString("Invalid destination")
-	}
-	// Get the travel disclosures
-	var disclosures []DB_TravelDisclosure
-	db.
-		Where("destination = ?", destination).
-		Order("departure_date DESC").
-		Preload("Member").
-		Find(&disclosures)
-
-	return c.Render("recent_gift_travel", fiber.Map{
-		"Title":      "Gifted Travel to " + destination,
-		"GiftTravel": disclosures,
-	}, "layouts/main")
-}
-
-func GetRecentGiftTravel(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	// Get the travel disclosures
-	var disclosures []DB_TravelDisclosure
-	db.
-		Order("departure_date DESC").
-		Preload("Member").
-		Limit(10).
-		Find(&disclosures)
-
-	var topDestinations []struct {
-		Destination string
-		Count       int
-	}
-	db.Table("db_travel_disclosures").
-		Select("destination, count(destination) as count").
-		Group("destination").
-		Order("count DESC").
-		Limit(10).
-		Scan(&topDestinations)
-
-	return c.Render("recent_gift_travel", fiber.Map{
-		"GiftTravel":      disclosures,
-		"TopDestinations": topDestinations,
-	})
-}
-
-func GetTravelDisclosures(c *fiber.Ctx) error {
-	// Get the member id
-	memberId := c.Params("id")
-	db := c.Locals("db").(*gorm.DB)
-
-	// Get the travel disclosures
-	var disclosures []DB_TravelDisclosure
-	db.
-		Where("member_id = ?", memberId).
-		Order("departure_date DESC").
-		Find(&disclosures)
-
-	return c.Render("travel_disclosures", fiber.Map{
-		"GiftTravel": disclosures,
-	})
 }
 
 type TravelDisclosure struct {
@@ -113,8 +40,13 @@ type DB_TravelDisclosure struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	DocId         string
+	// Where the travel disclosure came from
+	Src string
+
+	// A doc id to prevent duplicates. Comes from upstream
+	DocId         string `gorm:"index"`
 	FilerName     string
+	MemberName    string
 	Year          string
 	FilingType    string
 	DepartureDate time.Time
@@ -122,11 +54,22 @@ type DB_TravelDisclosure struct {
 	Destination   string
 	TravelSponsor string
 
-	MemberId string
+	// These fields only appear on senate filings
+	DateRecieved    time.Time
+	TransactionDate time.Time
+
+	// A url to download the original document from
+	DocURL string
+
+	MemberId string `gorm:"index"`
 	Member   m.DB_CongressMember
 }
 
-func LoadXml(rc io.ReadCloser, db *gorm.DB) {
+func (d DB_TravelDisclosure) TableName() string {
+	return "travel_disclosures"
+}
+
+func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {
 	// Parse the XML file
 	decoder := xml.NewDecoder(rc)
 	for {
@@ -141,19 +84,63 @@ func LoadXml(rc io.ReadCloser, db *gorm.DB) {
 				decoder.DecodeElement(&disclosure, &se)
 				fmt.Println(disclosure)
 
+				if disclosure.State == "" {
+					// Skip no state disclosure
+					continue
+				}
+
+				// Check for duplicates by doc id
+				var count int64
+				db.Model(&DB_TravelDisclosure{}).Where("doc_id = ?", disclosure.DocId).Count(&count)
+				if count > 0 {
+					fmt.Println("Skipping duplicate", disclosure.DocId)
+					continue
+				}
+
 				arr := strings.Split(disclosure.MemberName, ",")
-				last := strings.Trim(arr[0], " ")
-				first := strings.Trim(arr[1], " ")
+				last := strings.Trim(arr[0], " .")
+				first := strings.Trim(arr[1], " .")
+
+				// split the first name and use the longer value
+				splitFirst := strings.Split(first, " ")
+				if len(splitFirst) > 1 {
+					if len(splitFirst[0]) > len(splitFirst[1]) {
+						first = splitFirst[0]
+					} else {
+						first = splitFirst[1]
+					}
+				}
 
 				// Find the congress member
+				var members []m.DB_CongressMember
 				var member m.DB_CongressMember
-				db.
-					Where("name LIKE '%' || ? || '%'", last).
-					Where("name LIKE '%' || ? || '%'", first).
-					First(&member)
+
+				// Special case for Steve Watkins
+				if first == "Steven" {
+					first = "Steve"
+				}
+
+				rpStr := "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, 'á', 'a'), 'ó', 'o'), 'ú', 'u'), 'é', 'e'), '’', ''''), '’', ''''), 'í', 'i')"
+
+				// Really stupid answer to the problem of accented characters
+				db.Debug().
+					Where(rpStr+" LIKE '%' || ? || '%'", last).
+					Where(rpStr+" LIKE '%' || ? || '%'", first).
+					Find(&members)
+
+				if len(members) == 1 {
+					member = members[0]
+				} else if len(members) > 1 {
+					for _, m := range members {
+						year, _ := strconv.Atoi(disclosure.Year)
+						if m.CongressMemberInfo.ServedDuringYear(year) {
+							member = m
+						}
+					}
+				}
 
 				if member.BioGuideId == "" {
-					fmt.Println("Could not find member", disclosure.MemberName)
+					log.Fatal("Could not find member", disclosure.MemberName)
 					continue
 				}
 
@@ -170,18 +157,12 @@ func LoadXml(rc io.ReadCloser, db *gorm.DB) {
 					continue
 				}
 
-				// Check for duplicates by doc id
-				var count int64
-				db.Model(&DB_TravelDisclosure{}).Where("doc_id = ?", disclosure.DocId).Count(&count)
-				if count > 0 {
-					fmt.Println("Skipping duplicate", disclosure.DocId)
-					continue
-				}
-
 				// Create the disclosure
 				db.Create(&DB_TravelDisclosure{
+					Src:           "house",
 					DocId:         disclosure.DocId,
 					FilerName:     disclosure.FilerName,
+					MemberName:    disclosure.MemberName,
 					Year:          disclosure.Year,
 					FilingType:    disclosure.FilingType,
 					DepartureDate: departureDate,
@@ -194,4 +175,158 @@ func LoadXml(rc io.ReadCloser, db *gorm.DB) {
 			}
 		}
 	}
+}
+
+func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) {
+	decoder := xml.NewDecoder(rc)
+	for {
+		t, _ := decoder.Token()
+		if t == nil {
+			break
+		}
+
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "dbo.filer" {
+				var filer senateFilerXml
+				decoder.DecodeElement(&filer, &se)
+
+				loadSenateFiler(db, filer)
+
+			}
+		}
+	}
+}
+
+func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
+	filerName := filer.FirstName + " " + filer.LastName
+
+	// fmt.Println(filerName, senator)
+
+	for _, office := range filer.Office {
+		senator := office.OfficeName
+
+		last, first := m.SplitName(senator)
+
+		var member m.DB_CongressMember
+		query1 := db.Model(&m.DB_CongressMember{}).
+			Where("json_extract(congress_member_info, '$.terms[#-1].type') = ?", "sen").
+			Where("UPPER(name) LIKE '%' || ? || '%'", last)
+		var cnt int64
+		query1.Count(&cnt)
+		fmt.Println(cnt)
+		if cnt > 1 {
+			both := query1.Where("UPPER(name) LIKE '%' || ? || '%'", first)
+			both.Count(&cnt)
+			fmt.Println(cnt)
+			if cnt > 1 {
+				// Print all records found
+				var members []m.DB_CongressMember
+				both.Find(&members)
+				for _, m := range members {
+					// Scan manually to see if we can find a year between them
+					// fmt.Println(m.BioGuideId, m.Name, m.CongressMemberInfo.ServedDuringYear(2021))
+					if m.CongressMemberInfo.ServedDuringYear(2021) {
+						member = m
+					}
+				}
+				if member.BioGuideId == "" {
+					log.Fatal("Could not find member ", senator)
+				}
+			} else if cnt == 1 {
+				both.First(&member)
+			}
+		} else if cnt == 1 {
+			query1.First(&member)
+		}
+
+		if cnt == 0 {
+			fmt.Println("Could not find member", senator)
+			continue
+		}
+
+		if member.BioGuideId == "" {
+			log.Fatal("Could not find member ", senator)
+		}
+
+		fmt.Println(senator, member.BioGuideId)
+
+		for _, doc := range office.Documents {
+			// Check for duplicates by doc id
+			var count int64
+			db.Model(&DB_TravelDisclosure{}).Where("doc_id = ?", doc.Reports[0].DocURL).Count(&count)
+			if count > 0 {
+				log.Println("Skipping duplicate", doc.Reports[0].DocURL)
+				continue
+			}
+			if len(doc.Reports) > 1 {
+				log.Fatal("Multiple reports for a single document")
+			}
+
+			// Parse the dates
+			departureDate, err := time.Parse("01/02/2006", doc.BeginTravelDate)
+			if err != nil {
+				log.Fatal("Error parsing departure date", doc.BeginTravelDate, err)
+			}
+			returnDate, err := time.Parse("01/02/2006", doc.EndTravelDate)
+			if err != nil {
+				log.Fatal("Error parsing return date", doc.EndTravelDate, err)
+			}
+			transactionDate, err := time.Parse("01/02/2006", doc.TransactionDate)
+			if err != nil {
+				log.Fatal("Error parsing transaction date", doc.TransactionDate, err)
+			}
+			recvDate, err := time.Parse("01/02/2006", doc.DateRecieved)
+			if err != nil {
+				log.Fatal("Error parsing received date", doc.DateRecieved, err)
+			}
+
+			x := DB_TravelDisclosure{
+				Src:             "senate",
+				FilerName:       filerName,
+				MemberName:      senator,
+				Year:            doc.Year,
+				DocId:           doc.Reports[0].DocURL,
+				DocURL:          doc.Reports[0].DocURL,
+				FilingType:      doc.Reports[0].ReportTitle,
+				DepartureDate:   departureDate,
+				ReturnDate:      returnDate,
+				TransactionDate: transactionDate,
+				DateRecieved:    recvDate,
+				MemberId:        member.BioGuideId,
+			}
+
+			db.Create(&x)
+		}
+	}
+
+}
+
+type senateFilerXml struct {
+	FirstName string `xml:"FirstName,attr"`
+	LastName  string `xml:"LastName,attr"`
+
+	Office []senateOfficeXml `xml:"dbo.Office"`
+}
+
+type senateOfficeXml struct {
+	OfficeName string `xml:"OfficeName,attr"`
+
+	Documents []senateDocumentXml `xml:"dbo.Document"`
+}
+
+type senateDocumentXml struct {
+	Year            string `xml:"ReportingYear,attr"`
+	BeginTravelDate string `xml:"BeginTravelDate,attr"`
+	EndTravelDate   string `xml:"EndTravelDate,attr"`
+	DateRecieved    string `xml:"DateReceived,attr"`
+	TransactionDate string `xml:"TransactionDate,attr"`
+	Pages           string `xml:"Pages,attr"`
+
+	Reports []senateReportXml `xml:"dbo.Reports"`
+}
+
+type senateReportXml struct {
+	ReportTitle string `xml:"ReportTitle,attr"`
+	DocURL      string `xml:"DocURL,attr"`
 }

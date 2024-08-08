@@ -7,6 +7,8 @@ import (
 
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
+	"github.com/ncruces/go-sqlite3"
+	"github.com/ncruces/go-sqlite3/driver"
 	_ "github.com/ncruces/go-sqlite3/embed"
 	"github.com/ncruces/go-sqlite3/gormlite"
 	"golang.org/x/text/cases"
@@ -279,20 +281,27 @@ func SetupDB() (*gorm.DB, error) {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
-			SlowThreshold:             100 * time.Millisecond, // Slow SQL threshold
-			LogLevel:                  logger.Silent,          // Log level
-			IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
-			ParameterizedQueries:      false,                  // Don't include params in the SQL log
-			Colorful:                  true,                   // Disable color
+			SlowThreshold:             70 * time.Millisecond, // Slow SQL threshold
+			LogLevel:                  logger.Silent,         // Log level
+			IgnoreRecordNotFoundError: true,                  // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      false,                 // Don't include params in the SQL log
+			Colorful:                  true,                  // Disable color
 		},
 	)
 
-	// Globally mode
-	// db, err := gorm.Open(sqlite.Open("congress.sqlite"), &gorm.Config{
-	// 	Logger:      newLogger,
-	// 	PrepareStmt: true,
-	// })
-	db, err := gorm.Open(gormlite.Open("congress.sqlite"), &gorm.Config{
+	conn, err := driver.Open("congress.sqlite", func(conn *sqlite3.Conn) error {
+		// err := unicode.Register(conn)
+		// if err != nil {
+		// 	return err
+		// }
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := gorm.Open(gormlite.OpenDB(conn), &gorm.Config{
 		Logger:      newLogger,
 		PrepareStmt: true,
 	})
