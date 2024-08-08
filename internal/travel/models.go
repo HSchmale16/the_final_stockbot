@@ -37,8 +37,20 @@ func GetRecentGiftTravel(c *fiber.Ctx) error {
 		Limit(10).
 		Find(&disclosures)
 
+	var topDestinations []struct {
+		Destination string
+		Count       int
+	}
+	db.Table("db_travel_disclosures").
+		Select("destination, count(destination) as count").
+		Group("destination").
+		Order("count DESC").
+		Limit(10).
+		Scan(&topDestinations)
+
 	return c.Render("recent_gift_travel", fiber.Map{
-		"GiftTravel": disclosures,
+		"GiftTravel":      disclosures,
+		"TopDestinations": topDestinations,
 	})
 }
 
