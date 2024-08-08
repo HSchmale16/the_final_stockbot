@@ -1,7 +1,9 @@
 <h2>Gifted Travel</h2>
 
+
+{{#if GiftTravel}}
 <p>
-    Congress members can be gifted travel to learn about the topics important to their constituints. 
+    Congress members can be gifted travel to learn about the topics important to their constituints.
     This can also be an obvious source of corruption, and an opportunity for some quid pro quo.
 </p>
 
@@ -26,3 +28,11 @@
         {{/each}}
     </tbody>
 </table>
+
+{{else}}
+
+<p>
+    There is no recent gifted travel to report. Seems this one is clean for gifted travel.
+</p>
+
+{{/if}}
