@@ -1,5 +1,6 @@
 <div class="grid md:grid-cols-4">
 
+    {{#if TopDestinations }}
     <div class="prose">
         <h3>Top Destinations</h3>
         <p>
@@ -8,10 +9,14 @@
         </p>
         <ol>
             {{#each TopDestinations }}
-            <li>{{ Destination }}</li>
+            <li>
+                <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
+            </li>
             {{/each}}
         </ol>
     </div>
+    {{/if}}
+
 
     <div class="col-span-3">
         <table>
@@ -27,7 +32,11 @@
             <tbody>
                 {{#each GiftTravel }}
                 <tr class="table-row-striped">
-                    <td><a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a></td>
+                    <td>
+                        <a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a> -
+                        {{ firstChar this.Member.Party }} -
+                        {{ this.Member.State }}
+                    </td>
                     <td>{{ this.Destination }}</td>
                     <td>{{ formatDate this.DepartureDate }}</td>
                     <td>{{ formatDate this.ReturnDate }}</td>
@@ -37,7 +46,6 @@
             </tbody>
         </table>
     </div>
-
 
 
 </div>

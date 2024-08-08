@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"time"
 
@@ -24,6 +25,28 @@ func SetupRoutes(app *fiber.App) {
 	// Setup the routes
 	app.Get("/htmx/congress-member/:id/travel", GetTravelDisclosures)
 	app.Get("/htmx/recent-gift-travel", GetRecentGiftTravel)
+	app.Get("/travel-by-destination/:destination", GetTravelByDestination)
+}
+
+func GetTravelByDestination(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	destination, err := url.PathUnescape(c.Params("destination"))
+	if err != nil {
+		return c.Status(400).SendString("Invalid destination")
+	}
+	// Get the travel disclosures
+	var disclosures []DB_TravelDisclosure
+	db.
+		Where("destination = ?", destination).
+		Order("departure_date DESC").
+		Preload("Member").
+		Find(&disclosures)
+
+	return c.Render("recent_gift_travel", fiber.Map{
+		"Title":      "Gifted Travel to " + destination,
+		"GiftTravel": disclosures,
+	}, "layouts/main")
 }
 
 func GetRecentGiftTravel(c *fiber.Ctx) error {
