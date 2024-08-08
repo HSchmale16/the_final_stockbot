@@ -53,7 +53,9 @@
                     <td>
                         {{ FilerName }}
                     </td>
-                    <td>{{ this.Destination }}</td>
+                    <td>
+                        <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
+                    </td>
                     <td>{{ formatDate this.DepartureDate }}</td>
                     <td>{{ formatDate this.ReturnDate }}</td>
                     <td>{{ this.TravelSponsor }}</td>
