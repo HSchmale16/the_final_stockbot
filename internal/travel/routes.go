@@ -1,6 +1,7 @@
 package travel
 
 import (
+	"log"
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +13,32 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/htmx/congress-member/:id/travel", GetTravelDisclosures)
 	app.Get("/htmx/recent-gift-travel", GetRecentGiftTravel)
 	app.Get("/travel-by-destination/:destination", GetTravelByDestination)
+	app.Get("/htmx/top-destinations", GetTopDestinations)
+}
+
+func GetTopDestinations(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var topDestinations []struct {
+		Destination string
+		Count       int
+	}
+	x := db.Table("travel_disclosures").
+		Select("destination, count(destination) as count").
+		Where("destination != ''").
+		Group("destination").
+		Order("count DESC").
+		Limit(15).
+		Scan(&topDestinations)
+
+	if x.Error != nil {
+		log.Default().Print(x.Error)
+		return x.Error
+	}
+
+	return c.Render("htmx/top_destinations", fiber.Map{
+		"TopDestinations": topDestinations,
+	})
 }
 
 func GetTravelByDestination(c *fiber.Ctx) error {
@@ -29,8 +56,9 @@ func GetTravelByDestination(c *fiber.Ctx) error {
 		Preload("Member").
 		Find(&disclosures)
 
-	return c.Render("recent_gift_travel", fiber.Map{
+	return c.Render("htmx/recent_gift_travel", fiber.Map{
 		"Title":      "Gifted Travel to " + destination,
+		"PageTitle":  "Gifted Travel to " + destination,
 		"GiftTravel": disclosures,
 	}, "layouts/main")
 }
@@ -46,20 +74,8 @@ func GetRecentGiftTravel(c *fiber.Ctx) error {
 		Limit(10).
 		Find(&disclosures)
 
-	var topDestinations []struct {
-		Destination string
-		Count       int
-	}
-	db.Table("db_travel_disclosures").
-		Select("destination, count(destination) as count").
-		Group("destination").
-		Order("count DESC").
-		Limit(15).
-		Scan(&topDestinations)
-
-	return c.Render("recent_gift_travel", fiber.Map{
-		"GiftTravel":      disclosures,
-		"TopDestinations": topDestinations,
+	return c.Render("htmx/recent_gift_travel", fiber.Map{
+		"GiftTravel": disclosures,
 	})
 }
 

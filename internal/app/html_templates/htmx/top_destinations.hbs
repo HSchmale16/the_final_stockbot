@@ -1,0 +1,16 @@
+{{#if TopDestinations }}
+<div class="prose">
+    <h3>Top Destinations</h3>
+    <p>
+        It's funny what the actual top destinations are for congress people to get gifted travel to.
+        Very rarely into their own states and often to a party!
+    </p>
+    <ol>
+        {{#each TopDestinations }}
+        <li>
+            <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
+        </li>
+        {{/each}}
+    </ol>
+</div>
+{{/if}}

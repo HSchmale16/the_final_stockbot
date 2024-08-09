@@ -1,22 +1,10 @@
+{{#if PageTitle}}
+{{> 'partials/title_heading' title=PageTitle subtitle=Subtitle }}
+{{/if}}
+
 <div class="grid md:grid-cols-4">
 
-    {{#if TopDestinations }}
-    <div class="prose">
-        <h3>Top Destinations</h3>
-        <p>
-            It's funny what the actual top destinations are for congress people to get gifted travel to.
-            Very rarely into their own states and often to a party!
-        </p>
-        <ol>
-            {{#each TopDestinations }}
-            <li>
-                <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
-            </li>
-            {{/each}}
-        </ol>
-    </div>
-    {{/if}}
-
+    <div hx-get="/htmx/top-destinations" hx-trigger="load"></div>
 
     <div class="col-span-3">
         <blockquote>
@@ -34,7 +22,10 @@
         <table>
             <thead>
                 <tr>
+                    <th>Member Type</th>
                     <th>Congress Member</th>
+                    <th>Party</th>
+                    <th>State</th>
                     <th>Document Filer</th>
                     <th>Destination</th>
                     <th>Departure Date</th>
@@ -45,11 +36,18 @@
             <tbody>
                 {{#each GiftTravel }}
                 <tr class="table-row-striped">
-                    <td>
-                        <a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a> -
-                        {{ firstChar this.Member.Party }} -
-                        {{ this.Member.State }}
+                    <td class="px-4 py-2">
+                        {{#if this.Member.IsSenator }}
+                        <span class="badge bg-blue-500 ">Senator</span>
+                        {{else}}
+                        <span class="badge bg-gray-500">Representative</span>
+                        {{/if}}
                     </td>
+                    <td>
+                        <a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a>
+                    </td>  
+                    <td>{{ firstChar this.Member.Party }}</td>
+                    <td>{{ this.Member.State }}</td>
                     <td>
                         {{ FilerName }}
                     </td>
@@ -64,6 +62,4 @@
             </tbody>
         </table>
     </div>
-
-
 </div>
