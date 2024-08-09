@@ -29,6 +29,10 @@
   .badge a {
     @apply text-white no-underline
   }
+
+  .horizontal-party-bar {
+    @apply flex align-center shadow-lg;
+  }
 }
 
 
