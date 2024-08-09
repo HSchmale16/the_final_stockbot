@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +15,40 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/htmx/recent-gift-travel", GetRecentGiftTravel)
 	app.Get("/travel-by-destination/:destination", GetTravelByDestination)
 	app.Get("/htmx/top-destinations", GetTopDestinations)
+	app.Get("/htmx/travel/committee/:committee", GetTravelByCommittee)
+}
+
+func GetTravelByCommittee(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	committee, err := url.PathUnescape(c.Params("committee"))
+	if err != nil {
+		return c.Status(400).SendString("Invalid committee")
+	}
+
+	var committeeDB m.DB_CongressCommittee
+	db.Find(&committeeDB, "thomas_id = ?", committee)
+
+	// Get the travel disclosures
+	var disclosures []DB_TravelDisclosure
+	errDb := db.
+		Joins("JOIN db_committee_memberships ON db_committee_memberships.db_congress_member_bio_guide_id = travel_disclosures.member_id").
+		Where("db_committee_memberships.db_congress_committee_thomas_id = ?", committeeDB.ThomasId).
+		Order("departure_date DESC").
+		Preload("Member").
+		Limit(75).
+		Find(&disclosures)
+
+	if errDb.Error != nil {
+		log.Default().Print(errDb.Error)
+		return c.Status(400).SendString("Invalid things")
+	}
+
+	return c.Render("htmx/travel_list", fiber.Map{
+		"Title":      "Gifted Travel for " + committeeDB.Name,
+		"PageTitle":  "Gifted Travel for " + committeeDB.Name,
+		"GiftTravel": disclosures,
+	})
 }
 
 func GetTopDestinations(c *fiber.Ctx) error {
