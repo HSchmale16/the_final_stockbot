@@ -31,7 +31,7 @@
   }
 
   .horizontal-party-bar {
-    @apply flex align-center shadow-lg;
+    @apply flex shadow-lg;
   }
 }
 
