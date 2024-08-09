@@ -1,5 +1,5 @@
-<div class="prose">
-    <h1>{{ Committee.Name }}</h1>
+<div class="prose-xl">
+    {{> 'partials/title_heading' title=Committee.Name }}
 
     <blockquote>
         <p>{{ Committee.Jurisdiction }}</p>
@@ -14,7 +14,7 @@
     <h2>Membership</h2>
 
     {{> 'partials/committee-party-bar' Committee=Committee }}
-    <ul class="member-list">
+    <ul class="md:columns-2">
         {{#each Committee.Memberships }}
         <li class="{{ CongressMember.Role }}">
             <a href="/congress-member/{{CongressMember.BioGuideId}}">{{> 'partials/member-name' Member=CongressMember }}</a>
@@ -23,6 +23,11 @@
         {{/each}}
     </ul>
     {{/if}}
+
+    <div hx-get="/travel/committee/{{ Committee.ThomasId }}" hx-trigger="load">
+        <h2>Travel</h2>
+        <p>Loading...</p>
+    </div>
 
 
     {{#if Committee.GovtRssItems }}
@@ -42,7 +47,7 @@
         <h4>Membership</h4>
         {{> 'partials/committee-party-bar' Committee=this }}
 
-        <ul class="member-list">
+        <ul class="md:columns-2">
             {{#each Memberships }}
             <li class="{{ CongressMember.Role}}">
                 <a href="/congress-member/{{CongressMember.BioGuideId}}">{{> 'partials/member-name' Member=CongressMember }}</a>
