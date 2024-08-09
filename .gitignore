@@ -2,6 +2,8 @@ the_final_stockbot
 *.out
 
 # Database stuff
+# just a backup and export file I use to move things back and forth
+data.sql 
 *.db
 *.sqlite*
 DOWNLOAD_MODELS/*
