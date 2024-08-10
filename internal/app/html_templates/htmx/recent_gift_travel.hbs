@@ -19,47 +19,6 @@
                 internet.
             </p>
         </blockquote>
-        <table class="travel-tbl">
-            <thead>
-                <tr>
-                    <th>Member Type</th>
-                    <th>Congress Member</th>
-                    <th>Party</th>
-                    <th>State</th>
-                    <th>Document Filer</th>
-                    <th>Destination</th>
-                    <th>Departure Date</th>
-                    <th>Return Date</th>
-                    <th>Sponsor</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each GiftTravel }}
-                <tr class="table-row-striped">
-                    <td class="px-4 py-2">
-                        {{#if this.Member.IsSenator }}
-                        <span class="badge bg-blue-500 ">Senator</span>
-                        {{else}}
-                        <span class="badge bg-gray-500">Representative</span>
-                        {{/if}}
-                    </td>
-                    <td>
-                        <a href="/congress-member/{{this.MemberId}}">{{ this.Member.Name }}</a>
-                    </td>  
-                    <td>{{ firstChar this.Member.Party }}</td>
-                    <td>{{ this.Member.State }}</td>
-                    <td>
-                        {{ FilerName }}
-                    </td>
-                    <td>
-                        <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
-                    </td>
-                    <td>{{ formatDate this.DepartureDate }}</td>
-                    <td>{{ formatDate this.ReturnDate }}</td>
-                    <td>{{ this.TravelSponsor }}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
+        {{> 'htmx/travel_list' GiftTravel=GiftTravel }}
     </div>
 </div>
