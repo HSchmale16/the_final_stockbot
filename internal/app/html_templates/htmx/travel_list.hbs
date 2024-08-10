@@ -48,24 +48,4 @@
 
 <div id="grid"></div>
 
-<script type="module">
-    import {
-        Grid,
-        html
-    } from "https://unpkg.com/gridjs?module";
-
-
-    (function() {
-        console.log('hello world')
-        let x = document.getElementsByClassName('dc-dt');
-        let tbl = new Grid({
-            from: x[0],
-            pagination: true,
-            search: true
-        })
-
-        tbl.render(document.getElementById('grid'));
-
-        console.log(tbl);
-    })();
-</script>
+{{> 'scripts/sorttable' }}
