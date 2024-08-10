@@ -422,7 +422,13 @@ func CongressMemberList(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var members []DB_CongressMember
-	db.Find(&members)
+	state := c.Query("state")
+
+	if state != "" {
+		db.Where("json_extract(congress_member_info, '$.terms[#-1].state') = ?", state).Find(&members)
+	} else {
+		db.Find(&members)
+	}
 
 	// Partition the members by being active
 	// TODO: Expose more of the terms via the sql database

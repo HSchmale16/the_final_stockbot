@@ -210,7 +210,7 @@ func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
 
 		var member m.DB_CongressMember
 		query1 := db.Model(&m.DB_CongressMember{}).
-			Where("json_extract(congress_member_info, '$.terms[#-1].type') = ?", "sen").
+			Where("json_extract(congress_member_info, '$.terms[#-1].state') = ?", "sen").
 			Where("UPPER(name) LIKE '%' || ? || '%'", last)
 		var cnt int64
 		query1.Count(&cnt)
