@@ -444,10 +444,15 @@ func CongressMemberList(c *fiber.Ctx) error {
 		return activeMembers[i].State() < activeMembers[j].State()
 	})
 
+	title := "Current Congress Members"
+	if state != "" {
+		title = "Current Congress Members from " + state
+	}
+
 	return c.Render("congress_member_list", fiber.Map{
 		"ActiveMembers": activeMembers,
 		"Description":   "A list of the current congress members",
-		"Title":         "Current Congress Members",
+		"Title":         title,
 	}, "layouts/main")
 }
 
