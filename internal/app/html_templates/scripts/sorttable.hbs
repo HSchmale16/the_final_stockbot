@@ -9,9 +9,13 @@
 
         new gridjs.Grid({
             sort: true,
+            {{#if search }}
+            search: true,
+            {{/if}}
             columns: Array.from(source.querySelectorAll('thead th')).map(th => th.textContent).map(head => ({
                 name: head,
                 formatter: (cell) => gridjs.html(cell),
+
                 sort: {
                     compare: (a, b) => {
                         var strip = (str) => new DOMParser().parseFromString(str, 'text/html').body.textContent || '',

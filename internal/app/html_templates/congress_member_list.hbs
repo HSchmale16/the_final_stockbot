@@ -1,7 +1,7 @@
 {{> 'partials/title_heading' title="Current Members of Congress" subtitle="The 117th Congress" }}
 
 
-<table class="table-auto w-full sortable">
+<table class="source">
     <thead class="">
         <tr>
             <th>Role</th>
@@ -13,7 +13,7 @@
     </thead>
     <tbody>
         {{#each ActiveMembers}}
-        <tr class="table-row-striped">
+        <tr>
             <td class="px-4 py-2">
                 {{#if this.IsSenator }}
                 <span class="badge bg-blue-500 ">Senator</span>
@@ -36,4 +36,6 @@
 </table>
 </div>
 
-<script src="/static/js/sorttable.js"></script>
+<div class="target"></div>
+
+{{> 'scripts/sorttable' search=true }}
