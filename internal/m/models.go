@@ -274,6 +274,25 @@ func (CongressMemberSponsored) TableName() string {
 
 ///////////////////////////////////////////////////////////////////
 
+type FeedbackItem struct {
+	ID        uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	Name    string
+	Email   string
+	Url     string
+	Message string
+
+	Status string `gorm:"default:'unanswered'"`
+}
+
+func (f FeedbackItem) TableName() string {
+	return "feedback_items"
+}
+
+///////////////////////////////////////////////////////////////////
+
 /**
  * Sets up the stupid database
  */
@@ -326,7 +345,7 @@ func SetupDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&FederalRegisterItem{}); err != nil {
+	if err := db.AutoMigrate(&FederalRegisterItem{}, &FeedbackItem{}); err != nil {
 		return nil, err
 	}
 

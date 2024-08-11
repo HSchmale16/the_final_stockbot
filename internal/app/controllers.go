@@ -17,6 +17,7 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	. "github.com/hschmale16/the_final_stockbot/internal/m"
 	"github.com/hschmale16/the_final_stockbot/internal/stocks"
 	"github.com/hschmale16/the_final_stockbot/internal/travel"
@@ -95,6 +96,21 @@ func SetupServer() {
 	app.Get("/", Index)
 	app.Get("/tags", TagList)
 	app.Get("/tag/:tag_id", TagIndex)
+
+	app.Post("/feedback", func(c *fiber.Ctx) error {
+		db := c.Locals("db").(*gorm.DB)
+
+		feedback := m.FeedbackItem{
+			Name:    c.FormValue("name"),
+			Email:   c.FormValue("email"),
+			Message: c.FormValue("message"),
+			Url:     c.FormValue("url"),
+		}
+
+		db.Create(&feedback)
+
+		return c.Status(200).SendString("Your response has been recorded")
+	})
 
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/htmx/tag-datalist", TagDataList)
