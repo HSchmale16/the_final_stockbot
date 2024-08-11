@@ -110,7 +110,7 @@ func SetupServer() {
 		}
 
 		// check if any of the above mentioned fields are blank
-		if feedback.Name == "" || feedback.Email == "" || feedback.Message == "" {
+		if feedback.Name == "" || feedback.Message == "" {
 			return c.Status(400).SendString("All fields are required")
 		}
 
