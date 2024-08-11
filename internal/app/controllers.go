@@ -97,27 +97,7 @@ func SetupServer() {
 	app.Get("/tags", TagList)
 	app.Get("/tag/:tag_id", TagIndex)
 
-	app.Post("/feedback", func(c *fiber.Ctx) error {
-		db := c.Locals("db").(*gorm.DB)
-
-		feedback := m.FeedbackItem{
-			Name:      c.FormValue("name"),
-			Email:     c.FormValue("email"),
-			Message:   c.FormValue("message"),
-			Url:       c.FormValue("url"),
-			UserAgent: c.Get("User-Agent"),
-			IpAddr:    c.IP(),
-		}
-
-		// check if any of the above mentioned fields are blank
-		if feedback.Name == "" || feedback.Message == "" {
-			return c.Status(400).SendString("All fields are required")
-		}
-
-		db.Create(&feedback)
-
-		return c.Status(200).SendString("<p>Your response has been recorded</p>")
-	})
+	app.Post("/feedback", SubmitFeedback)
 
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/htmx/tag-datalist", TagDataList)
@@ -180,6 +160,28 @@ func SetupServer() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func SubmitFeedback(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	feedback := m.FeedbackItem{
+		Name:      c.FormValue("name"),
+		Email:     c.FormValue("email"),
+		Message:   c.FormValue("message"),
+		Url:       c.FormValue("url"),
+		UserAgent: c.Get("User-Agent"),
+		IpAddr:    c.IP(),
+	}
+
+	// check if any of the above mentioned fields are blank
+	if feedback.Name == "" || feedback.Message == "" {
+		return c.Status(400).SendString("All fields are required")
+	}
+
+	db.Create(&feedback)
+
+	return c.Status(200).SendString("<p>Your response has been recorded</p>")
 }
 
 func RelatedLaws(c *fiber.Ctx) error {
