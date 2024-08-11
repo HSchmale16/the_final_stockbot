@@ -101,10 +101,12 @@ func SetupServer() {
 		db := c.Locals("db").(*gorm.DB)
 
 		feedback := m.FeedbackItem{
-			Name:    c.FormValue("name"),
-			Email:   c.FormValue("email"),
-			Message: c.FormValue("message"),
-			Url:     c.FormValue("url"),
+			Name:      c.FormValue("name"),
+			Email:     c.FormValue("email"),
+			Message:   c.FormValue("message"),
+			Url:       c.FormValue("url"),
+			UserAgent: c.Get("User-Agent"),
+			IpAddr:    c.IP(),
 		}
 
 		db.Create(&feedback)

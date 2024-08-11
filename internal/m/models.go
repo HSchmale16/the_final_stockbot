@@ -279,10 +279,12 @@ type FeedbackItem struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Name    string
-	Email   string
-	Url     string
-	Message string
+	Name      string
+	Email     string
+	Url       string
+	Message   string
+	UserAgent string
+	IpAddr    string
 
 	Status string `gorm:"default:'unanswered'"`
 }
