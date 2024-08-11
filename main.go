@@ -31,7 +31,9 @@ var loadCclFile = ""
 var doSenateLobbyingMain = false
 var committeesFile = ""
 var committeeMembershipsFile = ""
-var script = ""false""
+
+// New things will define a value in my switch case below for a script to run.
+var script = ""
 var file = ""
 
 func init() {
@@ -63,7 +65,7 @@ func main() {
 		//app.DoTagUpdates()
 		//stocks.LoadDocuments(file)
 		// stocks.ProcessBatchOfDocuments(db)
-		switch (script) {
+		switch script {
 		case "house-travel":
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
 				travel.LoadHouseXml(rc, db)
@@ -76,7 +78,6 @@ func main() {
 			break
 		}
 
-		
 		return
 	}
 
