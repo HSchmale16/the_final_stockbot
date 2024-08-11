@@ -111,6 +111,15 @@
         job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html"
         user: root
         state: present
+    - name: Add the house travel disclosure cron job
+      become: true
+      ansible.builtin.cron:
+        name: "Update House Travel Disclosure"
+        day: "*"
+        hour: "1"
+        job: "~{{ service_user_name }}/the_final_stockbot/cron-scripts/house_gift_travel.sh"
+        user: final_stockbot
+        state: present
 
     - name: Add the sitemap generation cron job
       become: true

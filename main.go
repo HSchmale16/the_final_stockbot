@@ -31,12 +31,12 @@ var loadCclFile = ""
 var doSenateLobbyingMain = false
 var committeesFile = ""
 var committeeMembershipsFile = ""
-var script = false
+var script = ""false""
 var file = ""
 
 func init() {
 	flag.StringVar(&file, "file", "", "some file to load")
-	flag.BoolVar(&script, "script", false, "Run a script")
+	flag.StringVar(&script, "script", "", "Run a script")
 	flag.IntVar(&reprocessId, "reprocess", 0, "Reprocess a specific item by ID")
 	flag.BoolVar(&disableFetcherService, "disable-fetcher", false, "Disable the fetcher service")
 	flag.BoolVar(&disableWebServer, "disable-web", false, "Disable the web server")
@@ -58,15 +58,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if script {
+	if script != "" {
 		// Run a random task
 		//app.DoTagUpdates()
 		//stocks.LoadDocuments(file)
 		// stocks.ProcessBatchOfDocuments(db)
-		utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
-			travel.LoadHouseXml(rc, db)
-			// travel.LoadSenateXml(rc, db)
-		})
+		switch (script) {
+		case "house-travel":
+			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
+				travel.LoadHouseXml(rc, db)
+			})
+			break
+		case "senate-travel":
+			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
+				travel.LoadSenateXml(rc, db)
+			})
+			break
+		}
+
+		
 		return
 	}
 
