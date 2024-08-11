@@ -65,17 +65,16 @@ func main() {
 		//app.DoTagUpdates()
 		//stocks.LoadDocuments(file)
 		// stocks.ProcessBatchOfDocuments(db)
+		fmt.Println("Target file is ", file)
 		switch script {
 		case "house-travel":
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
 				travel.LoadHouseXml(rc, db)
 			})
-			break
 		case "senate-travel":
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
 				travel.LoadSenateXml(rc, db)
 			})
-			break
 		}
 
 		return

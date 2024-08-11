@@ -117,10 +117,18 @@
         name: "Update House Travel Disclosure"
         day: "*"
         hour: "1"
-        job: "~{{ service_user_name }}/the_final_stockbot/cron-scripts/house_gift_travel.sh"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/house_gift_travel.sh"
         user: final_stockbot
         state: present
-
+    - name: Add the senate travel disclosure cron job
+      become: true
+      ansible.builtin.cron:
+        name: "Update Senate Travel Disclosure"
+        day: "*"
+        hour: "2"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate_gift_travel.sh"
+        user: final_stockbot
+        state: present
     - name: Add the sitemap generation cron job
       become: true
       ansible.builtin.cron:
