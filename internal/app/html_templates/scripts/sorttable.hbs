@@ -1,11 +1,9 @@
 <script src="/static/js/gridjs.umd.js"></script>
 <script>
 
-    setTimeout(function () {
+    window.addEventListener('load', () => {
         let target = document.querySelector('.target'),
             source = document.querySelector('.source');
-
-        console.log("BULLSHIT")
 
         new gridjs.Grid({
             sort: true,
@@ -36,5 +34,5 @@
 
         // Set source to be display none
         source.style.display = 'none';
-    }, 1500);
+    }) //, 1500);
 </script>
