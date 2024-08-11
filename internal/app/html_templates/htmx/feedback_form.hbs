@@ -1,16 +1,21 @@
 <div id="feedback-form" class="p-4">
-    <form hx-post="/feedback" hx-target="#feedback-form" hx-swap="outerHTML" class="flex flex-col space-y-4">
-        <label for="name">Your name:</label>
-        <input type="text" id="name" name="name" placeholder="Your name" class="p-2 border border-gray-300 rounded-md">
-        
-        <label for="email">Your email (If you want us to reach out):</label>
-        <input type="email" id="email" name="email" placeholder="Your email" class="p-2 border border-gray-300 rounded-md">
-        
-        <label for="message">Your message:</label>
-        <textarea id="message" name="message" placeholder="Your message" class="p-2 border border-gray-300 rounded-md"></textarea>
+    <form hx-post="/feedback" hx-target="#feedback-form" hx-swap="outerHTML" class="flex flex-col space-y-4" >
+        <span id="warning"></span>
 
-        <input name="url" hidden="true" value="{{ Url }}"/>
-        
+        <label for="name">Your name:</label>
+        <input required type="text" id="name" name="name" placeholder="Your name" class="p-2 border border-gray-300 rounded-md">
+
+        <label for="email">Your email (If you want us to reach out):</label>
+        <input type="email" id="email" name="email" placeholder="Your email"
+            class="p-2 border border-gray-300 rounded-md">
+
+        <label for="message">Your message:</label>
+        <textarea required id="message" name="message" placeholder="Your message"
+            class="p-2 border border-gray-300 rounded-md"></textarea>
+
+        <input name="url" hidden="true" value="{{ Url }}" />
+
+
         <button class="p-2 bg-blue-500 text-white rounded-md">Send</button>
     </form>
 </div>

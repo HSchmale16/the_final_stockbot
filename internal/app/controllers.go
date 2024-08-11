@@ -109,6 +109,11 @@ func SetupServer() {
 			IpAddr:    c.IP(),
 		}
 
+		// check if any of the above mentioned fields are blank
+		if feedback.Name == "" || feedback.Email == "" || feedback.Message == "" {
+			return c.Status(400).SendString("All fields are required")
+		}
+
 		db.Create(&feedback)
 
 		return c.Status(200).SendString("Your response has been recorded")
