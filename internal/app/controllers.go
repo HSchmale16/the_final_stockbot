@@ -116,7 +116,7 @@ func SetupServer() {
 
 		db.Create(&feedback)
 
-		return c.Status(200).SendString("Your response has been recorded")
+		return c.Status(200).SendString("<p>Your response has been recorded</p>")
 	})
 
 	app.Get("/htmx/topic-search", TopicSearch)
