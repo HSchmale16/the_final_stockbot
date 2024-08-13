@@ -3,6 +3,8 @@
 <script src="/static/js/d3.v7.min.js?cache-bust={{ CacheBust }}"></script>
 <div id="travelByParty"></div>
 
+<div id="tabs" hx-get="/htmx/travel/who-travels-most/2024" hx-trigger="load delay:100ms" hx-target="#tabs" hx-swap="innerHTML"></div>
+
 <script>
     var margin = { top: 10, right: 30, bottom: 20, left: 50 },
         width = 550 - margin.left - margin.right,
@@ -15,6 +17,15 @@
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add chart title
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 - (margin.top / 2 - 15))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text("Travel by Party Over Years");
 
     fetch("/json/travel-by-party")
         .then(response => response.json())

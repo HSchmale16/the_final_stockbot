@@ -19,11 +19,43 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/htmx/top-destinations", GetTopDestinations)
 	app.Get("/htmx/travel/committee/:committee", GetTravelByCommittee)
 	app.Get("/travel", GetTravelHomepage)
+	app.Get("/htmx/travel/who-travels-most/:year", GetMostTravelTable)
 	app.Get("/json/travel-by-party", GetTravelByParty)
 }
 
 func GetTravelHomepage(c *fiber.Ctx) error {
-	return c.Render("travel_homepage", fiber.Map{}, "layouts/main")
+	return c.Render("travel_homepage", fiber.Map{
+		"Title": "Gifted Travel Disclosures",
+	}, "layouts/main")
+}
+
+func GetMostTravelTable(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	// Get the year
+	year, err := strconv.Atoi(c.Params("year"))
+	if err != nil {
+		return c.Status(400).SendString("Invalid year")
+	}
+
+	var data []struct {
+		DB_TravelDisclosure
+		Count int
+	}
+
+	db.Debug().Model(&DB_TravelDisclosure{}).
+		Where("year = ?", year).
+		Joins("Member").
+		Group("member_id").
+		Select("member_id, Count(*) as count").
+		Order("count DESC").
+		Limit(10).
+		Scan(&data)
+
+	return c.Render("htmx/most_travel_table", fiber.Map{
+		"MostTravel": data,
+		"Years":      []int{2018, 2019, 2020, 2021, 2022, 2023, 2024},
+	})
 }
 
 func GetTravelByParty(c *fiber.Ctx) error {
@@ -35,7 +67,7 @@ func GetTravelByParty(c *fiber.Ctx) error {
 		Count int    `json:"count"`
 	}
 
-	db.Debug().Model(&DB_TravelDisclosure{}).
+	db.Model(&DB_TravelDisclosure{}).
 		Joins("Inner Join congress_member cm ON cm.bio_guide_id = member_id").
 		Group("year, json_extract(congress_member_info, '$.terms[#-1].party')").
 		Select("year, json_extract(congress_member_info, '$.terms[#-1].party') as party, Count(*) as count").
@@ -149,11 +181,6 @@ func GetTravelByDestination(c *fiber.Ctx) error {
 		Order("departure_date DESC").
 		Preload("Member").
 		Find(&disclosures)
-
-	var interfaceDisclosures []interface{}
-	for _, d := range disclosures {
-		interfaceDisclosures = append(interfaceDisclosures, d)
-	}
 
 	PartyBreakdown := m.MakeSponsorshipMap(disclosures, func(i DB_TravelDisclosure) string {
 		return i.Member.Party()

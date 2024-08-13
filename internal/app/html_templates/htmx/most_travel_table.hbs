@@ -1,0 +1,40 @@
+<div id="most-travel-table">
+    <h2>Which Congress Person's Office Received the Most Gifted Travel?</h2>
+
+    <div class="tablist" role="tablist">
+        {{#each Years }}
+        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" aria-selected="false">{{ this }}</button>
+        {{/each}}
+    </div>
+
+    <div id="tab-content" role="tabpanel" class="tab-content">
+        <table>
+            <thead>
+                <tr>
+                    <td>Type</td>
+                    <td>Member</td>
+                    <td>State</td>
+                    <td>Party</td>
+                    <td>Number of Trips</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each MostTravel }}
+                <tr>
+                    <td class="px-4 py-2">
+                        {{#if this.IsSenator }}
+                        <span class="badge bg-blue-500 ">Senator</span>
+                        {{else}}
+                        <span class="badge bg-gray-500">Representative</span>
+                        {{/if}}
+                    </td>
+                    <td>{{ this.Member.Name }}</td>
+                    <td>{{ this.Member.State }}</td>
+                    <td>{{ this.Member.Party }}</td>
+                    <td>{{ this.count }}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
