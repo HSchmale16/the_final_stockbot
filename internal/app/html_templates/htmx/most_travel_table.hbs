@@ -1,40 +1,71 @@
-<div id="most-travel-table">
+<div class="prose-xl">
     <h2>Which Congress Person's Office Received the Most Gifted Travel?</h2>
 
     <div class="tablist" role="tablist">
         {{#each Years }}
-        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" aria-selected="false">{{ this }}</button>
+        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" aria-selected="false"
+            class="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300">{{ this }}</button>
         {{/each}}
     </div>
 
     <div id="tab-content" role="tabpanel" class="tab-content">
-        <table>
+        <table class="min-w-full divide-y divide-gray-200">
             <thead>
                 <tr>
-                    <td>Type</td>
-                    <td>Member</td>
-                    <td>State</td>
-                    <td>Party</td>
-                    <td>Number of Trips</td>
+                    <th scope="col"
+                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Member
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        State
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Party
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Number of Trips
+                    </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="bg-white divide-y divide-gray-200">
                 {{#each MostTravel }}
                 <tr>
-                    <td class="px-4 py-2">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         {{#if this.IsSenator }}
-                        <span class="badge bg-blue-500 ">Senator</span>
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            Senator
+                        </span>
                         {{else}}
-                        <span class="badge bg-gray-500">Representative</span>
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                            Representative
+                        </span>
                         {{/if}}
                     </td>
-                    <td>{{ this.Member.Name }}</td>
-                    <td>{{ this.Member.State }}</td>
-                    <td>{{ this.Member.Party }}</td>
-                    <td>{{ this.count }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="/congress-member/{{ this.Member.BioGuideId}}">{{ this.Member.Name }}</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ this.Member.State }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ this.Member.Party }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        {{ this.count }}
+                    </td>
                 </tr>
                 {{/each}}
             </tbody>
+        </table>
         </table>
     </div>
 </div>
