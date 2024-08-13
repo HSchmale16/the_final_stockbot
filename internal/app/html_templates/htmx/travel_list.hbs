@@ -1,4 +1,4 @@
-{{#if PageTitle }}
+{{#if IncludeTitle }}
 {{> 'partials/title_heading' title=PageTitle }}
 {{/if}}
 
@@ -12,8 +12,8 @@
             <th>State</th>
             <th>Document Filer</th>
             <th>Destination</th>
-            <th>Departure Date</th>
-            <th>Return Date</th>
+            <th dataType="date">Departure Date</th>
+            <th dataType="date">Return Date</th>
             <th>Sponsor</th>
         </tr>
     </thead>

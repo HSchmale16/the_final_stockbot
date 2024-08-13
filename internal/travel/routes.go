@@ -3,6 +3,7 @@ package travel
 import (
 	"log"
 	"net/url"
+	"sort"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,6 +18,59 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/travel-by-destination/:destination", GetTravelByDestination)
 	app.Get("/htmx/top-destinations", GetTopDestinations)
 	app.Get("/htmx/travel/committee/:committee", GetTravelByCommittee)
+	app.Get("/travel", GetTravelHomepage)
+	app.Get("/json/travel-by-party", GetTravelByParty)
+}
+
+func GetTravelHomepage(c *fiber.Ctx) error {
+	return c.Render("travel_homepage", fiber.Map{}, "layouts/main")
+}
+
+func GetTravelByParty(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var data []struct {
+		Year  int    `json:"year"`
+		Party string `json:"party"`
+		Count int    `json:"count"`
+	}
+
+	db.Debug().Model(&DB_TravelDisclosure{}).
+		Joins("Inner Join congress_member cm ON cm.bio_guide_id = member_id").
+		Group("year, json_extract(congress_member_info, '$.terms[#-1].party')").
+		Select("year, json_extract(congress_member_info, '$.terms[#-1].party') as party, Count(*) as count").
+		Scan(&data)
+
+	result := make(map[int]map[string]int)
+
+	for _, d := range data {
+		year := d.Year
+		party := d.Party
+		count := d.Count
+
+		if _, ok := result[year]; !ok {
+			result[year] = make(map[string]int)
+		}
+
+		result[year][party] = count
+	}
+
+	result2 := make([]map[string]interface{}, 0)
+	for year, parties := range result {
+		partyMap := make(map[string]interface{})
+		partyMap["year"] = year
+		for party, count := range parties {
+			partyMap[party] = count
+		}
+		result2 = append(result2, partyMap)
+	}
+
+	// sort by year
+	sort.Slice(result2, func(i, j int) bool {
+		return result2[i]["year"].(int) < result2[j]["year"].(int)
+	})
+
+	return c.JSON(result2)
 }
 
 func GetTravelByCommittee(c *fiber.Ctx) error {

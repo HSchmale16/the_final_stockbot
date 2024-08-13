@@ -5,78 +5,84 @@
         <div class="">
             <h3>Bio Information</h3>
             Born: {{#if Member.CongressMemberInfo.Bio.Birthday}}
-                {{ formatDate Member.CongressMemberInfo.Bio.Birthday }}
+            {{ formatDate Member.CongressMemberInfo.Bio.Birthday }}
             {{else}}
-                Not Available
+            Not Available
             {{/if}}
         </div>
         <div class="">
             <h3>Terms</h3>
             <ul>
-            {{#each Member.CongressMemberInfo.Terms }}
+                {{#each Member.CongressMemberInfo.Terms }}
                 {{#if IsSenator }}
-                    <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Senator - {{ Party }}</li>
+                <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Senator - {{ Party }}</li>
                 {{else}}
-                    <li>{{{ Start }}} to {{{ End }}} for {{ State }}-{{District}} as Representative - {{ Party }}</li>
+                <li>{{{ Start }}} to {{{ End }}} for {{ State }}-{{District}} as Representative - {{ Party }}</li>
                 {{/if}}
-            {{/each}}
+                {{/each}}
             </ul>
         </div>
     </div>
 
     <div class="row">
         <h2>Committees</h2>
+        {{#if Member.Committees }}
         <ul>
             {{#each Member.Committees }}
             <li><a href="/committee/{{ Committee.ThomasId}}">{{ Committee.Name }}</a></li>
             {{/each}}
         </ul>
+        {{else}}
+        <p>This Congressperson is not on any committees at the moment.</p>
+        {{/if}}
     </div>
     <div class="row" hx-get="/htmx/congress-member/{{ Member.BioGuideId }}/travel" hx-trigger="load"></div>
 
     {{!-- <div class="row" hx-get="/congress-member/{{ Member.BioGuideId }}/finances" hx-trigger="load"></div> --}}
 
-    <div class="row">
-        <div class="col-md-8 prose-xl">
-            <h3>Sponsored Bills</h3>
-            {{#each Member.Sponsored }}
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{{ Title }}}</h5>
-                        {{> 'partials/sponsorship-bar' Law=this }}
-                        <p class="card-text">{{{ Metadata.OfficialTitle }}}
+    <div class="prose-xl">
+        <h3>Sponsored Bills</h3>
+        {{#if Member.Sponsored }}
+        {{#each Member.Sponsored }}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{{ Title }}}</h5>
+                {{> 'partials/sponsorship-bar' Law=this }}
+                <p class="card-text">{{{ Metadata.OfficialTitle }}}
 
-                        <a href="/law/{{ ID }}">Read More</a></p>
-                        </p>
-                    </div>
-                </div>
-            {{/each}}
-        </div>    
+                    <a href="/law/{{ ID }}">Read More</a>
+                </p>
+                </p>
+            </div>
+        </div>
+        {{/each}}
+        {{else}}
+        <p>At the moment we haven't indexed any bills sponsored by this member. Check back later to see what they are up
+            to.</p>
+        {{/if}}
     </div>
 
-
+    {{#if Member.Sponsored}}
     <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/works_with" hx-trigger="load">
         <h3>Works With</h3>
     </div>
+    {{/if}}
 
 
 
     <div class="row">
-        <div class="col-md-8">
-            <h3>External Links</h3>
-            <p>Learn more about this Congressperson from External Resources!</p>
-            {{#with Member.CongressMemberInfo.Id }}
-            <ul>
-                <li><a href="https://en.wikipedia.org/wiki/{{ Wikipedia }}">Wikipedia</a></li>
-                <li><a href="https://ballotpedia.org/{{ Ballotpedia }}">Balltopedia</a></li>
-                {{#each Fec }}
-                    <li><a href="https://www.fec.gov/data/candidate/{{ this }}">Federal Election Commission</a></li>
-                {{/each}}
-            </ul>
-            {{/with}}
-        </div>
+        <h3>External Links</h3>
+        <p>Learn more about this Congressperson from External Resources!</p>
+        {{#with Member.CongressMemberInfo.Id }}
+        <ul>
+            <li><a href="https://en.wikipedia.org/wiki/{{ Wikipedia }}">Wikipedia</a></li>
+            <li><a href="https://ballotpedia.org/{{ Ballotpedia }}">Balltopedia</a></li>
+            {{#each Fec }}
+            <li><a href="https://www.fec.gov/data/candidate/{{ this }}">Federal Election Commission</a></li>
+            {{/each}}
+        </ul>
+        {{/with}}
     </div>
 
 
 </div>
-

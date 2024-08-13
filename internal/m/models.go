@@ -44,31 +44,9 @@ type stupidPair struct{ Num, Percent float64 }
 type SponsorshipMap map[string]stupidPair
 
 func (g GovtRssItem) ComputeSponsorship() SponsorshipMap {
-	sponsorship := make(SponsorshipMap)
-
-	for _, sponsor := range g.Sponsors {
-		p := sponsor.Party()
-		entry, ok := sponsorship[p]
-		if ok {
-			entry.Num++
-		} else {
-			entry.Num = 1
-		}
-		sponsorship[p] = entry
-	}
-
-	// Compute Sum
-	sum := 0.0
-	for _, v := range sponsorship {
-		sum += v.Num
-	}
-
-	// Normalize
-	for k, v := range sponsorship {
-		sponsorship[k] = stupidPair{v.Num, v.Num / sum * 100}
-	}
-
-	return sponsorship
+	return MakeSponsorshipMap(g.Sponsors, func(s DB_CongressMember) string {
+		return s.Party()
+	})
 }
 
 func MakeSponsorshipMap[K any](items []K, toString func(K) string) SponsorshipMap {

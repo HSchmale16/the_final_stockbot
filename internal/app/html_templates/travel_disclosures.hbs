@@ -20,7 +20,7 @@
 
 {{#if GiftTravel}}
 
-<table class="travel-tbl">
+<table class="source">
     <thead>
         <tr>
             <th>Filer Name</th>
@@ -28,6 +28,7 @@
             <th>Return Date</th>
             <th>Destination</th>
             <th>Sponsor</th>
+            <th>Link</th>
         </tr>
     </thead>
     <tbody>
@@ -40,12 +41,17 @@
                 <a href="/travel-by-destination/{{ Destination }}">{{ Destination }}</a>
             </td>
             <td>{{ TravelSponsor }}</td>
+            <td>
+                <a target="_blank" href="{{ DocURL }}">Link</a>
+            </td>
             {{!-- <td>{{ FilingType }}</td> --}}
         </tr>
         {{/each}}
     </tbody>
 </table>
+<div class="target"></div>
 
+{{> 'scripts/sorttable' }}
 {{else}}
 
 <p>
