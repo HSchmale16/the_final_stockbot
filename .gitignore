@@ -1,6 +1,8 @@
 the_final_stockbot
 *.out
 
+travel-spend
+
 # Database stuff
 # just a backup and export file I use to move things back and forth
 data.sql 

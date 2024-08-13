@@ -71,6 +71,34 @@ func (g GovtRssItem) ComputeSponsorship() SponsorshipMap {
 	return sponsorship
 }
 
+func MakeSponsorshipMap[K any](items []K, toString func(K) string) SponsorshipMap {
+	sponsorship := make(SponsorshipMap)
+
+	for _, item := range items {
+		str := toString(item)
+		entry, ok := sponsorship[str]
+		if ok {
+			entry.Num++
+		} else {
+			entry.Num = 1
+		}
+		sponsorship[str] = entry
+	}
+
+	// Compute Sum
+	sum := 0.0
+	for _, v := range sponsorship {
+		sum += v.Num
+	}
+
+	// Normalize
+	for k, v := range sponsorship {
+		sponsorship[k] = stupidPair{v.Num, v.Num / sum * 100}
+	}
+
+	return sponsorship
+}
+
 type FederalRegisterItem struct {
 	gorm.Model
 	GovtRssItemId uint

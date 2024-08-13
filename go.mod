@@ -23,6 +23,7 @@ require (
 require (
 	github.com/apache/arrow/go/v14 v14.0.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
@@ -38,6 +39,7 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
+	github.com/tebeka/selenium v0.9.9 // indirect
 	github.com/tetratelabs/wazero v1.7.3 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect

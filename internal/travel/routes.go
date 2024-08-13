@@ -3,6 +3,7 @@ package travel
 import (
 	"log"
 	"net/url"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
@@ -54,6 +55,10 @@ func GetTravelByCommittee(c *fiber.Ctx) error {
 func GetTopDestinations(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
+	// Get limit param
+	limitStr, _ := strconv.Atoi(c.Query("limit"))
+	limit := min(150, max(15, limitStr))
+
 	var topDestinations []struct {
 		Destination string
 		Count       int
@@ -63,7 +68,7 @@ func GetTopDestinations(c *fiber.Ctx) error {
 		Where("destination != ''").
 		Group("destination").
 		Order("count DESC").
-		Limit(15).
+		Limit(limit).
 		Scan(&topDestinations)
 
 	if x.Error != nil {
@@ -91,10 +96,20 @@ func GetTravelByDestination(c *fiber.Ctx) error {
 		Preload("Member").
 		Find(&disclosures)
 
-	return c.Render("htmx/recent_gift_travel", fiber.Map{
-		"Title":      "Gifted Travel to " + destination,
-		"PageTitle":  "Gifted Travel to " + destination,
-		"GiftTravel": disclosures,
+	var interfaceDisclosures []interface{}
+	for _, d := range disclosures {
+		interfaceDisclosures = append(interfaceDisclosures, d)
+	}
+
+	PartyBreakdown := m.MakeSponsorshipMap(disclosures, func(i DB_TravelDisclosure) string {
+		return i.Member.Party()
+	})
+
+	return c.Render("htmx/gift_travel_to_dest", fiber.Map{
+		"Title":          "Gifted Travel to " + destination,
+		"PageTitle":      "Gifted Travel to " + destination,
+		"GiftTravel":     disclosures,
+		"PartyBreakdown": PartyBreakdown,
 	}, "layouts/main")
 }
 

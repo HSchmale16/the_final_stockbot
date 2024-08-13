@@ -1,0 +1,34 @@
+{{#if PageTitle}}
+{{> 'partials/title_heading' title=PageTitle subtitle=Subtitle }}
+{{/if}}
+
+<div class="grid md:grid-cols-4">
+
+    <div hx-get="/htmx/top-destinations?limit=100" hx-trigger="load"></div>
+
+    <div class="col-span-3">
+
+        <blockquote>
+            <p>
+                In accordance with House Rule 25 of the 115th Congress, Members, officers, and staff must file reports
+                which detail travel-related expenses reimbursed by non-government sources and charitable contributions
+                made in lieu of honoraria (a payment for services that do not have a set fee).
+            </p>
+
+            <p>Section 304 of the Honest Leadership and Open Government Act of 2007 requires the Office of the Clerk to
+                make travel disclosure reports received during the past six years available to the public on the
+                internet.
+            </p>
+        </blockquote>
+        
+        <span class="border-text">Party Breakdown</span>
+        <div class="horizontal-party-bar">
+            {{#each PartyBreakdown }}
+            <div class="bar-segment" title="{{this.Num}} {{@key}} on this committee"
+                style="background-color: {{partyColor @key}}; width: {{this.Percent}}%; height: 20px"></div>
+            {{/each}}
+        </div>
+
+        {{> 'htmx/travel_list' GiftTravel=GiftTravel }}
+    </div>
+</div>
