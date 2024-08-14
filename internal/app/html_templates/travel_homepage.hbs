@@ -1,113 +1,17 @@
 {{> 'partials/title_heading' title="Gifted Travel" subtitle="Travel by Party" }}
 
-<p>Travel can be gifted to congress people to learn about new topics or issues affecting their constituients. 
-    This travel can also be to just go party and see the political equivalent of a time share presentation. 
+<p>Travel can be gifted to congress people to learn about new topics or issues affecting their constituients.
+    This travel can also be to just go party and see the political equivalent of a time share presentation.
     In other cases especially with international travel it's about foreign aid.</p>
 
+<div class="flex">
+    <div id="travel-by-party"></div>
+    <div id="days-traveled-by-party"></div>
+</div>
+
+
+<div id="tabs" hx-get="/htmx/travel/who-travels-most/2024" hx-trigger="load delay:100ms" hx-target="#tabs"
+    hx-swap="innerHTML"></div>
+
 <script src="/static/js/d3.v7.min.js?cache-bust={{ CacheBust }}"></script>
-<div id="travelByParty"></div>
-
-<div id="tabs" hx-get="/htmx/travel/who-travels-most/2024" hx-trigger="load delay:100ms" hx-target="#tabs" hx-swap="innerHTML"></div>
-
-<script>
-    var margin = { top: 10, right: 30, bottom: 20, left: 50 },
-        width = 550 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
-
-    var svg = d3.select("#travelByParty")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
-
-        // Add chart title
-        svg.append("text")
-            .attr("x", (width / 2))
-            .attr("y", 0 - (margin.top / 2 - 15))
-            .attr("text-anchor", "middle")
-            .style("font-size", "16px")
-            .style("text-decoration", "underline")
-            .text("Travel by Party Over Years");
-
-    fetch("/json/travel-by-party")
-        .then(response => response.json())
-        .then(data => {
-            // data is a list of objects, each with a year, party and a count
-            // we are rendering a grouped bar chart using d3. Year is the x-axis, count is the y-axis, and party is the grouping
-
-            var subgroups = ['Republican', 'Democrat', 'Independent', 'Libertarian'];
-            var groups = d3.map(data, (d) => d.year).keys();
-
-            var x = d3.scaleBand()
-                .domain(data.map(d => d.year))
-                .range([0, width])
-                .padding(0.2);
-
-
-            svg.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x).tickSize(0));
-
-
-            var y = d3.scaleLinear()
-                .domain([0, 1500])
-                .range([height, 0]);
-            svg.append("g")
-                .call(d3.axisLeft(y).ticks(null, "s"))
-
-            var xSubgroup = d3.scaleBand()
-                .domain(subgroups)
-                .range([0, x.bandwidth()])
-                .padding(0.05);
-
-            var color = d3.scaleOrdinal()
-                .domain(subgroups)
-                .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3']);
-
-            var tooltip = d3.select("body").append("div")
-                .attr("class", "tooltip")
-                .style("position", "absolute")
-                .style("background-color", "white")
-                .style("border", "solid")
-                .style("border-width", "1px")
-                .style("border-radius", "5px")
-                .style("padding", "10px")
-                .style("display", "none");
-
-            // Show the bars
-            svg.append("g")
-                .selectAll("g")
-                // Enter in data = loop group per group
-                .data(data)
-                .enter()
-                .append("g")
-                .attr("transform", function (d) { return "translate(" + x(d.year) + ",0)"; })
-                .selectAll("rect")
-                .data(function (d) { return subgroups.map(function (key) { return { key: key, value: d[key] || 0 }; }); })
-                .enter().append("rect")
-                .attr("x", function (d) { return xSubgroup(d.key); })
-                .attr("y", function (d) { return y(d.value); })
-                .attr("width", xSubgroup.bandwidth())
-                .attr("height", function (d) {
-                    return height - y(d.value);
-                })
-                .attr("fill", function (d) { return color(d.key); })
-                .on("mouseover", function (event, d) {
-                    d3.select(this).attr("fill", d3.rgb(color(d.key)).darker(1));
-                    tooltip.style("display", "block")
-                        .html(`Party: ${d.key}<br>Count: ${d.value}`)
-                        .style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY - 10) + "px");
-                })
-                .on("mouseout", function (event, d) {
-                    d3.select(this).attr("fill", color(d.key));
-                    tooltip.style("display", "none");
-                })
-                .on("mousemove", function (event) {
-                    tooltip.style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY - 10) + "px");
-                });
-        })
-</script>
+<script src="/static/viz-js/travel-by-party.js?cache-bust={{ CacheBust }}"></script>
