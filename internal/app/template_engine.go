@@ -60,7 +60,7 @@ func GetTemplateEngine() fiber.Views {
 		t, err := time.Parse(layout, date)
 		if err != nil {
 			fmt.Println(err)
-			return "FUCK!"
+			return "The date is stupid!"
 		}
 		return t.Format("Jan 2, 2006")
 	})

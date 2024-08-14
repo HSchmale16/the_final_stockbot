@@ -3,8 +3,8 @@
 
     <div class="tablist" role="tablist">
         {{#each Years }}
-        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" aria-selected="false"
-            class="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300">{{ this }}</button>
+        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" aria-selected="{{eqTernary SelectedYear this 'true' 'false'}}"
+            class="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300 {{eqTernary SelectedYear this "underline" ""}}">{{ this }}</button>
         {{/each}}
     </div>
 

@@ -49,12 +49,13 @@ func GetMostTravelTable(c *fiber.Ctx) error {
 		Group("member_id").
 		Select("member_id, Count(*) as count").
 		Order("count DESC").
-		Limit(10).
+		Limit(15).
 		Scan(&data)
 
 	return c.Render("htmx/most_travel_table", fiber.Map{
-		"MostTravel": data,
-		"Years":      []int{2018, 2019, 2020, 2021, 2022, 2023, 2024},
+		"MostTravel":   data,
+		"SelectedYear": year,
+		"Years":        []int{2018, 2019, 2020, 2021, 2022, 2023, 2024},
 	})
 }
 

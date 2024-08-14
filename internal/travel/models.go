@@ -47,7 +47,7 @@ type DB_TravelDisclosure struct {
 	DocId         string `gorm:"index"`
 	FilerName     string
 	MemberName    string
-	Year          string
+	Year          string `gorm:"index"`
 	FilingType    string
 	DepartureDate time.Time
 	ReturnDate    time.Time
