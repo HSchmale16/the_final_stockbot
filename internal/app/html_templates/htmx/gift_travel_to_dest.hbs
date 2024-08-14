@@ -2,11 +2,11 @@
 {{> 'partials/title_heading' title=PageTitle subtitle=Subtitle }}
 {{/if}}
 
-<div class="grid md:grid-cols-4">
+<div class="flex flex-col lg:flex-row">
 
-    <div hx-get="/htmx/top-destinations?limit=100" hx-trigger="load"></div>
+    <div class="w-full lg:w-1/4 bg-gray-200" hx-get="/htmx/top-destinations?limit=100" hx-trigger="load"></div>
 
-    <div class="col-span-3">
+    <div class="w-full lg:w-3/4 bg-white">
 
         <blockquote>
             <p>
@@ -29,6 +29,9 @@
             {{/each}}
         </div>
 
-        {{> 'htmx/travel_list' GiftTravel=GiftTravel }}
+        <div class="overflow-auto">
+            {{> 'htmx/travel_list' GiftTravel=GiftTravel }}
+        </div>
+
     </div>
 </div>
