@@ -26,20 +26,14 @@ func init() {
 
 func RegisterDebugFilePath(path string) {
 	if os.Getenv("DEBUG") == "true" {
+		if strings.HasPrefix(path, "/") {
+			path = path[1:]
+			log.Println("Are you a dumbass we never debug from root? Use a relative path!!!")
+		}
 		log.Println("Registering debug path: ", path)
 		// Convert the path to a fs.FS
 		target1 := os.DirFS(path)
 
-		fs.WalkDir(target1, ".", func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() {
-				return nil
-			}
-			fmt.Println(path)
-			return nil
-		})
 		templatesFS = append(templatesFS, target1)
 	}
 }

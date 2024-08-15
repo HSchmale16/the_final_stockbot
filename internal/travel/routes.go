@@ -26,7 +26,8 @@ func SetupRoutes(app *fiber.App) {
 
 func GetTravelHomepage(c *fiber.Ctx) error {
 	return c.Render("travel_homepage", fiber.Map{
-		"Title": "Gifted Travel Disclosures",
+		"Title":   "Gifted Travel Disclosures",
+		"OgImage": "static/img/og-travel-plots.png",
 	}, "layouts/main")
 }
 

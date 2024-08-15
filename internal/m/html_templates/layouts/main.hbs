@@ -9,7 +9,11 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/static/sitemap.xml">
 
     <meta property="og:title" content="{{ Title }}" />
+    {{#if OgImage }}
+    <meta property="og:image" content="{{ OgImage }}" />
+    {{else}}
     <meta property="og:image" content="/static/img/navbar.png" />
+    {{/fi}}
     <meta property="og:description" content="{{ Description }}" />
     <meta property="og:url" content="{{ Url }}" />
 
