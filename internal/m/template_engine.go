@@ -63,6 +63,8 @@ func getEngine() *handlebars.Engine {
 func GetTemplateEngine() fiber.Views {
 	engine := getEngine()
 
+	engine.Debug(true)
+
 	// register an isEquals helper or else
 	engine.AddFunc("isEqualApplyClass", func(a, b, class string) string {
 		if a == b {
@@ -112,15 +114,6 @@ func GetTemplateEngine() fiber.Views {
 	})
 
 	engine.AddFunc("eqTernaryShort", eqTernaryShort)
-
-	// This is the end
-	err := engine.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for k := range engine.Templates {
-		fmt.Println(k)
-	}
 
 	return engine
 }
