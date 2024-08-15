@@ -149,7 +149,7 @@ func LoadHouseRollCallXml(url string, db *gorm.DB) {
 		AmmendmentNum:    res.AmmendmentNum,
 		AmmendmentAuthor: res.AmmendmentAuthor,
 		Session:          res.Session,
-		VoteDesc:         res.VoteDesc,
+		VoteDesc:         res.Question,
 	}
 
 	fmt.Println("Trying to find ", res.RollCallNum, res.CongressNum, res.Session, res.Chamber)
@@ -180,7 +180,7 @@ func LoadHouseRollCallXml(url string, db *gorm.DB) {
 		}
 	}
 
-	x = db.Debug().CreateInBatches(&voteRecords, 3)
+	x = db.CreateInBatches(&voteRecords, 50)
 	if x.Error != nil {
 		log.Fatalln(x.Error)
 	}

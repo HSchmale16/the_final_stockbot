@@ -16,14 +16,16 @@ func GetVotesForMember(c *fiber.Ctx) error {
 	memberId := c.Params("memberId")
 
 	var results []struct {
-		VoteType string
-		Count    int
+		VoteType   string
+		VoteStatus string
+		Count      int
 	}
 
-	db.Model(&Vote{}).
-		Select("vote_type, count(*) as count").
+	db.Debug().Model(&VoteRecord{}).
+		InnerJoins("Vote").
+		Select("vote_type, vote_status, count(*) as count").
 		Where("member_id = ?", memberId).
-		Group("vote_type").
+		Group("vote_type, vote_status").
 		Scan(&results)
 
 	return c.Render("votes_members", fiber.Map{

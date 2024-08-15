@@ -38,6 +38,10 @@ func TestProcessHouseRollCall(t *testing.T) {
 		t.Error("Result is not correct")
 	}
 
+	if res.Question != "On Motion to Recommit" {
+		t.Error("Question is not correct")
+	}
+
 	if res.VoteType != "YEA-AND-NAY" {
 		t.Error("VoteType is not correct")
 	}
@@ -50,7 +54,7 @@ func TestProcessHouseRollCall(t *testing.T) {
 		t.Error("ActionTime is not correctt, got '", res.ActionTime, "'")
 	}
 
-	if len(res.Votes) != 435 {
+	if len(res.Votes) != 434 {
 		t.Error("Votes length is not correct got ", len(res.Votes))
 	}
 }
