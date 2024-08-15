@@ -162,4 +162,3 @@
         name: litestream
         state: restarted
         enabled: true
-
