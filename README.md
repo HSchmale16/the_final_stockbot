@@ -14,3 +14,10 @@ The app lives in `/internal/app` with various modules living in `/internal` that
 
 It attempts to be modular but really isn't that modular.
 
+# Running It
+
+You'll need congress.sqlite in the current directory. Download it from the server.
+
+    DEBUG=true go run . -disable-fetcher
+
+This is the best way to run it locally.

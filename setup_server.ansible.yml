@@ -9,6 +9,7 @@
     static_root: /var/lib/final_stockbot/the_final_stockbot/static/
     server_name: www.dirtycongress.com
     update_packages: true
+    stockbot_version: votes
 
   tasks:
     - name: Install Packages
@@ -45,7 +46,7 @@
           ansible.builtin.git:
             repo: https://github.com/benbjohnson/litestream
             dest: /root/litestream
-            version: votes
+            version: master
           notify:
             - Install Litestream
         - name: Conditionally load the secrets for litestream
@@ -73,7 +74,7 @@
       ansible.builtin.git:
         repo: https://github.com/HSchmale16/the_final_stockbot
         dest: ~{{ service_user_name }}/the_final_stockbot
-        version: master
+        version: {{ stockbot_version }}
       register: stockbot_git
       notify:
         - Build my application
