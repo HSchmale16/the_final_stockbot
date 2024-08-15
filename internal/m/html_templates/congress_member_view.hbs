@@ -62,9 +62,9 @@
         {{/if}}
     </div>
 
-    <div hx-get="/htmx/votes/{{ Member.BioGuideId }}" hx-trigger="load">
+    {{!-- <div hx-get="/htmx/votes/{{ Member.BioGuideId }}" hx-trigger="load">
         <h3>Voting Record</h3>
-    </div>
+    </div> --}}
 
     {{#if Member.Sponsored}}
     <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/works_with" hx-trigger="load">

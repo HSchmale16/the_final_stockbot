@@ -28,6 +28,29 @@ func GetVotesForMember(c *fiber.Ctx) error {
 		Group("vote_type, vote_status").
 		Scan(&results)
 
+	// Create a map to store the contingency table
+	contingencyTable := make(map[string]map[string]int)
+
+	// Iterate over the results and populate the contingency table
+	for _, result := range results {
+		voteType := result.VoteType
+		voteStatus := result.VoteStatus
+		count := result.Count
+
+		// Check if the vote type exists in the contingency table
+		if _, ok := contingencyTable[voteType]; !ok {
+			contingencyTable[voteType] = make(map[string]int)
+		}
+
+		// Update the count for the vote status in the contingency table
+		contingencyTable[voteType][voteStatus] = count
+	}
+
+	// Render the contingency table as a JSON response
+	return c.JSON(fiber.Map{
+		"ContingencyTable": contingencyTable,
+	})
+
 	return c.Render("votes_members", fiber.Map{
 		"Votes": results,
 	})
