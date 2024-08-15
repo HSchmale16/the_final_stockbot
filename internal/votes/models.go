@@ -1,14 +1,20 @@
 package votes
 
 import (
+	"embed"
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
 )
 
+//go:embed html_templates/*
+var templateFS embed.FS
+
 func init() {
 	m.RegisterModels(&Vote{}, &VoteRecord{})
+	m.RegisterDebugFilePath("internal/votes/html_templates")
+	m.RegisterEmbededFS(templateFS)
 }
 
 type Vote struct {

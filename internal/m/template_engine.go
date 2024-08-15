@@ -1,33 +1,67 @@
-package app
+package m
 
 import (
 	"embed"
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/handlebars/v2"
+	"github.com/yalue/merged_fs"
 )
 
 //go:embed html_templates/*
-var templates embed.FS
+var builtInTemplates embed.FS
+
+func init() {
+	RegisterEmbededFS(builtInTemplates)
+	RegisterDebugFilePath("internal/m/html_templates")
+}
+
+func RegisterDebugFilePath(path string) {
+	if os.Getenv("DEBUG") == "true" {
+		log.Println("Registering debug path: ", path)
+		// Convert the path to a fs.FS
+		target1 := os.DirFS(path)
+
+		fs.WalkDir(target1, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				return nil
+			}
+			fmt.Println(path)
+			return nil
+		})
+		templatesFS = append(templatesFS, target1)
+	}
+}
+
+func RegisterEmbededFS(embededFS embed.FS) {
+	if os.Getenv("DEBUG") == "true" {
+		return
+	}
+	subFS, err := fs.Sub(embededFS, "html_templates")
+	if err != nil {
+		log.Fatal(err)
+	}
+	templatesFS = append(templatesFS, subFS)
+}
+
+var templatesFS = make([]fs.FS, 0, 10)
 
 func getEngine() *handlebars.Engine {
-	// Check for debug environment variable
-	if os.Getenv("DEBUG") == "true" {
-		engine := handlebars.New("./internal/app/html_templates", ".hbs")
-		engine.Reload(true)
-		return engine
-	}
-	subFS, err := fs.Sub(templates, "html_templates")
-	if err != nil {
-		panic(err)
-	}
-	engine := handlebars.NewFileSystem(http.FS(subFS), ".hbs")
+	fmt.Println(templatesFS)
+	myFS := merged_fs.MergeMultiple(templatesFS...)
+
+	engine := handlebars.NewFileSystem(http.FS(myFS), ".hbs")
 	return engine
 }
 

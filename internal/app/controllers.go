@@ -21,6 +21,7 @@ import (
 	. "github.com/hschmale16/the_final_stockbot/internal/m"
 	"github.com/hschmale16/the_final_stockbot/internal/stocks"
 	"github.com/hschmale16/the_final_stockbot/internal/travel"
+	"github.com/hschmale16/the_final_stockbot/internal/votes"
 	"golang.org/x/text/message"
 
 	"gorm.io/gorm"
@@ -38,7 +39,7 @@ func SetupServer() {
 	}
 
 	app := fiber.New(fiber.Config{
-		Views: GetTemplateEngine(),
+		Views: m.GetTemplateEngine(),
 		// Required if I want to get the ip address of actual requests.
 		// Powered by NGINX
 		ProxyHeader: fiber.HeaderXForwardedFor,
@@ -155,6 +156,7 @@ func SetupServer() {
 	congress.SetupRoutes(app)
 	stocks.SetupRoutes(app)
 	travel.SetupRoutes(app)
+	votes.SetupRoutes(app)
 
 	err = app.Listen(":8080")
 	if err != nil {

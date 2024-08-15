@@ -164,7 +164,15 @@ func LoadHouseRollCallXml(url string, db *gorm.DB) {
 	}
 
 	var voteRecords = make([]VoteRecord, len(res.Votes))
+	memberIdFixer := map[string]string{
+		"L000555": "L000595",
+	}
+
 	for i, v := range res.Votes {
+		if memberIdFixer[v.Legislator.NameId] != "" {
+			v.Legislator.NameId = memberIdFixer[v.Legislator.NameId]
+		}
+
 		voteRecords[i] = VoteRecord{
 			MemberId:   v.Legislator.NameId,
 			VoteStatus: v.Vote,
@@ -172,7 +180,7 @@ func LoadHouseRollCallXml(url string, db *gorm.DB) {
 		}
 	}
 
-	x = db.CreateInBatches(&voteRecords, 500)
+	x = db.Debug().CreateInBatches(&voteRecords, 3)
 	if x.Error != nil {
 		log.Fatalln(x.Error)
 	}

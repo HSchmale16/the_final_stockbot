@@ -80,6 +80,8 @@ func main() {
 			})
 		case "house-votes":
 			var scrape = map[int]int{
+				2021: 449,
+				2022: 549,
 				2023: 724,
 				2024: 400,
 			}
