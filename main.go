@@ -13,6 +13,7 @@ import (
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"github.com/hschmale16/the_final_stockbot/internal/travel"
+	"github.com/hschmale16/the_final_stockbot/internal/votes"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"github.com/hschmale16/the_final_stockbot/pkg/utils"
 	"github.com/robfig/cron/v3"
@@ -75,6 +76,9 @@ func main() {
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
 				travel.LoadSenateXml(rc, db)
 			})
+		case "house-votes":
+			url := "https://clerk.house.gov/evs/2023/roll099.xml"
+			votes.LoadHouseRollCallXml(url, db)
 		}
 
 		return

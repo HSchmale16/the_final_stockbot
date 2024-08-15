@@ -14,9 +14,11 @@ import (
 )
 
 var year string = "2016"
+var senate_token string
 
 func init() {
 	flag.StringVar(&year, "year", "2016", "Year to get data for")
+	flag.StringVar(&senate_token, os.Getenv("SENATE_TOKEN"), "", "Senate API Token")
 }
 
 func Main() {

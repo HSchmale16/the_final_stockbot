@@ -4,17 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 )
 
 const BASE_URL = "https://lda.senate.gov/api/v1/"
-
-var SENATE_TOKEN string
-
-func init() {
-	SENATE_TOKEN = os.Getenv("SENATE_TOKEN")
-	fmt.Println("SENATE TOKEN:", SENATE_TOKEN)
-}
 
 /*
  * Implements a very very stupid request handler to download the things.
@@ -27,8 +19,8 @@ func SendRequest(url string) ([]byte, error) {
 	}
 
 	// This is an anon api but it's a hell of a lot faster with a token
-	if SENATE_TOKEN != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Token %s", SENATE_TOKEN))
+	if senate_token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Token %s", senate_token))
 	}
 
 	resp, err := http.DefaultClient.Do(req)
