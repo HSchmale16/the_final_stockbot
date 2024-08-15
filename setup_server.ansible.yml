@@ -35,24 +35,7 @@
       become: true
       community.general.ufw:
         rule: allow
-        port: "80"
-        comment: "Allow HTTP traffic"
-        state: enabled
-    - name: Configure Firewall
-      become: true
-      community.general.ufw:
-        rule: allow
-        port: "443"
-        comment: "Allow HTTPS traffic"
-        state: enabled
-
-    - name: Configure Firewall
-      become: true
-      community.general.ufw:
-        rule: deny
-        port: "8080"
-        comment: "Allow Proxy HTTP traffic"
-        state: enabled
+        name: "Nginx Full"
 
     - name: Install and Setup do_litestream
       when: do_litestream
