@@ -62,6 +62,8 @@ func main() {
 	}
 
 	if script != "" {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 		// Run a random task
 		//app.DoTagUpdates()
 		//stocks.LoadDocuments(file)
@@ -77,8 +79,17 @@ func main() {
 				travel.LoadSenateXml(rc, db)
 			})
 		case "house-votes":
-			url := "https://clerk.house.gov/evs/2023/roll099.xml"
-			votes.LoadHouseRollCallXml(url, db)
+			var scrape = map[int]int{
+				2023: 724,
+				2024: 400,
+			}
+
+			for year, maxRollCall := range scrape {
+				for i := 1; i <= maxRollCall; i++ {
+					url := fmt.Sprintf("https://clerk.house.gov/evs/%d/roll%03d.xml", year, i)
+					votes.LoadHouseRollCallXml(url, db)
+				}
+			}
 		}
 
 		return
