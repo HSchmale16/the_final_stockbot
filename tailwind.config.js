@@ -2,8 +2,10 @@
 module.exports = {
   content: [
 	  "base.css",
-    "internal/app/html_templates/**/*.hbs",
-    "internal/app/html_templates/*.hbs"
+    "internal/m/html_templates/**/*.hbs",
+    "internal/m/html_templates/*.hbs",
+    "internal/votes/html_templates/**/*.hbs",
+    "internal/votes/html_templates/*.hbs",
   ],
   theme: {
     extend: {},

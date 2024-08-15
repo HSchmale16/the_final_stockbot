@@ -31,7 +31,7 @@
           - node-npm
           - poppler-utils
         state: present
-        update_cache: true
+        update_cache: false
     - name: Configure Firewall
       become: true
       community.general.ufw:
@@ -74,7 +74,7 @@
       ansible.builtin.git:
         repo: https://github.com/HSchmale16/the_final_stockbot
         dest: ~{{ service_user_name }}/the_final_stockbot
-        version: {{ stockbot_version }}
+        version: "{{ stockbot_version }}"
       register: stockbot_git
       notify:
         - Build my application
