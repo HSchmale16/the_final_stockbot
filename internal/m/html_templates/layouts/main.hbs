@@ -10,20 +10,21 @@
 
     <meta property="og:title" content="{{ Title }}" />
     {{#if OgImage }}
-    <meta property="og:image" content="{{ OgImage }}" />
+    <meta property="og:image" content="https://www.dirtycongress.com{{ OgImage }}" />
+    <meta name="twitter:image" content="https://www.dirtycongress.com/{{OgImage}}">
     {{else}}
-    <meta property="og:image" content="/static/img/navbar.png" />
+    <meta property="og:image" content="https://www.dirtycongress.com/static/img/navbar.png" />
+    <meta name="twitter:image" content="https://www.dirtycongress.com/static/img/navbar.png">
     {{/fi}}
     <meta property="og:description" content="{{ Description }}" />
     <meta property="og:url" content="{{ Url }}" />
 
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="dirtycongress.com">
-    <meta property="twitter:url" content="{{ Url}}">
+    <meta property="twitter:url" content="{{ Url }}">
     <meta name="twitter:title" content="{{ Title}}">
     <meta name="twitter:description"
         content="{{ Description}}">
-    <meta name="twitter:image" content="https://dirtycongress.com/static/img/navbar.png">
 
 
     {{!-- <link rel="stylesheet" href="/static/css/bootstrap.min.css?cache-bust={{ CacheBust }}"> --}}
