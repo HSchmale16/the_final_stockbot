@@ -56,10 +56,7 @@ func getEngine() *handlebars.Engine {
 	myFS := merged_fs.MergeMultiple(templatesFS...)
 
 	engine := handlebars.NewFileSystem(http.FS(myFS), ".hbs")
-	err := engine.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	return engine
 }
 
@@ -116,6 +113,11 @@ func GetTemplateEngine() fiber.Views {
 
 	engine.AddFunc("eqTernaryShort", eqTernaryShort)
 
+	// This is the end
+	err := engine.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 	for k := range engine.Templates {
 		fmt.Println(k)
 	}
