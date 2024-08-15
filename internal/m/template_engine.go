@@ -56,6 +56,10 @@ func getEngine() *handlebars.Engine {
 	myFS := merged_fs.MergeMultiple(templatesFS...)
 
 	engine := handlebars.NewFileSystem(http.FS(myFS), ".hbs")
+	err := engine.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 	return engine
 }
 
