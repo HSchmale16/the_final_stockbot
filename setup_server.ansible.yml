@@ -122,13 +122,13 @@
         job: "~{{ service_user_name }}/the_final_stockbot/the_final_stockbot --sitemap"
         user: final_stockbot
         state: present
-    - name: Upload the Lobbying Database
-      become: true
-      become_user: "{{ service_user_name }}"
-      ansible.posix.synchronize:
-        src: lobbying.duckdb
-        dest: /var/lib/{{ service_user_name }}/lobbying.duckdb
-        compress: true
+    # - name: Upload the Lobbying Database
+    #   become: true
+    #   become_user: "{{ service_user_name }}"
+    #   ansible.posix.synchronize:
+    #     src: lobbying.duckdb
+    #     dest: /var/lib/{{ service_user_name }}/lobbying.duckdb
+    #     compress: true
 
     - name: Enable Nginx Site
       become: true
