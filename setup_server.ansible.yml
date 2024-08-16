@@ -2,6 +2,7 @@
 - name: Setup Server
   hosts: all
   remote_user: linuxuser
+  gather_facts: false
   vars:
     variable_name: variable_value
     service_user_name: final_stockbot

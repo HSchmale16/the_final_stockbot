@@ -29,7 +29,17 @@
         {{#if Member.Committees }}
         <ul>
             {{#each Member.Committees }}
-            <li><a href="/committee/{{ Committee.ThomasId}}">{{ Committee.Name }}</a></li>
+            {{!-- A committee membership object --}}
+            <li><a href="/committee/{{ Committee.ThomasId}}">{{ Committee.Name }}</a>
+
+                {{#if Committee.Subcommittees }}
+                <ul>
+                    {{#each Committee.Subcommittees }}
+                    <li><a href="/committee/{{ Committee.ThomasId }}">{{ Name }}</a></li>
+                    {{/each}}
+                </ul>
+                {{/if}}
+            </li>
             {{/each}}
         </ul>
         {{else}}

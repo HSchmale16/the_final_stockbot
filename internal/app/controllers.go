@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"html"
 	"log"
 	"os"
@@ -483,6 +484,29 @@ func ViewCongressMember(c *fiber.Ctx) error {
 		First(&member, DB_CongressMember{
 			BioGuideId: c.Params("bio_guide_id"),
 		})
+
+	var parents, childs []m.DB_CommitteeMembership
+	for _, committee := range member.Committees {
+		if committee.Committee.ParentCommitteeId == nil {
+			parents = append(parents, committee)
+		} else {
+			childs = append(childs, committee)
+		}
+	}
+	for _, child := range childs {
+		fmt.Println(*child.Committee.ParentCommitteeId)
+
+		for i, parent := range parents {
+			fmt.Println(parent.Committee.ThomasId)
+			if *child.Committee.ParentCommitteeId == parent.Committee.ThomasId {
+				parents[i].Committee.Subcommittees = append(parents[i].Committee.Subcommittees, child.Committee)
+			}
+		}
+
+		fmt.Println("-----")
+	}
+
+	member.Committees = parents
 
 	return c.Render("congress_member_view", fiber.Map{
 		"Title":       member.Name,
