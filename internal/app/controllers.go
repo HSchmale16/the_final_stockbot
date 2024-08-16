@@ -17,7 +17,6 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
 	"github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
 	"github.com/hschmale16/the_final_stockbot/internal/stocks"
 	"github.com/hschmale16/the_final_stockbot/internal/travel"
 	"github.com/hschmale16/the_final_stockbot/internal/votes"
@@ -31,8 +30,16 @@ const (
 	DOMAIN = "https://www.dirtycongress.com"
 )
 
+type GovtRssItem = m.GovtRssItem
+type Tag = m.Tag
+type GovtRssItemTag = m.GovtRssItemTag
+type GovtLawText = m.GovtLawText
+type CongressMemberSponsored = m.CongressMemberSponsored
+type DB_CongressMember = m.DB_CongressMember
+type SearchQuery = m.SearchQuery
+
 func SetupServer() {
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		panic(err)
 	}
@@ -180,7 +187,7 @@ func SubmitFeedback(c *fiber.Ctx) error {
 func RelatedLaws(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var govtLaw GovtRssItem
+	var govtLaw m.GovtRssItem
 	db.First(&govtLaw, c.Params("law_id"))
 
 	title := govtLaw.Title
@@ -189,7 +196,7 @@ func RelatedLaws(c *fiber.Ctx) error {
 
 	x := strings.ReplaceAll(before, "&nbsp;", "%") + " %"
 
-	var govtLaws []GovtRssItem
+	var govtLaws []m.GovtRssItem
 	db.Where("title LIKE ?", x).Where("ID != ?", govtLaw.ID).Limit(10).Find(&govtLaws)
 
 	return c.Render("partials/law-list", fiber.Map{

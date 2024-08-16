@@ -13,9 +13,11 @@ import (
 	"github.com/mmcdole/gofeed"
 	"gorm.io/gorm"
 
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	henry_groq "github.com/hschmale16/the_final_stockbot/pkg/groq"
 )
+
+type LawModsData = m.LawModsData
 
 var RssLinks = []string{
 	"https://www.govinfo.gov/rss/bills.xml",
@@ -70,7 +72,7 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 
 func RunFetcherService(ch LawRssItemChannel) {
 	defer close(ch)
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
 		return
@@ -94,7 +96,7 @@ func RunFetcherService(ch LawRssItemChannel) {
 			ModsXML:       mods,
 		})
 
-		modsData := ReadLawModsData(mods)
+		modsData := m.ReadLawModsData(mods)
 		congressMembers := make([]string, len(modsData.CongressMembers))
 		for i, member := range modsData.CongressMembers {
 			congressMembers[i] = member.Name
@@ -149,7 +151,7 @@ func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
 		committee.AuthorityId = strings.TrimSuffix(committee.AuthorityId, "00")
 
 		// Find the committee
-		var dbCommittee DB_CongressCommittee
+		var dbCommittee m.DB_CongressCommittee
 		err := db.Debug().Where("LOWER(thomas_id) = ?", committee.AuthorityId).First(&dbCommittee)
 		if err.Error != nil {
 			log.Printf("Could not find committee %s\n", committee.AuthorityId)
@@ -163,7 +165,7 @@ func ScanLawSponsors(modsData LawModsData, item GovtRssItem, db *gorm.DB) {
 }
 
 func FindUntaggedLaws() {
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
 		return
@@ -184,7 +186,7 @@ func FindUntaggedLaws() {
 }
 
 func ProcessLawItemsFromChannel(ch chan GovtRssItem) {
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		fmt.Println("Failed to setup database:", err)
 		return
@@ -220,7 +222,7 @@ func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 				break
 			}
 			fmt.Println("Error:", err)
-			db.Create(&GenerationError{
+			db.Create(&m.GenerationError{
 				Model:         string(model),
 				ErrorMessage:  err.Error(),
 				AttemptedText: chunk,
@@ -255,7 +257,7 @@ func ProcessLawTextForTags(src GovtRssItem, db *gorm.DB) {
 
 func CreateTagsOnItem(tags []string, item GovtRssItem, textOffset int, db *gorm.DB) {
 	for _, tag := range tags {
-		tag := GetTag(db, tag)
+		tag := m.GetTag(db, tag)
 
 		// Check if the tag relationship already exists
 		var count int64
@@ -267,7 +269,7 @@ func CreateTagsOnItem(tags []string, item GovtRssItem, textOffset int, db *gorm.
 		}
 
 		db.FirstOrCreate(&myGovt, myGovt)
-		db.Create(&LawOffset{
+		db.Create(&m.LawOffset{
 			GovtRssItemTagId: myGovt.ID,
 			Offset:           textOffset,
 		})

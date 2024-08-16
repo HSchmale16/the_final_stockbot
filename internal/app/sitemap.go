@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 const (
@@ -37,7 +37,7 @@ func init() {
 }
 
 func MakeSitemap() {
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		panic(err)
 	}

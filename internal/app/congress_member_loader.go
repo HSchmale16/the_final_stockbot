@@ -14,10 +14,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
-
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
+
+type US_CongressLegislator = m.US_CongressLegislator
 
 /**
  * https://github.com/unitedstates/congress-legislators?tab=readme-ov-file
@@ -109,7 +110,7 @@ func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
 
 		db.Model(&law).Association("GovtRssItem").Find(&law.GovtRssItem)
 
-		modsData := ReadLawModsData(law.ModsXML)
+		modsData := m.ReadLawModsData(law.ModsXML)
 		law.GovtRssItem.Metadata = modsData
 		db.Save(&law.GovtRssItem)
 
