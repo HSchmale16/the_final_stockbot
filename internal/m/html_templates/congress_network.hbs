@@ -3,14 +3,18 @@
 
 <h1>Congress Network</h1>
 
-<p>
-    This visualization shows the network of congress members based on their co-sponsorship of bills.
-    Each node represents a congress member, and each edge represents a bill that both members have co-sponsored.
-    The size of the node is proportional to the number of bills the member has co-sponsored.
-    The color of the node is based on the party of the member.
-    The color of the edge is based on the number of bills that the two members have co-sponsored.
-</p>
+<div id="network"></div>
 
-{{> 'partials/congress-network' }}
+<script src="/static/js/d3.v7.min.js"></script>
+<script src="/static/viz-js/new_network.js"></script>
 
 </div>
+
+<style>
+.link {
+  stroke: steelblue;
+  stroke-opacity: 0.4;
+  fill: none;
+  pointer-events: none;
+}
+</style>

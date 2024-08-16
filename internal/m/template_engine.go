@@ -56,14 +56,15 @@ func getEngine() *handlebars.Engine {
 	myFS := merged_fs.MergeMultiple(templatesFS...)
 
 	engine := handlebars.NewFileSystem(http.FS(myFS), ".hbs")
+	if os.Getenv("DEBUG") == "true" {
+		engine.Reload(true)
+	}
 
 	return engine
 }
 
 func GetTemplateEngine() fiber.Views {
 	engine := getEngine()
-
-	engine.Debug(true)
 
 	// register an isEquals helper or else
 	engine.AddFunc("isEqualApplyClass", func(a, b, class string) string {

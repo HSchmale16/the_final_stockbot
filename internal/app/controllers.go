@@ -9,10 +9,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/utils"
 
 	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	"github.com/hschmale16/the_final_stockbot/internal/faq"
@@ -84,15 +82,6 @@ func SetupServer() {
 	})
 	app.Use(helmet.New())
 
-	if !IsDebug {
-		app.Use(cache.New(cache.Config{
-			KeyGenerator: func(c *fiber.Ctx) string {
-				return utils.CopyString(c.Path()) + utils.CopyString(string(c.Context().URI().QueryString()))
-			},
-			Expiration: 5 * time.Minute,
-		}))
-	}
-
 	// Setup the Routes
 	app.Get("/", Index)
 	app.Get("/tags", TagList)
@@ -106,6 +95,7 @@ func SetupServer() {
 	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
 	app.Get("/json/congress-network", CongressNetwork)
+	app.Get("/json/congress-network-hier", CongressNetworkHierarchy)
 	app.Get("/congress-network", func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
 			"Title": "Congress Network Visualization",

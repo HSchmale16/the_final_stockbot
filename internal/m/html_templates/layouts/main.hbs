@@ -9,8 +9,10 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/static/sitemap.xml">
 
     <meta property="og:title" content="{{ Title }}" />
+    <meta property="og:logo" content="https://www.dirtycongress.com/static/img/navbar.png" />
+
     {{#if OgImage }}
-    <meta property="og:image" content="https://www.dirtycongress.com{{ OgImage }}" />
+    <meta property="og:image" content="https://www.dirtycongress.com/{{ OgImage }}" />
     <meta name="twitter:image" content="https://www.dirtycongress.com/{{OgImage}}">
     {{else}}
     <meta property="og:image" content="https://www.dirtycongress.com/static/img/navbar.png" />

@@ -24,3 +24,4 @@ cpu.pb.gz
 
 #
 node_modules
+*.pdf

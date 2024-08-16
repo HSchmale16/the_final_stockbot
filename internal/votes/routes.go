@@ -50,8 +50,4 @@ func GetVotesForMember(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"ContingencyTable": contingencyTable,
 	})
-
-	return c.Render("votes_members", fiber.Map{
-		"Votes": results,
-	})
 }

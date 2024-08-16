@@ -2,6 +2,7 @@ package app
 
 import (
 	_ "embed"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -9,7 +10,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
 //go:embed sql/congress_network.sql
@@ -21,31 +21,56 @@ var congress_network_tag_sql string
 func CongressNetwork(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	chamber := c.FormValue("chamber")
-
-	var edges []struct {
-		Source string `json:"source"`
-		Target string `json:"target"`
-		Value  int    `json:"value"`
+	edges, nodes, err := GetGraphNodes(db, c.Query("chamber"), c.Query("tag_id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	tag_id := c.FormValue("tag_id")
-	if tag_id != "" {
+	return c.JSON(fiber.Map{
+		"nodes": nodes,
+		"edges": edges,
+	})
+}
+
+func CongressNetworkHierarchy(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	edges, nodes, err := GetGraphNodes(db, c.Query("chamber"), c.Query("tag_id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	BuildAStupidGraph(nodes, edges)
+
+	return nil
+}
+
+func BuildAStupidGraph(nodes []CM_GraphNode, edges []CM_Edge) {
+
+}
+
+func GetGraphNodes(db *gorm.DB, chamber, tagId string) ([]CM_Edge, []CM_GraphNode, error) {
+	var edges []CM_Edge
+
+	if tagId != "" {
 		log.Print("Using tag_id")
-		tag_id_num, err := strconv.Atoi(tag_id)
+		tag_id_num, err := strconv.Atoi(tagId)
 		if err != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"error": "tag_id must be an integer",
-			})
+			return nil, nil, fmt.Errorf("tag_id must be an integer")
 		}
 		db.Raw(congress_network_tag_sql, chamber, tag_id_num).Scan(&edges)
 
 		// log usage of special congress network views
 		db.Create(&m.TagUse{
-			TagId:     uint(tag_id_num),
-			IpAddr:    c.IP(),
-			UserAgent: c.Get("User-Agent"),
-			UseType:   "cn", // congress network usage
+			TagId: uint(tag_id_num),
+			// right now I don't care to log them at the moment.
+			// IpAddr:    c.IP(),
+			// UserAgent: c.Get("User-Agent"),
+			UseType: "cn", // congress network usage
 		})
 	} else {
 		db.Raw(congress_network_sql, chamber).Scan(&edges)
@@ -64,23 +89,14 @@ func CongressNetwork(c *fiber.Ctx) error {
 
 	// Select all the congress people mentioned in node_names keys
 	var congress_people []struct {
-		DB_CongressMember
+		m.DB_CongressMember
 		Count int
 	}
 	db.Table("congress_member").
 		Select("congress_member.*", "(SELECT COUNT(*) FROM congress_member_sponsored WHERE db_congress_member_bio_guide_id = congress_member.bio_guide_id) as count").
 		Where("bio_guide_id IN ?", keys).Find(&congress_people)
 
-	type Node struct {
-		BioGuideId string
-		RenderName string
-		Name       string
-		State      string
-		Party      string
-		Count      int
-	}
-
-	var nodes = make([]Node, len(congress_people))
+	var nodes = make([]CM_GraphNode, len(congress_people))
 
 	for i, person := range congress_people {
 		nodes[i].BioGuideId = person.BioGuideId
@@ -91,8 +107,20 @@ func CongressNetwork(c *fiber.Ctx) error {
 		nodes[i].RenderName = person.Name + " (" + person.State() + "-" + person.Party() + ")"
 	}
 
-	return c.JSON(fiber.Map{
-		"nodes": nodes,
-		"edges": edges,
-	})
+	return edges, nodes, nil
+}
+
+type CM_Edge struct {
+	Source string `json:"source"`
+	Target string `json:"target"`
+	Value  int    `json:"value"`
+}
+
+type CM_GraphNode struct {
+	BioGuideId string
+	RenderName string
+	Name       string
+	State      string
+	Party      string
+	Count      int
 }

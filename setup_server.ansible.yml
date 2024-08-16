@@ -92,7 +92,7 @@
       ansible.builtin.cron:
         name: "Update Web Analytics"
         minute: "*/15"
-        job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html"
+        job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html --ignore-crawlers"
         user: root
         state: present
     - name: Add the house travel disclosure cron job
