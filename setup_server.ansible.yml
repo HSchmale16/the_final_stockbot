@@ -9,7 +9,7 @@
     static_root: /var/lib/final_stockbot/the_final_stockbot/static/
     server_name: www.dirtycongress.com
     update_packages: true
-    stockbot_version: votes
+    stockbot_version: master
 
   tasks:
     - name: Install Packages
