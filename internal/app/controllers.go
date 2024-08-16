@@ -488,6 +488,7 @@ func ViewCongressMember(c *fiber.Ctx) error {
 		"Title":       member.Name,
 		"Description": "Understand more about how " + member.Name + " is connected to other congress members and the bills they have sponsored",
 		"Member":      member,
+		"Terms":       m.CollapseTerms(member.CongressMemberInfo.Terms),
 	}, "layouts/main")
 }
 

@@ -13,7 +13,7 @@
         <div class="">
             <h3>Terms</h3>
             <ul>
-                {{#each Member.CongressMemberInfo.Terms }}
+                {{#each Terms }}
                 {{#if IsSenator }}
                 <li>{{{ Start }}} to {{{ End }}} for {{ State }} as Senator - {{ Party }}</li>
                 {{else}}
