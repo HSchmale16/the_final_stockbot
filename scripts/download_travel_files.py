@@ -34,10 +34,15 @@ def download_house_disclosure_urls():
         os.makedirs(os.path.dirname(dest), exist_ok=True)
 
         # Check if the document exists
+        url_saved = False
         for src in ['ST', 'MT']:
             if download_pdf_at_url(format_url(src, year, doc_id), dest):
                 cursor.execute("UPDATE travel_disclosures SET doc_url = ? WHERE doc_id = ?", (dest, doc_id))
+                url_saved = True
                 break
+
+        if not url_saved:
+            print(f"Failed to download {doc_id} from {year}")
         
         
 
