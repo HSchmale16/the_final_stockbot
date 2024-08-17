@@ -60,6 +60,8 @@ type DB_TravelDisclosure struct {
 
 	// A url to download the original document from
 	DocURL string
+	// WHere it's stored on the local system
+	Filepath string
 
 	MemberId string `gorm:"index"`
 	Member   m.DB_CongressMember
