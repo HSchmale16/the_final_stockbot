@@ -4,7 +4,7 @@ import time
 import requests
 
 
-db = sqlite3.connect("congress.sqlite")
+db = sqlite3.connect("test.db") #"congress.sqlite")
 
 
 def format_url(src, year, docid):
@@ -13,7 +13,7 @@ def format_url(src, year, docid):
 def download_pdf_at_url(url, dest) -> bool:
     r = requests.get(url)
     if r.status_code == requests.codes.ok:
-        with open(dest) as f:
+        with open(dest, 'w') as f:
             f.write(r.content)
         return True
     else:
