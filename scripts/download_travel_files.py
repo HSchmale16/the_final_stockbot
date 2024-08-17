@@ -1,5 +1,6 @@
 import sqlite3 
 import os
+import time
 import requests
 
 
@@ -36,6 +37,8 @@ def download_house_disclosure_urls():
         # Check if the document exists
         url_saved = False
         for src in ['ST', 'MT']:
+            # Slow down the requests to avoid a rate limit
+            time.sleep(0.5) 
             if download_pdf_at_url(format_url(src, year, doc_id), dest):
                 cursor.execute("UPDATE travel_disclosures SET doc_url = ? WHERE doc_id = ?", (dest, doc_id))
                 url_saved = True
