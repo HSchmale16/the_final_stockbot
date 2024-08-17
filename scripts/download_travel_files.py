@@ -40,7 +40,9 @@ def download_house_disclosure_urls():
             # Slow down the requests to avoid a rate limit
             url = format_url(src, year, doc_id)
             if download_pdf_at_url(url, dest):
-                db.execute("UPDATE travel_disclosures SET doc_url = ?, filepath = ? WHERE doc_id = ?", (url, dest, doc_id))
+                c = db.execute("UPDATE travel_disclosures SET doc_url = ?, filepath = ? WHERE doc_id = ?", (url, dest, doc_id))
+                if c.rowcount == 0:
+                    print(f"Failed to update {doc_id} from {year}")
                 url_saved = True
                 break
             time.sleep(0.5) 
