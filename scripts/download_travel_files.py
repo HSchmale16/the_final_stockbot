@@ -13,7 +13,7 @@ def format_url(src, year, docid):
 def download_pdf_at_url(url, dest) -> bool:
     r = requests.get(url)
     if r.status_code == requests.codes.ok:
-        with open(dest, 'w') as f:
+        with open(dest, 'wb') as f:
             f.write(r.content)
         return True
     else:
@@ -38,11 +38,13 @@ def download_house_disclosure_urls():
         url_saved = False
         for src in ['ST', 'MT']:
             # Slow down the requests to avoid a rate limit
-            time.sleep(0.5) 
-            if download_pdf_at_url(format_url(src, year, doc_id), dest):
-                cursor.execute("UPDATE travel_disclosures SET doc_url = ? WHERE doc_id = ?", (dest, doc_id))
+            url = format_url(src, year, doc_id)
+            if download_pdf_at_url(url, dest):
+                db.execute("UPDATE travel_disclosures SET doc_url = ?, filepath = ? WHERE doc_id = ?", (url, dest, doc_id))
                 url_saved = True
                 break
+            time.sleep(0.5) 
+
 
         if not url_saved:
             print(f"Failed to download {doc_id} from {year}")
