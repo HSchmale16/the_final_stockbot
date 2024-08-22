@@ -26,7 +26,7 @@ def download_house_disclosure_urls():
     House Travel Disclosures can exist at either an MT or 
     """
     cursor = db.cursor()
-    cursor = cursor.execute("SELECT doc_id, year FROM travel_disclosures WHERE doc_url IS NULL or doc_url = ''")
+    cursor = cursor.execute("SELECT doc_id, year FROM travel_disclosures WHERE doc_url IS NULL or doc_url = '' ORDER BY RANDOM()")
     for row in cursor:
         doc_id, year = row[0], row[1]
         # Create a path for the document
