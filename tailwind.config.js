@@ -6,6 +6,8 @@ module.exports = {
     "./internal/m/html_templates/*.hbs",
     "./internal/votes/html_templates/**/*.hbs",
     "./internal/votes/html_templates/*.hbs",
+    "./internal/travel/html_templates/**/*.hbs",
+    "./internal/travel/html_templates/*.hbs",
   ],
   theme: {
     extend: {},

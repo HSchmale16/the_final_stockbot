@@ -14,6 +14,7 @@
             <th>Destination</th>
             <th dataType="date">Departure Date</th>
             <th dataType="date">Return Date</th>
+            <th>Filing Type</th>
             <th>Sponsor</th>
         </tr>
     </thead>
@@ -41,6 +42,7 @@
             <td>{{ formatDate this.DepartureDate }}</td>
             <td>{{ formatDate this.ReturnDate }}</td>
             <td>{{ this.TravelSponsor }}</td>
+            <td>{{ this.FilingType }}</td>
         </tr>
         {{/each}}
     </tbody>

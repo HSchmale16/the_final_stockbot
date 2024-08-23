@@ -30,7 +30,7 @@ def download_house_disclosure_urls():
     for row in cursor:
         doc_id, year = row[0], row[1]
         # Create a path for the document
-        dest = f"pdfs/{year}/{doc_id}.pdf"
+        dest = f"pdfs2/{year}/{doc_id}.pdf"
         # Create the directory if it doesn't exist
         os.makedirs(os.path.dirname(dest), exist_ok=True)
 

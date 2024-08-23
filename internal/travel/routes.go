@@ -1,6 +1,7 @@
 package travel
 
 import (
+	"embed"
 	"log"
 	"net/url"
 	"sort"
@@ -10,6 +11,14 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
 )
+
+//go:embed html_templates/*
+var templateFS embed.FS
+
+func init() {
+	m.RegisterDebugFilePath("internal/travel/html_templates")
+	m.RegisterEmbededFS(templateFS)
+}
 
 func SetupRoutes(app *fiber.App) {
 	// Setup the routes
@@ -46,6 +55,7 @@ func GetMostTravelTable(c *fiber.Ctx) error {
 	}
 
 	db.Debug().Model(&DB_TravelDisclosure{}).
+		Where("filing_type = ?", "Original").
 		Where("year = ?", year).
 		Joins("Member").
 		Group("member_id").
@@ -71,6 +81,7 @@ func GetDaysGiftedTravelByParty(c *fiber.Ctx) error {
 	}
 
 	db.Model(&DB_TravelDisclosure{}).
+		Where("filing_type = ?", "Original").
 		Joins("Inner Join congress_member cm ON cm.bio_guide_id = member_id").
 		Group("year, json_extract(congress_member_info, '$.terms[#-1].party')").
 		Select("year, json_extract(congress_member_info, '$.terms[#-1].party') as party, sum(julianday(return_date) - julianday(departure_date)) as count").
@@ -118,6 +129,7 @@ func GetTravelByParty(c *fiber.Ctx) error {
 	}
 
 	db.Model(&DB_TravelDisclosure{}).
+		Where("filing_type = ?", "Original").
 		Joins("Inner Join congress_member cm ON cm.bio_guide_id = member_id").
 		Group("year, json_extract(congress_member_info, '$.terms[#-1].party')").
 		Select("year, json_extract(congress_member_info, '$.terms[#-1].party') as party, Count(*) as count").

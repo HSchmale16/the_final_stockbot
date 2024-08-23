@@ -41,7 +41,9 @@ server {
         alias {{ static_root }}/robots.txt;
     }
 
-
+    location /secret-metrics {
+            stub_status on;
+    }
 
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/{{ server_name }}/fullchain.pem; # managed by Certbot

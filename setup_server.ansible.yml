@@ -31,6 +31,8 @@
           - prometheus
           - node-npm
           - poppler-utils
+          - awscli
+          - rclone
         state: present
         update_cache: false
     - name: Configure Firewall
