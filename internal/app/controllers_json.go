@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,29 +29,67 @@ func CongressNetwork(c *fiber.Ctx) error {
 		})
 	}
 
+	SetGroupsViaConnectedComponents(nodes, edges)
+	for i, node := range nodes {
+		nodes[i].R = math.Sqrt(float64(node.Count)) + 3.0
+	}
+
 	return c.JSON(fiber.Map{
 		"nodes": nodes,
 		"edges": edges,
 	})
 }
 
-func CongressNetworkHierarchy(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
+func SetGroupsViaConnectedComponents(nodes []CM_GraphNode, edges []CM_Edge) {
+	groupNum := 1
 
-	edges, nodes, err := GetGraphNodes(db, c.Query("chamber"), c.Query("tag_id"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+	// Build a map of the nodes
+	visited := make(map[string]*CM_GraphNode, len(nodes))
+	for i, node := range nodes {
+		nodes[i].Group = 0
+		visited[node.BioGuideId] = &nodes[i]
 	}
 
-	BuildAStupidGraph(nodes, edges)
+	for _, node := range visited {
+		if node.NotVisited() {
+			// Do a depth first search
+			var stack = []*CM_GraphNode{node}
+			for len(stack) > 0 {
+				// Pop the stack
+				current := stack[len(stack)-1]
+				stack = stack[:len(stack)-1]
 
-	return nil
-}
+				if current.NotVisited() {
+					current.Group = groupNum
+					for _, edge := range edges {
+						if edge.Source == current.BioGuideId {
+							visited[edge.Target].Group = groupNum
+							stack = append(stack, visited[edge.Target])
+						}
+						if edge.Target == current.BioGuideId {
+							visited[edge.Source].Group = groupNum
+							stack = append(stack, visited[edge.Source])
+						}
+					}
+				}
+			}
+			groupNum++
+		}
+	}
 
-func BuildAStupidGraph(nodes []CM_GraphNode, edges []CM_Edge) {
+	// Double check the numbers
+	x := make(map[int]bool, 500)
+	for _, node := range nodes {
+		x[node.Group] = true
+	}
+	// check for the number of connected components
+	for i := 1; i < groupNum; i++ {
+		if !x[i] {
+			log.Println("Missing group", i)
+		}
+	}
 
+	fmt.Println("Found", len(x), "count", groupNum, "connected components")
 }
 
 func GetGraphNodes(db *gorm.DB, chamber, tagId string) ([]CM_Edge, []CM_GraphNode, error) {
@@ -123,4 +162,14 @@ type CM_GraphNode struct {
 	State      string
 	Party      string
 	Count      int
+
+	// What componenet id this node belongs to
+	Group int
+
+	// Radius
+	R float64
+}
+
+func (c CM_GraphNode) NotVisited() bool {
+	return c.Group == 0
 }

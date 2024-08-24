@@ -103,7 +103,6 @@ func SetupServer() {
 	app.Get("/law/:law_id/mods", LawView)
 	app.Get("/laws", LawIndex)
 	app.Get("/json/congress-network", CongressNetwork)
-	app.Get("/json/congress-network-hier", CongressNetworkHierarchy)
 	app.Get("/congress-network", func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
 			"Title": "Congress Network Visualization",

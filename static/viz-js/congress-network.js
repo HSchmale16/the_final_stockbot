@@ -1,7 +1,5 @@
-function fetchDataForChamber(chamber, tagId="") {
+function fetchDataForChamber(chamber, tagId = "") {
     // Clear it before generating new element
-
-
     document.getElementById("container").innerHTML = "";
 
     // load the data
@@ -9,6 +7,17 @@ function fetchDataForChamber(chamber, tagId="") {
         .then(response => response.json())
         .then(data => {
             drawNetwork(data);
+        });
+}
+
+function updateBioguideTooltipWindow(bioGuideId, tooltip) {
+    const url = getCongressPersonDetailsUrl(bioGuideId);
+    tooltip.html("Loading...");
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            tooltip.html(html);
         });
 }
 
@@ -20,7 +29,22 @@ function getCongressPersonDetailsUrl(bioGuideId) {
 
 function NodeSizeHandler(d) {
     // return 1.5 * d.Count;
+    return d.R;
     return Math.sqrt(d.Count) + 3;
+}
+
+// create a continious color scale
+
+const color = d3.scaleLinear([0, 100], ["red", "blue"]);
+
+
+function restoreNodeAppearance(nodes) {
+    nodes.attr("r", NodeSizeHandler)
+        // .attr("stroke", d => colorScale(d.State))
+        .attr("stroke", "#FFF")
+        .attr("stroke-width", 1)
+        .attr("fill", d => color(d.Group));
+        // .attr("fill", d => PartyColor(d.Party));
 }
 
 function drawNetwork(data) {
@@ -34,11 +58,17 @@ function drawNetwork(data) {
 
 
     const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.BioGuideId).distance(80))
-        .force("charge", d3.forceManyBody())
-        .force("x", d3.forceX())
-        .force("y", d3.forceY())
+        .force("link", d3.forceLink(links).id(d => d.BioGuideId).distance(0).strength(0))
+        .force("charge", d3.forceManyBody().strength(-5))
+        // .force("x", d3.forceX())
+        // .force("y", d3.forceY())
+        .force("x", d3.forceX().strength(0.01))
+        .force("y", d3.forceY().strength(0.01))
+        .force("cluster", forceCluster())
+        .force("collide", forceCollide())
         .on("tick", ticked);
+
+
 
     const svg = d3.create("svg")
         .attr("width", width)
@@ -46,6 +76,7 @@ function drawNetwork(data) {
         .attr("viewBox", [-width / 2, -height / 2, width, height])
         .attr("style", "max-width: 100%; height: auto;");
 
+    // We're going to hide thie links by default.
     const link = svg.append("g")
         .attr("stroke", "#999")
         .attr("stroke-opacity", 0.6)
@@ -55,14 +86,11 @@ function drawNetwork(data) {
         .attr("stroke-width", d => d.value / 5);
 
     const node = svg.append("g")
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 1.5)
         .selectAll()
         .data(nodes)
         .join("circle")
-        .attr("r", NodeSizeHandler)
-        .attr("fill", d => PartyColor(d.Party));
 
+    restoreNodeAppearance(node);
 
 
     // JavaScript: Enhance node hover effect and implement tooltips
@@ -75,27 +103,24 @@ function drawNetwork(data) {
         if (!clicked) {
             // Enhance node appearance
             d3.select(event.currentTarget)
-                // .attr("r", 10) // Increase radius
-                .attr("stroke", "gold"); // Change color
+                .attr("r", d => 2 * NodeSizeHandler(d)) // Increase radius
+                .attr("stroke", "gold");
+
+            updateBioguideTooltipWindow(d.BioGuideId, tooltip);
 
             // Show tooltip
             tooltip.transition()
                 .duration(400)
                 .style("opacity", .9);
 
-            tooltip.html(`<div hx-trigger="revealed" hx-get="${getCongressPersonDetailsUrl(d.BioGuideId)}" >${d.Name}</div>`)
-
-
-            htmx.process(document.getElementById("tooltip"));
         }
     })
         .on("mouseout", (event, d) => {
             if (!clicked) {
                 // Reset node appearance
-                d3.select(event.currentTarget)
-                    .attr("r", NodeSizeHandler) // Reset radius
-                    .attr("fill", d => PartyColor(d.Party)) // Reset color
-                    .attr("stroke", "#fff"); // Reset color
+                let node = d3.select(event.currentTarget)
+
+                restoreNodeAppearance(node);
 
                 // Hide tooltip
                 tooltip.transition()
@@ -107,12 +132,11 @@ function drawNetwork(data) {
             clicked = !clicked;
             if (clicked) {
                 d3.select(event.currentTarget)
-                    .attr("r", 10) // Increase radius
+                    .attr("r", d => 2 * NodeSizeHandler(d)) // Increase radius
                     .attr("fill", "gold"); // Change color
             } else {
-                d3.select(event.currentTarget)
-                    .attr("r", 5) // Reset radius
-                    .attr("fill", d => PartyColor(d.Party)); // Reset color
+                restoreNodeAppearance(d3.select(event.currentTarget));
+
             }
         });
 
@@ -162,6 +186,76 @@ function drawNetwork(data) {
             .attr("cy", d => d.y);
     }
 }
+
+
+// https://observablehq.com/@d3/clustered-bubbles
+// forceCluster and centroid are from the above link
+function forceCluster() {
+    const strength = 0.2;
+    let nodes;
+
+    function force(alpha) {
+        const centroids = d3.rollup(nodes, centroid, d => d.Group);
+        const l = alpha * strength;
+        for (const d of nodes) {
+            const { x: cx, y: cy } = centroids.get(d.Group);
+            d.vx -= (d.x - cx) * l;
+            d.vy -= (d.y - cy) * l;
+        }
+    }
+
+    force.initialize = _ => nodes = _;
+
+    return force;
+}
+
+function centroid(nodes) {
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    for (const d of nodes) {
+        let k = NodeSizeHandler(d) ** 2;
+        x += d.x * k;
+        y += d.y * k;
+        z += k;
+    }
+    return { x: x / z, y: y / z };
+}
+
+function forceCollide() {
+    const alpha = 0.4; // fixed for greater rigidity!
+    const padding1 = 2; // separation between same-color nodes
+    const padding2 = 6; // separation between different-color nodes
+    let nodes;
+    let maxRadius;
+  
+    function force() {
+      const quadtree = d3.quadtree(nodes, d => d.x, d => d.y);
+      for (const d of nodes) {
+        const r = d.r + maxRadius;
+        const nx1 = d.x - r, ny1 = d.y - r;
+        const nx2 = d.x + r, ny2 = d.y + r;
+        quadtree.visit((q, x1, y1, x2, y2) => {
+          if (!q.length) do {
+            if (q.data !== d) {
+              const r = d.r + q.R + (d.Group === q.data.Group? padding1 : padding2);
+              let x = d.x - q.data.x, y = d.y - q.data.y, l = Math.hypot(x, y);
+              if (l < r) {
+                l = (l - r) / l * alpha;
+                d.x -= x *= l, d.y -= y *= l;
+                q.data.x += x, q.data.y += y;
+              }
+            }
+          } while (q = q.next);
+          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+        });
+      }
+    }
+  
+    force.initialize = _ => maxRadius = d3.max(nodes = _, d => d.r) + Math.max(padding1, padding2);
+  
+    return force;
+  }
 
 function PartyColor(party) {
     switch (party[0]) {

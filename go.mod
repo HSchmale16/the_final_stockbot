@@ -34,7 +34,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
-	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.19.1 // indirect
@@ -42,7 +41,6 @@ require (
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/tetratelabs/wazero v1.7.3 // indirect
-	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
 	golang.org/x/mod v0.17.0 // indirect
