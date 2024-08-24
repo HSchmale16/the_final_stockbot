@@ -79,15 +79,9 @@ func SetGroupsViaConnectedComponents(nodes []CM_GraphNode, edges []CM_Edge) int 
 		visited[node.BioGuideId] = i
 	}
 
-	first := true
 	for _, nodeNum := range visited {
 		node := &nodes[nodeNum]
-		if first {
-			log.Println("Starting at node", node.BioGuideId, node.Group)
-			first = false
-		}
 		if node.NotVisited() {
-			fmt.Println("Working on node", node.BioGuideId)
 			// Do the DFS
 			RecursiveDFS(node, nodes, edges, visited, groupNum, 0)
 
