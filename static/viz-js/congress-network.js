@@ -74,13 +74,13 @@ function drawNetwork(data) {
         .attr("style", "max-width: 100%; height: auto;");
 
     // We're going to hide thie links by default.
-    const link = svg.append("g")
-        .attr("stroke", "#999")
-        .attr("stroke-opacity", 0.6)
-        .selectAll()
-        .data(links)
-        .join("line")
-        .attr("stroke-width", d => d.value / 5);
+    // const link = svg.append("g")
+    //     .attr("stroke", "#999")
+    //     .attr("stroke-opacity", 0.6)
+    //     .selectAll()
+    //     .data(links)
+    //     .join("line")
+    //     .attr("stroke-width", d => d.value / 5);
 
     const node = svg.append("g")
         .selectAll()
@@ -174,10 +174,10 @@ function drawNetwork(data) {
     document.getElementById("container").appendChild(svg.node());
 
     function ticked() {
-        link.attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
+        // link.attr("x1", d => d.source.x)
+        //     .attr("y1", d => d.source.y)
+        //     .attr("x2", d => d.target.x)
+        //     .attr("y2", d => d.target.y);
 
         node.attr("cx", d => d.x)
             .attr("cy", d => d.y);
