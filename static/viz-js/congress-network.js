@@ -30,12 +30,10 @@ function getCongressPersonDetailsUrl(bioGuideId) {
 function NodeSizeHandler(d) {
     // return 1.5 * d.Count;
     return d.R;
-    return Math.sqrt(d.Count) + 3;
 }
 
 // create a continious color scale
 
-const color = d3.scaleLinear([0, 100], ["red", "blue"]);
 
 
 function restoreNodeAppearance(nodes) {
@@ -43,8 +41,7 @@ function restoreNodeAppearance(nodes) {
         // .attr("stroke", d => colorScale(d.State))
         .attr("stroke", "#FFF")
         .attr("stroke-width", 1)
-        .attr("fill", d => color(d.Group));
-        // .attr("fill", d => PartyColor(d.Party));
+        .attr("fill", d => PartyColor(d.Party));
 }
 
 function drawNetwork(data) {

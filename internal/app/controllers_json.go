@@ -40,56 +40,69 @@ func CongressNetwork(c *fiber.Ctx) error {
 	})
 }
 
-func SetGroupsViaConnectedComponents(nodes []CM_GraphNode, edges []CM_Edge) {
+func RecursiveDFS(node *CM_GraphNode, nodes []CM_GraphNode, edges []CM_Edge, nodeIndexMap map[string]int, groupNum, depth int) {
+	// Clamped DFS
+	if depth > 2 {
+		return
+	}
+	// Discover it
+	node.Group = groupNum
+	// Add the neighbors to the stack
+	for _, edge := range edges {
+		if edge.Source == node.BioGuideId {
+			neighbor := &nodes[nodeIndexMap[edge.Target]]
+			if neighbor.NotVisited() {
+				RecursiveDFS(neighbor, nodes, edges, nodeIndexMap, groupNum, depth+1)
+			}
+		}
+		if edge.Target == node.BioGuideId {
+			neighbor := &nodes[nodeIndexMap[edge.Source]]
+			if neighbor.NotVisited() {
+				RecursiveDFS(neighbor, nodes, edges, nodeIndexMap, groupNum, depth+1)
+			}
+		}
+	}
+}
+
+func SetGroupsViaConnectedComponents(nodes []CM_GraphNode, edges []CM_Edge) int {
 	groupNum := 1
 
+	fmt.Println("Total Edge Count = ", len(edges))
+
 	// Build a map of the nodes
-	visited := make(map[string]*CM_GraphNode, len(nodes))
+	visited := make(map[string]int, len(nodes))
 	for i, node := range nodes {
+		// Reset the group identity
 		nodes[i].Group = 0
-		visited[node.BioGuideId] = &nodes[i]
+
+		// Create a map of the nodes to make it easier to find them
+		visited[node.BioGuideId] = i
 	}
 
-	for _, node := range visited {
+	first := true
+	for _, nodeNum := range visited {
+		node := &nodes[nodeNum]
+		if first {
+			log.Println("Starting at node", node.BioGuideId, node.Group)
+			first = false
+		}
 		if node.NotVisited() {
-			// Do a depth first search
-			var stack = []*CM_GraphNode{node}
-			for len(stack) > 0 {
-				// Pop the stack
-				current := stack[len(stack)-1]
-				stack = stack[:len(stack)-1]
+			fmt.Println("Working on node", node.BioGuideId)
+			// Do the DFS
+			RecursiveDFS(node, nodes, edges, visited, groupNum, 0)
 
-				if current.NotVisited() {
-					current.Group = groupNum
-					for _, edge := range edges {
-						if edge.Source == current.BioGuideId {
-							visited[edge.Target].Group = groupNum
-							stack = append(stack, visited[edge.Target])
-						}
-						if edge.Target == current.BioGuideId {
-							visited[edge.Source].Group = groupNum
-							stack = append(stack, visited[edge.Source])
-						}
-					}
-				}
-			}
+			// Start a new group
 			groupNum++
 		}
 	}
 
-	// Double check the numbers
 	x := make(map[int]bool, 500)
 	for _, node := range nodes {
 		x[node.Group] = true
 	}
-	// check for the number of connected components
-	for i := 1; i < groupNum; i++ {
-		if !x[i] {
-			log.Println("Missing group", i)
-		}
-	}
+	log.Println("Found", groupNum-1, len(x), "connected components")
 
-	fmt.Println("Found", len(x), "count", groupNum, "connected components")
+	return groupNum
 }
 
 func GetGraphNodes(db *gorm.DB, chamber, tagId string) ([]CM_Edge, []CM_GraphNode, error) {
