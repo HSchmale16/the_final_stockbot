@@ -32,6 +32,11 @@
 
   .horizontal-party-bar {
     @apply flex shadow-lg;
+    text-align: center;
+  }
+
+  .bar-segment {
+    @apply flex-1 text-white text-xs font-bold py-2;
   }
 }
 

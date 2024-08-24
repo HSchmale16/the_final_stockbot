@@ -1,6 +1,6 @@
 <div class="horizontal-party-bar">
     {{#each Law.ComputeSponsorship }}
     <div class="bar-segment" title="{{this.Num}} {{@key}} sponsor this bill"
-        style="background-color: {{partyColor @key}}; width: {{this.Percent}}%; height: 20px"></div>
+        style="background-color: {{partyColor @key}}; width: {{this.Percent}}%;">{{this.Num}}</div>
     {{/each}}
 </div>
