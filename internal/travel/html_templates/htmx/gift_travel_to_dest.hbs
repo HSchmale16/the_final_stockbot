@@ -24,8 +24,8 @@
         <span class="border-text">Party Breakdown</span>
         <div class="horizontal-party-bar">
             {{#each PartyBreakdown }}
-            <div class="bar-segment" title="{{this.Num}} {{@key}} on this committee"
-                style="background-color: {{partyColor @key}}; width: {{this.Percent}}%; height: 20px"></div>
+            <div class="bar-segment" title="{{this.Num}} {{@key}} traveled to {{ Destination }}"
+                style="background-color: {{partyColor @key}}; width: {{this.Percent}}%;">{{ this.Num }}</div>
             {{/each}}
         </div>
 

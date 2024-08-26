@@ -251,6 +251,7 @@ func GetTravelByDestination(c *fiber.Ctx) error {
 	return c.Render("htmx/gift_travel_to_dest", fiber.Map{
 		"Title":          "Gifted Travel to " + destination,
 		"PageTitle":      "Gifted Travel to " + destination,
+		"Destination":    destination,
 		"GiftTravel":     disclosures,
 		"PartyBreakdown": PartyBreakdown,
 	}, "layouts/main")

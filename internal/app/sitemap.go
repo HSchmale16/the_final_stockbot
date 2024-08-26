@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 )
 
@@ -92,14 +91,14 @@ func MakeSitemap() {
 	}
 
 	// Select the lobbying years
-	for _, year := range lobbying.YearsLoaded {
-		url := SITEURL + "/lobbying/" + year
-		tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
-		file.WriteString(tmp)
-		for _, ltype := range lobbying.LobbyingTypes {
-			url = SITEURL + "/lobbying/breakdown/" + year + "/" + ltype
-			tmp = fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
-			file.WriteString(tmp)
-		}
-	}
+	// for _, year := range lobbying.YearsLoaded {
+	// 	url := SITEURL + "/lobbying/" + year
+	// 	tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
+	// 	file.WriteString(tmp)
+	// 	for _, ltype := range lobbying.LobbyingTypes {
+	// 		url = SITEURL + "/lobbying/breakdown/" + year + "/" + ltype
+	// 		tmp = fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
+	// 		file.WriteString(tmp)
+	// 	}
+	// }
 }
