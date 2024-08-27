@@ -6,12 +6,14 @@ import (
 	"io"
 	"os"
 
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 )
+
+type JSON_CongressCommittee = m.JSON_CongressCommittee
 
 func LoadCongressCommittees(file string) {
 	// Open the Database
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +62,7 @@ func LoadCongressCommittees(file string) {
 
 func LoadCommitteeMemberships(file string) {
 	// Open the Database
-	db, err := SetupDB()
+	db, err := m.SetupDB()
 	if err != nil {
 		panic(err)
 	}

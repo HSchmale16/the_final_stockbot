@@ -1,16 +1,53 @@
 package congress
 
 import (
+	"embed"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	. "github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
 )
 
+type DB_CongressCommittee = m.DB_CongressCommittee
+type DB_CommitteeMembership = m.DB_CommitteeMembership
+
+//go:embed html_templates/*
+var templateFS embed.FS
+
+func init() {
+	m.RegisterDebugFilePath("internal/congress/html_templates")
+	m.RegisterEmbededFS(templateFS)
+}
+
 func SetupRoutes(app *fiber.App) {
+	app.Get("/json/overlap/subcommittees/:thomas_id", CommitteeOverlap)
+	app.Get("/committee_explorer", CommitteeExplorer)
 	app.Get("/committee/:thomas_id", CommitteeView)
 	app.Get("/committees", CommitteeList)
+}
+
+func CommitteeExplorer(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var committees []DB_CongressCommittee
+	db.Where("parent_committee_id IS NULL").Find(&committees)
+
+	return c.Render("committee_explorer", fiber.Map{
+		"Title":      "Committee Explorer",
+		"Committees": committees,
+	}, "layouts/main")
+}
+
+func CommitteeOverlap(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var committees DB_CongressCommittee
+	db.Where("thomas_id = ?", c.Params("thomas_id")).Preload("Subcommittees.Memberships").Find(&committees)
+
+	overlaps := computeOverlap(committees.Subcommittees)
+
+	return c.JSON(overlaps)
 }
 
 func CommitteeList(c *fiber.Ctx) error {

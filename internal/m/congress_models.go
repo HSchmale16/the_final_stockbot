@@ -52,6 +52,18 @@ func (DB_CongressCommittee) TableName() string {
 	return "congress_committee"
 }
 
+func (c DB_CongressCommittee) MembershipOverlap(other DB_CongressCommittee) float64 {
+	overlap := 0.0
+	for _, m := range c.Memberships {
+		for _, o := range other.Memberships {
+			if m.CongressMemberId == o.CongressMemberId {
+				overlap++
+			}
+		}
+	}
+	return overlap
+}
+
 func (c *DB_CongressCommittee) SortMembers() {
 	// Sort the members by rank
 	sort.Slice(c.Memberships, func(i, j int) bool {

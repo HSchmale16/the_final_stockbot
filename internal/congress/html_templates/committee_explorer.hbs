@@ -1,0 +1,43 @@
+{{> 'partials/title_heading' title="Committee Explorer" }}
+
+<p>Welcome to the Committee Explorer! Here you can render views of intersections between different committees</p>
+
+{{#each Committees }}
+    <a href="/committee/{{ThomasId}}">{{Name}}</a>
+{{/each}}
+
+<div id="venn"></div>
+
+
+<script src="/static/js/d3.v7.min.js"></script>
+<script src="/static/js/venn.min.js"></script>
+<script>
+    // Load the data
+    fetch("/json/overlap/subcommittees/HSAG")
+        .then(x => x.json())
+        .then(data => {
+            console.log(data)
+            const chart = venn.VennDiagram();
+
+            const div = d3.select("#venn");
+            div.datum(data).call(chart)
+
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "venntooltip");
+
+            
+            console.log(chart);
+            div.selectAll('g')
+                .on('mouseenter', (d) => {
+                    const node = d3.select(d.target).transition();
+                    node.select("path")
+                        .style("stroke-width", 3)
+                        .style("fill-opacity", .4)
+                }).on("mouseleave", (d) => {
+                    const node = d3.select(d.target).transition();
+                    node.select("path")
+                        .style("stroke-width", 1)
+                        .style("fill-opacity", 0.2)
+                })
+        })
+</script>
