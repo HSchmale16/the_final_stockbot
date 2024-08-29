@@ -156,6 +156,9 @@ func main() {
 
 		cron := cron.New()
 		cron.AddFunc("@every 4h", triggerRssFetch)
+		// cron.AddFunc("@every 12", func() {
+		// 	db.Exec("ANALYZE")
+		// })
 		//cron.AddFunc("@every 12h", app.FindUntaggedLaws)
 		app.FindUntaggedLaws()
 		triggerRssFetch()
@@ -164,6 +167,10 @@ func main() {
 	}
 
 	if !disableWebServer {
+		fmt.Println("Before go live do database maintenance")
+		// On start up do database maintanence
+		db.Exec("ANALYZE")
+
 		fmt.Println("Starting up...")
 		app.SetupServer()
 		fmt.Println("The FUCK")
