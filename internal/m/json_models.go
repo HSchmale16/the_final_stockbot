@@ -21,6 +21,14 @@ type US_CongressLegislator struct {
 	Terms []Terms `json:"terms"`
 }
 
+func (l US_CongressLegislator) LastTerm() Terms {
+	return l.Terms[len(l.Terms)-1]
+}
+
+func (l US_CongressLegislator) FirstTerm() Terms {
+	return l.Terms[0]
+}
+
 func (l US_CongressLegislator) ServedDuringYear(year int) bool {
 	for _, term := range l.Terms {
 		start, err := parseYear(term.Start)

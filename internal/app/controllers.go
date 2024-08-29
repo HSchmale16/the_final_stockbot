@@ -348,6 +348,18 @@ func TagIndex(c *fiber.Ctx) error {
 func TopicSearch(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
+	// We will also search for the congress critters by name using a double or.
+	// Order by when the last term ends: "json_extract(congress_member_info, '$.terms[#-1].end') DESC"
+
+	var members []DB_CongressMember
+	db.Debug().
+		Where("name LIKE ?", "%"+strings.ReplaceAll(c.FormValue("search"), " ", "%")+"%").
+		Where("json_extract(congress_member_info, '$.terms[#-1].end') > ?", "1930").
+		Order("json_extract(congress_member_info, '$.terms[#-1].end') DESC").
+		Limit(15).
+		Find(&members)
+
+	// Do the tag search
 	var results []struct {
 		TagId     int64
 		Name      string
@@ -400,6 +412,7 @@ func TopicSearch(c *fiber.Ctx) error {
 	})
 
 	return c.Render("tag_search", fiber.Map{
+		"Members":  members,
 		"Tags":     results,
 		"FtsLaws":  ftsResults,
 		"MinCount": minCount,

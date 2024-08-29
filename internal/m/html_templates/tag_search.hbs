@@ -1,3 +1,18 @@
+<ul class="prose members-serp">
+    {{#each Members }}
+    <li>
+        <a href="/congress-member/{{ BioGuideId }}?utm_source=topic_search">{{ Name }}</a>
+        <small>{{ Party }} - {{ State }}</small>
+        {{#if IsSenator }}
+            <small>Senator</small>
+        {{else}}
+            <small>Representative</small>
+        {{/if}}
+        <small>Serving from {{ formatYear CongressMemberInfo.FirstTerm.Start }} to {{ formatYear CongressMemberInfo.LastTerm.End }}</small>
+    </li>
+    {{/each}}
+</ul>
+
 <ul class="prose">
     {{#each FtsLaws }}
         <li>

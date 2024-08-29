@@ -97,6 +97,10 @@ func GetTemplateEngine() fiber.Views {
 		return t.Format("Jan 2, 2006")
 	})
 
+	engine.AddFunc("formatYear", func(date string) string {
+		return date[:4]
+	})
+
 	engine.AddFunc("partyColor", func(s string) string {
 		s = strings.ToLower(s)
 		switch s {
