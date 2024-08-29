@@ -354,7 +354,7 @@ func TopicSearch(c *fiber.Ctx) error {
 	var members []DB_CongressMember
 	db.Debug().
 		Where("name LIKE ?", "%"+strings.ReplaceAll(c.FormValue("search"), " ", "%")+"%").
-		Where("json_extract(congress_member_info, '$.terms[#-1].end') > ?", "1930").
+		Where("json_extract(congress_member_info, '$.terms[#-1].end') > ?", "1980").
 		Order("json_extract(congress_member_info, '$.terms[#-1].end') DESC").
 		Limit(15).
 		Find(&members)
