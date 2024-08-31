@@ -2,6 +2,7 @@ the_final_stockbot
 *.out
 
 travel-spend
+*.zip
 
 # Database stuff
 # just a backup and export file I use to move things back and forth
@@ -17,6 +18,7 @@ static/css/tailwind.css
 tmp/*
 temp/*
 
+t.sql
 cpu.pprof
 cpu.pb.gz
 *.gz

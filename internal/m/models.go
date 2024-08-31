@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/plugin/prometheus"
@@ -27,7 +28,7 @@ type GovtRssItem struct {
 	Link               string    `gorm:"index:,unique,composite:unique_per_item"`
 	PubDate            time.Time `gorm:"index:,unique,composite:unique_per_item"`
 	ProcessedOn        time.Time
-	Metadata           LawModsData
+	Metadata           LawModsData `gorm:"type:jsonb"`
 
 	// many to many relationship of tags through GovtRssItemTag
 	Tags       []Tag                  `gorm:"many2many:govt_rss_item_tag;"`
@@ -221,7 +222,7 @@ type DB_CongressMember struct {
 	BioGuideId         string `gorm:"primaryKey"`
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
-	CongressMemberInfo US_CongressLegislator
+	CongressMemberInfo US_CongressLegislator `gorm:"type:jsonb"`
 	Name               string
 	Sponsored          []GovtRssItem            `gorm:"many2many:congress_member_sponsored;"`
 	Committees         []DB_CommitteeMembership `gorm:"foreignKey:CongressMemberId"`
@@ -266,6 +267,7 @@ func (d DB_CongressMember) IsSenator() bool {
 }
 
 type CongressMemberSponsored struct {
+	ID                          uint
 	CreatedAt                   time.Time
 	CongressNumber              string
 	Chamber                     string
@@ -301,11 +303,8 @@ func (f FeedbackItem) TableName() string {
 
 ///////////////////////////////////////////////////////////////////
 
-/**
- * Sets up the stupid database
- */
-func SetupDB() (*gorm.DB, error) {
-	newLogger := logger.New(
+func GetLogger() logger.Interface {
+	return logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
 			SlowThreshold:             70 * time.Millisecond, // Slow SQL threshold
@@ -315,13 +314,10 @@ func SetupDB() (*gorm.DB, error) {
 			Colorful:                  true,                  // Disable color
 		},
 	)
+}
 
+func GetSqliteDB() (*gorm.DB, error) {
 	conn, err := driver.Open("congress.sqlite", func(conn *sqlite3.Conn) error {
-		// err := unicode.Register(conn)
-		// if err != nil {
-		// 	return err
-		// }
-
 		return nil
 	})
 	if err != nil {
@@ -329,70 +325,93 @@ func SetupDB() (*gorm.DB, error) {
 	}
 
 	db, err := gorm.Open(gormlite.OpenDB(conn), &gorm.Config{
-		Logger:      newLogger,
+		Logger:      GetLogger(),
 		PrepareStmt: true,
 	})
 	if err != nil {
 		return nil, err
 	}
+	return db, nil
+}
 
+func GetPostgresqlDB() (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open("host=localhost user=hschmale dbname=congress sslmode=disable"), &gorm.Config{
+		Logger: GetLogger(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+/**
+ * Sets up the stupid database
+ */
+func SetupDB() (*gorm.DB, error) {
+	db, err := GetPostgresqlDB()
+	if err != nil {
+		panic(err)
+	}
+
+	return db, nil
+}
+
+func ApplyMigrations(db *gorm.DB) error {
 	db.Use(prometheus.New(prometheus.Config{
 		DBName:          "congress", // use `DBName` as metrics label
 		RefreshInterval: 15,         // Refresh metrics interval (default 15 seconds)
 		StartServer:     true,       // start http server to expose metrics
 		HTTPServerPort:  2112,       // configure http server port, default port 8080 (if you have configured multiple instances, only the first `HTTPServerPort` will be used to start server)
 		MetricsCollector: []prometheus.MetricsCollector{
-			&prometheus.MySQL{
-				VariableNames: []string{"Threads_running"},
-			},
+			&prometheus.Postgres{},
 		}, // user defined metrics
 	}))
 
 	// Auto migrate models
 	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}, &LawOffset{}); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := db.AutoMigrate(&FederalRegisterItem{}, &FeedbackItem{}); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressMember{}, &CongressMemberSponsored{}, &TagUse{}); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := db.AutoMigrate(fecwrangling.CampaignCanidateLinkage{}); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := db.AutoMigrate(lobbying.LobbyingSqlQuery{}); err != nil {
-		return nil, err
+		return err
 	}
 
 	// Register additional models
 	for i, m := range additionalModels {
 		log.Printf("Registering model %d: %T", i, m)
 		if err := db.AutoMigrate(m); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	// Check if some full text search tables exist
-	if !db.Migrator().HasTable("fts_law_title") {
-		log.Print("Creating FTS table")
-		if err := db.Exec("CREATE VIRTUAL TABLE fts_law_title USING fts5(title, pub_date, content='govt_rss_item', content_rowid='id');").Error; err != nil {
-			return nil, err
-		}
-		if err := db.Exec("CREATE TRIGGER trg_fts_law_title AFTER INSERT ON govt_rss_item BEGIN INSERT INTO fts_law_title(rowid, title, pub_date) VALUES (new.id, new.title, new.pub_date); END;").Error; err != nil {
-			return nil, err
-		}
-	}
+	// if !db.Migrator().HasTable("fts_law_title") {
+	// 	log.Print("Creating FTS table")
+	// 	if err := db.Exec("CREATE VIRTUAL TABLE fts_law_title USING fts5(title, pub_date, content='govt_rss_item', content_rowid='id');").Error; err != nil {
+	// 		return nil, err
+	// 	}
+	// 	if err := db.Exec("CREATE TRIGGER trg_fts_law_title AFTER INSERT ON govt_rss_item BEGIN INSERT INTO fts_law_title(rowid, title, pub_date) VALUES (new.id, new.title, new.pub_date); END;").Error; err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	if err := db.AutoMigrate(&DB_CongressCommittee{}, &DB_CommitteeMembership{}); err != nil {
-		return nil, err
+		return err
 	}
 
-	return db, nil
+	return nil
 }
 
 func GetTag(db *gorm.DB, tagName string) Tag {

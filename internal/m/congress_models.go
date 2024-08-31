@@ -101,14 +101,15 @@ func (c DB_CongressCommittee) ComputeParties() SponsorshipMap {
 }
 
 type DB_CommitteeMembership struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-
 	// For some retarded reason gorm wants these columns named this way.
-	CongressMemberId string `gorm:"primaryKey;column:db_congress_member_bio_guide_id"`
-	CommitteeId      string `gorm:"primaryKey;column:db_congress_committee_thomas_id"`
-	Rank             int
-	Title            string
+	ID               uint   `gorm:"primaryKey"`
+	CongressMemberId string `gorm:"column:db_congress_member_bio_guide_id;index:,unique,composite:unique_per_item"`
+	CommitteeId      string `gorm:"column:db_congress_committee_thomas_id;index:,unique,composite:unique_per_item"`
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+
+	Rank  int
+	Title string
 
 	CongressMember DB_CongressMember    `gorm:"foreignKey:CongressMemberId"`
 	Committee      DB_CongressCommittee `gorm:"foreignKey:CommitteeId"`
