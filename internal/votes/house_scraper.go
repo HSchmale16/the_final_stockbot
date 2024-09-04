@@ -150,6 +150,7 @@ func LoadHouseRollCallXml(url string, db *gorm.DB) {
 		AmmendmentAuthor: res.AmmendmentAuthor,
 		Session:          res.Session,
 		VoteDesc:         res.Question,
+		Url:              url,
 	}
 
 	fmt.Println("Trying to find ", res.RollCallNum, res.CongressNum, res.Session, res.Chamber)

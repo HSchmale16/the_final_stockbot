@@ -31,6 +31,7 @@ type Vote struct {
 	AmmendmentNum    int
 	AmmendmentAuthor string
 	VoteDesc         string
+	Url              string
 
 	VoteRecords []VoteRecord
 }

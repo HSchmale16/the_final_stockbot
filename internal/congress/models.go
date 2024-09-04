@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/votes"
 	"gorm.io/datatypes"
 )
 
@@ -47,6 +48,9 @@ type BillAction struct {
 	SourceSystemCode int
 	Type             string
 	Text             string
+
+	VoteId *uint
+	Vote   *votes.Vote
 
 	BillID      uint
 	CommitteeId sql.NullString

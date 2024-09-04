@@ -4,13 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/congress"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/votes"
 	congressgov "github.com/hschmale16/the_final_stockbot/pkg/congress_gov"
 	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -30,8 +33,8 @@ func main() {
 
 		maxItems = data.Pagination.Count
 
-		for i, bill := range data.Bills {
-			fmt.Println("Working on entry", i, "of", len(data.Bills))
+		for billNum, bill := range data.Bills {
+			fmt.Println("Next offset at entry", i+billNum)
 			dbBill := congress.Bill{
 				CongressNumber: bill.Congress,
 				BillNumber:     bill.Number,
@@ -59,36 +62,7 @@ func main() {
 			}
 
 			for _, action := range actions.Actions {
-				actionTimeStr := action.ActionDate
-				actionTime, err := time.Parse(time.DateOnly, actionTimeStr)
-				if err != nil {
-					panic(err)
-				}
-
-				committeeId := sql.NullString{}
-				if len(action.Committees) > 0 {
-					stripped, _ := strings.CutSuffix(strings.ToUpper(action.Committees[0].SystemCode), "00")
-					committeeId = sql.NullString{
-						String: stripped,
-						Valid:  true,
-					}
-				}
-
-				dbAction := congress.BillAction{
-					ActionTime:       actionTime,
-					ActionCode:       action.ActionCode,
-					ActionDate:       action.ActionDate,
-					SourceSystemCode: action.SourceSystem.SourceSystemCode,
-					Type:             action.Type,
-					Text:             action.ActionText,
-					BillID:           dbBill.ID,
-					CommitteeId:      committeeId,
-				}
-
-				dbErr := db.Debug().Create(&dbAction)
-				if dbErr.Error != nil {
-					panic(dbErr.Error)
-				}
+				ProcessAction(dbBill.ID, action, db)
 			}
 
 			// Get the cosponsors
@@ -120,6 +94,63 @@ func main() {
 					panic(err.Error)
 				}
 			}
+		}
+	}
+}
+
+func ProcessAction(billId uint, action congressgov.BillAction, db *gorm.DB) {
+	var err error
+	var actionTime time.Time
+	if action.ActionTime != "" {
+		actionTime, err = time.Parse(time.RFC3339, action.ActionDate+"T"+action.ActionTime+"Z")
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		actionTime, err = time.Parse(time.DateOnly, action.ActionDate)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	committeeId := sql.NullString{}
+	if len(action.Committees) > 0 {
+		stripped, _ := strings.CutSuffix(strings.ToUpper(action.Committees[0].SystemCode), "00")
+		committeeId = sql.NullString{
+			String: stripped,
+			Valid:  true,
+		}
+	}
+
+	dbAction := congress.BillAction{
+		ActionTime:       actionTime,
+		ActionCode:       action.ActionCode,
+		ActionDate:       action.ActionDate,
+		SourceSystemCode: action.SourceSystem.SourceSystemCode,
+		Type:             action.Type,
+		Text:             action.ActionText,
+		BillID:           billId,
+		CommitteeId:      committeeId,
+	}
+
+	dbErr := db.Create(&dbAction)
+	if dbErr.Error != nil {
+		panic(dbErr.Error)
+	}
+
+	// Find the recorded vote. It seems like there is only one included in any given action
+	if len(action.RecordedVotes) > 0 {
+		vote := action.RecordedVotes[0]
+		votes.LoadHouseRollCallXml(vote.Url, db)
+
+		// find the vote
+		var dbVote votes.Vote
+		db.Debug().Where("roll_call_num = ? AND congress_num = ? AND session LIKE ?::text || '%' AND chamber LIKE '%' || ? || '%'", vote.RollNumber, vote.Congress, strconv.Itoa(vote.SessionNumber), vote.Chamber).First(&dbVote)
+
+		dbAction.VoteId = &dbVote.ID
+		dbErr := db.Debug().Save(&dbAction)
+		if dbErr.Error != nil {
+			panic(dbErr.Error)
 		}
 	}
 }

@@ -20,22 +20,7 @@ type LatestBillActions struct {
 }
 
 type BillActions struct {
-	Actions []struct {
-		ActionCode   string `json:"actionCode"`
-		ActionDate   string `json:"actionDate"`
-		ActionTime   string `json:"actionTime"`
-		ActionText   string `json:"text"`
-		SourceSystem struct {
-			SourceSystemCode int    `json:"code"`
-			SourceSystemName string `json:"name"`
-		}
-		Committees []struct {
-			Name string `json:"name"`
-			// Links to the thomas_id
-			SystemCode string `json:"systemCode"`
-		} `json:"committees"`
-		Type string `json:"type"`
-	} `json:"actions"`
+	Actions []BillAction `json:"actions"`
 }
 
 type Pagination struct {
@@ -50,4 +35,33 @@ type CosponsorsResponse struct {
 		SponsorshipDate   string `json:"sponsorshipDate"`
 	} `json:"cosponsors"`
 	Pagination Pagination `json:"pagination"`
+}
+
+type BillAction struct {
+	ActionCode   string `json:"actionCode"`
+	ActionDate   string `json:"actionDate"`
+	ActionTime   string `json:"actionTime"`
+	ActionText   string `json:"text"`
+	SourceSystem struct {
+		SourceSystemCode int    `json:"code"`
+		SourceSystemName string `json:"name"`
+	}
+	RecordedVotes []struct {
+		Chamber       string `json:"chamber"`
+		Congress      int    `json:"congress"`
+		Date          string `json:"date"`
+		RollNumber    int    `json:"rollNumber"`
+		SessionNumber int    `json:"sessionNumber"`
+		Url           string `json:"url"`
+	} `json:"recordedVotes"`
+	CalendarNumber struct {
+		Calendar string `json:"calendar"`
+		Number   string `json:"number"`
+	} `json:"calendarNumber"`
+	Committees []struct {
+		Name string `json:"name"`
+		// Links to the thomas_id
+		SystemCode string `json:"systemCode"`
+	} `json:"committees"`
+	Type string `json:"type"`
 }

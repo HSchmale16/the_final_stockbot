@@ -1,6 +1,7 @@
 package m
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -335,7 +336,10 @@ func GetSqliteDB() (*gorm.DB, error) {
 }
 
 func GetPostgresqlDB() (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open("host=localhost user=hschmale dbname=congress sslmode=disable"), &gorm.Config{
+	whoami := os.Getenv("USER")
+	dsn := fmt.Sprintf("host=localhost user=%s dbname=congress sslmode=disable", whoami)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: GetLogger(),
 	})
 	if err != nil {
