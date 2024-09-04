@@ -16,17 +16,38 @@ type LatestBillActions struct {
 		UpdateDateIncludingText string `json:"updateDateIncludingText"`
 		URL                     string `json:"url"`
 	} `json:"bills"`
+	Pagination Pagination `json:"pagination"`
 }
 
 type BillActions struct {
 	Actions []struct {
 		ActionCode   string `json:"actionCode"`
 		ActionDate   string `json:"actionDate"`
+		ActionTime   string `json:"actionTime"`
 		ActionText   string `json:"text"`
 		SourceSystem struct {
 			SourceSystemCode int    `json:"code"`
 			SourceSystemName string `json:"name"`
 		}
+		Committees []struct {
+			Name string `json:"name"`
+			// Links to the thomas_id
+			SystemCode string `json:"systemCode"`
+		} `json:"committees"`
 		Type string `json:"type"`
 	} `json:"actions"`
+}
+
+type Pagination struct {
+	Count   int    `json:"count"`
+	NextUrl string `json:"nextUrl"`
+}
+
+type CosponsorsResponse struct {
+	Cosponsors []struct {
+		BioGuideId        string `json:"bioguideid"`
+		OriginalCosponsor bool   `json:"isOriginalCosponsor"`
+		SponsorshipDate   string `json:"sponsorshipDate"`
+	} `json:"cosponsors"`
+	Pagination Pagination `json:"pagination"`
 }

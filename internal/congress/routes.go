@@ -25,6 +25,35 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/committee_explorer", CommitteeExplorer)
 	app.Get("/committee/:thomas_id", CommitteeView)
 	app.Get("/committees", CommitteeList)
+	app.Get("/bills", BillList)
+	app.Get("/bill/:congress_number/:bill_type/:bill_number", BillView)
+}
+
+func BillList(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var bills []Bill
+	db.Find(&bills)
+
+	return c.Render("bill_list", fiber.Map{
+		"Title":       "Bill List",
+		"Bills":       bills,
+		"Description": "List of all bills in the US Congress, understand their scope and membership.",
+	}, "layouts/main")
+}
+
+func BillView(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var bill Bill
+	db.Debug().Preload("Actions").
+		Preload("Cosponsors.Member").
+		First(&bill, "bill_type = ? AND congress_number = ? AND bill_number = ?", c.Params("bill_type"), c.Params("congress_number"), c.Params("bill_number"))
+
+	return c.Render("bill_view", fiber.Map{
+		"Title": bill.FormatTitle(),
+		"Bill":  bill,
+	}, "layouts/main")
 }
 
 func CommitteeExplorer(c *fiber.Ctx) error {

@@ -1,0 +1,85 @@
+---
+- name: Setup Database Server
+  become: true
+  hosts: all
+
+  # pre_tasks:
+  #   - name: "Install Packages"
+  #     ansible.builtin.package:
+  #       name:
+  #         - gnupg2
+  #       state: present
+  #       update_cache: false
+  #   - name: "Get Postgresql Key"
+  #     ansible.builtin.shell: "wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -"
+  #   - name: "Add Postgresql Repository"
+  #     ansible.builtin.shell: "echo 'deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main' | sudo tee /etc/apt/sources.list.d/pgdg.list"
+  #   - name: "Update Package Cache"
+  #     ansible.builtin.apt:
+  #       update_cache: true
+
+  tasks:
+    # - name: "Install latest Postgresql"
+    #   ansible.builtin.apt:
+    #     name:
+    #       - postgresql-16
+    #       - python3-psycopg2
+    #       - acl
+    #     state: present
+    #     update_cache: false
+    #   notify: Enable Postgresql
+    - name: "Create my database"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_db:
+        name: congress
+        encoding: UTF-8
+        state: present
+
+    - name: "Create my user"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_user:
+        name: final_stockbot
+        role_attr_flags: CREATEDB
+        state: present
+    - name: "Create my user"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_user:
+        name: linuxuser
+        role_attr_flags: CREATEDB
+        state: present
+
+    - name: "Grant all privileges on database"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_privs:
+        db: congress
+        privs: ALL
+        type: schema
+        objs: public
+        role: linuxuser,final_stockbot
+        state: present
+
+
+  handlers:
+    - name: Restart Postgresql
+      ansible.builtin.systemd:
+        name: postgresql
+        state: restarted
+
+    - name: Start Postgresql
+      ansible.builtin.systemd:
+        name: postgresql
+        state: started
+
+    - name: Stop Postgresql
+      ansible.builtin.systemd:
+        name: postgresql
+        state: stopped
+
+    - name: Enable Postgresql
+      ansible.builtin.systemd:
+        name: postgresql
+        enabled: true

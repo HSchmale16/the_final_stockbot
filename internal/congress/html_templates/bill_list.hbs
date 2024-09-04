@@ -1,0 +1,8 @@
+
+<ul>
+    {{#each Bills }}
+    <li>
+        <a href="/bill/{{ CongressNumber }}/{{BillType}}/{{BillNumber}}">{{ BillType }} {{ BillNumber }} - {{ Title }}</a>
+    </li>
+    {{/each}}
+</ul>

@@ -1,0 +1,24 @@
+{{> 'partials/title_heading' title=Title }}
+
+
+{{#if Bill.Cosponsors }}
+    <h2>Cosponsors</h2>
+    <ul>
+        {{#each Bill.Cosponsors }}
+            <li>
+                <a href="/congress-member/{{MemberId}}">{{ Member.Name }}</a>
+            </li>
+        {{/each}}
+    </ul>
+{{/if}}
+
+{{#if Bill.Actions }}
+    <h2>Actions</h2>
+    <ul>
+        {{#each Bill.Actions }}
+            <li>
+                {{ ActionDate }} {{SourceSystemCode}}: {{Type}}: {{ Text }}
+            </li>
+        {{/each}}
+    </ul>
+{{/if}}
