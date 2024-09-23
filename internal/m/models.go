@@ -354,7 +354,7 @@ func GetPostgresqlDB() (*gorm.DB, error) {
 func SetupDB() (*gorm.DB, error) {
 	db, err := GetPostgresqlDB()
 	if err != nil {
-		panic(err)
+		log.Fatal("Failed to connect to database", err)
 	}
 
 	if err := ApplyMigrations(db); err != nil {
