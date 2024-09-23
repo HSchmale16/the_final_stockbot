@@ -126,8 +126,8 @@ func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {
 
 				// Really stupid answer to the problem of accented characters
 				db.Debug().
-					Where(rpStr+" LIKE '%' || ? || '%'", last).
-					Where(rpStr+" LIKE '%' || ? || '%'", first).
+					Where(rpStr+" ILIKE '%' || ? || '%'", last).
+					Where(rpStr+" ILIKE '%' || ? || '%'", first).
 					Find(&members)
 
 				if len(members) == 1 {
@@ -200,6 +200,59 @@ func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) {
 	}
 }
 
+func FuzzyFindSenator(db *gorm.DB, last, first, state string) (m.DB_CongressMember, error) {
+	first = strings.Trim(first, ".")
+	last = strings.Trim(last, ".")
+	senator := last + ", " + first
+
+	var member m.DB_CongressMember
+	query1 := db.Debug().Model(&m.DB_CongressMember{}).
+		Where("jsonb_path_query_first(congress_member_info, '$.terms[last].type')#>>'{}' = ?", "sen").
+		Where("UNACCENT(UPPER(name)) ILIKE '%' || ? || '%'", last)
+	if state != "" {
+		query1 = query1.Where("jsonb_path_query_first(congress_member_info, '$.terms[last].state')#>>'{}' = ?", state)
+	}
+
+	var cnt int64
+	query1.Count(&cnt)
+	fmt.Println(cnt)
+	if cnt > 1 {
+		if first == "BOB" && last == "CASEY" {
+			first = "ROBERT"
+		}
+		both := query1.Where("UNACCENT(UPPER(name)) ILIKE '%' || ? || '%'", first)
+		both.Count(&cnt)
+		fmt.Println(cnt)
+		if cnt > 1 {
+			// Print all records found
+			var members []m.DB_CongressMember
+			both.Find(&members)
+			for _, m := range members {
+				// Scan manually to see if we can find a year between them
+				// We are only looking back at most 6 years for senators.
+				if m.CongressMemberInfo.ServedDuringYear(2021) || m.CongressMemberInfo.ServedDuringYear(2023) {
+					member = m
+					break
+				}
+			}
+		} else if cnt == 1 {
+			both.First(&member)
+		}
+	} else if cnt == 1 {
+		query1.First(&member)
+	}
+
+	if cnt == 0 {
+		return m.DB_CongressMember{}, fmt.Errorf("no members found f='%s' l='%s' '%s'", first, last, senator)
+	}
+
+	if member.BioGuideId == "" {
+		return m.DB_CongressMember{}, fmt.Errorf("could not find member %s", senator)
+	}
+
+	return member, nil
+}
+
 func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
 	filerName := filer.FirstName + " " + filer.LastName
 
@@ -207,51 +260,19 @@ func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
 
 	for _, office := range filer.Office {
 		senator := office.OfficeName
-
-		last, first := m.SplitName(senator)
-
-		var member m.DB_CongressMember
-		query1 := db.Debug().Model(&m.DB_CongressMember{}).
-			Where("json_extract(congress_member_info, '$.terms[#-1].type') = ?", "sen").
-			Where("UPPER(name) LIKE '%' || ? || '%'", last)
-		var cnt int64
-		query1.Count(&cnt)
-		fmt.Println(cnt)
-		if cnt > 1 {
-			both := query1.Where("UPPER(name) LIKE '%' || ? || '%'", first)
-			both.Count(&cnt)
-			fmt.Println(cnt)
-			if cnt > 1 {
-				// Print all records found
-				var members []m.DB_CongressMember
-				both.Find(&members)
-				for _, m := range members {
-					// Scan manually to see if we can find a year between them
-					// fmt.Println(m.BioGuideId, m.Name, m.CongressMemberInfo.ServedDuringYear(2021))
-					if m.CongressMemberInfo.ServedDuringYear(2021) {
-						member = m
-					}
-				}
-				if member.BioGuideId == "" {
-					log.Fatal("Could not find member ", senator)
-				}
-			} else if cnt == 1 {
-				both.First(&member)
-			}
-		} else if cnt == 1 {
-			query1.First(&member)
+		if senator == "BERRY, SONCERIA" {
+			continue
 		}
-
-		if cnt == 0 {
-			fmt.Println("Could not find member", senator)
+		if strings.Contains(senator, "SECRETARY FOR THE") {
+			// skip non congress critters
 			continue
 		}
 
-		if member.BioGuideId == "" {
-			log.Fatal("Could not find member ", senator)
+		last, first := m.SplitName(senator)
+		member, err := FuzzyFindSenator(db, last, first, "")
+		if err != nil {
+			log.Fatal(err)
 		}
-
-		fmt.Println(senator, member.BioGuideId)
 
 		for _, doc := range office.Documents {
 			// Check for duplicates by doc id

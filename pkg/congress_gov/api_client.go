@@ -92,7 +92,7 @@ func (c *CongGovApiClient) GetBillActions(congressNumber int, billNumber, billTy
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return BillActions{}, fmt.Errorf("Error getting bill actions: %s", resp)
+		return BillActions{}, fmt.Errorf("error getting bill actions: %v", resp)
 	}
 
 	var billActions BillActions
@@ -122,7 +122,7 @@ func (c *CongGovApiClient) GetBillCosponsors(offset, congressNumber int, billNum
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return CosponsorsResponse{}, fmt.Errorf("Error getting bill cosponsors: %s", resp)
+		return CosponsorsResponse{}, fmt.Errorf("error getting bill cosponsors: %v", resp)
 	}
 
 	var cosponsors CosponsorsResponse
@@ -152,7 +152,7 @@ func (c *CongGovApiClient) GetBillDetails(congressNumber int, billNumber, billTy
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("error getting bill details: %s", resp)
+		return nil, fmt.Errorf("error getting bill details: %v", resp)
 	}
 
 	return io.ReadAll(resp.Body)

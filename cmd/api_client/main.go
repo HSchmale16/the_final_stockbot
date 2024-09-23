@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -141,7 +142,13 @@ func ProcessAction(billId uint, action congressgov.BillAction, db *gorm.DB) {
 	// Find the recorded vote. It seems like there is only one included in any given action
 	if len(action.RecordedVotes) > 0 {
 		vote := action.RecordedVotes[0]
-		votes.LoadHouseRollCallXml(vote.Url, db)
+		if strings.Contains(vote.Url, "house.gov") {
+			votes.LoadHouseRollCallXml(vote.Url, db)
+		} else if strings.Contains(vote.Url, "senate.gov") {
+			votes.LoadSenateRollCallXml(vote.Url, db)
+		} else {
+			log.Fatal("Unknown vote URL", vote.Url)
+		}
 
 		// find the vote
 		var dbVote votes.Vote

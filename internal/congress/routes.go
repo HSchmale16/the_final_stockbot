@@ -46,7 +46,12 @@ func BillView(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
 	var bill Bill
-	db.Debug().Preload("Actions").
+	db.Debug().Preload("Actions", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bill_actions.action_time DESC")
+	}).
+		Preload("Actions.Committee").
+		Preload("Actions.Vote").
+		Preload("Actions.Vote.VoteRecords").
 		Preload("Cosponsors.Member").
 		First(&bill, "bill_type = ? AND congress_number = ? AND bill_number = ?", c.Params("bill_type"), c.Params("congress_number"), c.Params("bill_number"))
 

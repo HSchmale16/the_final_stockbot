@@ -7,7 +7,30 @@ import (
 
 func SetupRoutes(app *fiber.App) {
 	vote := app.Group("/htmx/votes")
-	vote.Get("/:memberId", GetVotesForMember)
+	vote.Get("/member/:memberId", GetVotesForMember)
+	vote.Get("/:voteId", GetVote)
+}
+
+func GetVote(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	voteId := c.Params("voteId")
+
+	var vote Vote
+	db.Debug().Preload("VoteRecords").Preload("VoteRecords.Member").First(&vote, "id = ?", voteId)
+
+	// Bin them by vote_status
+
+	var voteStatus = map[string][]VoteRecord{}
+	for _, record := range vote.VoteRecords {
+		voteStatus[record.VoteStatus] = append(voteStatus[record.VoteStatus], record)
+	}
+
+	return c.Render("vote_table", fiber.Map{
+		"Title":      "Vote",
+		"Vote":       vote,
+		"VoteStatus": voteStatus,
+	})
 }
 
 func GetVotesForMember(c *fiber.Ctx) error {

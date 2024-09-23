@@ -1,0 +1,18 @@
+
+{{#each VoteStatus }}
+
+<div>
+    <h1>{{ @key }}</h1>
+
+    {{#each this}}
+    <table>
+        
+    {{#with Member }}
+        {{Name}} - {{Party}} - {{State}} - {{District}}
+    {{/with}}
+    {{/each}}
+    </table>
+
+</div>
+
+{{/each}}

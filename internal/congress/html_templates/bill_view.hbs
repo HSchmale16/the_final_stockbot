@@ -17,7 +17,14 @@
     <ul>
         {{#each Bill.Actions }}
             <li>
-                {{ ActionDate }} {{SourceSystemCode}}: {{Type}}: {{ Text }}
+                {{Type}} - {{ formatDate ActionTime }}
+            {{#equal Type "Committee" }}
+                {{#if Committee }}
+                    {{ Committee.Name }}
+                {{/if}}
+            {{else}}
+                {{ Type }}
+            {{/equal}}
             </li>
         {{/each}}
     </ul>

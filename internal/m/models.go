@@ -399,7 +399,7 @@ func ApplyMigrations(db *gorm.DB) error {
 	// Register additional models
 	for i, m := range additionalModels {
 		log.Printf("Registering model %d: %T", i, m)
-		if err := db.Debug().AutoMigrate(m); err != nil {
+		if err := db.AutoMigrate(m); err != nil {
 			return err
 		}
 	}

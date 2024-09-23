@@ -20,10 +20,10 @@ func init() {
 type Vote struct {
 	gorm.Model
 
-	RollCallNum      int    `gorm:"index:,unique,composite:votename"`
-	CongressNum      int    `gorm:"index:,unique,composite:votename"`
-	Session          string `gorm:"index:,unique,composite:votename"`
-	Chamber          string `gorm:"index:,unique,composite:votename"`
+	RollCallNum      int    `gorm:"uniqueIndex:,unique,composite:votename"`
+	CongressNum      int    `gorm:"uniqueIndex:,unique,composite:votename"`
+	Session          string `gorm:"uniqueIndex:,unique,composite:votename"`
+	Chamber          string `gorm:"uniqueIndex:,unique,composite:votename"`
 	ActionAt         time.Time
 	VoteType         string
 	LegisName        string
@@ -31,7 +31,7 @@ type Vote struct {
 	AmmendmentNum    int
 	AmmendmentAuthor string
 	VoteDesc         string
-	Url              string
+	Url              string `gorm:uniqueIndex`
 
 	VoteRecords []VoteRecord
 }
@@ -40,8 +40,8 @@ type VoteRecord struct {
 	ID        uint `gorm:"primaryKey"`
 	CreatedAt time.Time
 
-	VoteID     uint   `gorm:"index:unique,composite:voterecord"`
-	MemberId   string `gorm:"index:unique,composite:voterecord"`
+	VoteID     uint   `gorm:"uniqueIndex:unique,composite:voterecord"`
+	MemberId   string `gorm:"uniqueIndex:unique,composite:voterecord"`
 	VoteStatus string
 
 	Vote   Vote

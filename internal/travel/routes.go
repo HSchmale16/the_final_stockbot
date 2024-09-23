@@ -43,26 +43,32 @@ func GetTravelHomepage(c *fiber.Ctx) error {
 func GetMostTravelTable(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	// Get the year
-	year, err := strconv.Atoi(c.Params("year"))
+	// Check the year is a number
+	_, err := strconv.Atoi(c.Params("year"))
 	if err != nil {
 		return c.Status(400).SendString("Invalid year")
 	}
+	year := c.Params("year")
 
 	var data []struct {
-		DB_TravelDisclosure
-		Count int
+		MemberId string
+		Member   m.DB_CongressMember
+		Count    int
 	}
 
-	db.Debug().Model(&DB_TravelDisclosure{}).
-		Where("filing_type = ?", "Original").
+	db.Model(DB_TravelDisclosure{}).
+		Where("filing_type != ?", "Ammendment").
 		Where("year = ?", year).
-		Joins("Member").
 		Group("member_id").
 		Select("member_id, Count(*) as count").
 		Order("count DESC").
 		Limit(15).
 		Scan(&data)
+
+	// N+1 query problem here. TODO: FIX
+	for i, d := range data {
+		db.Find(&data[i].Member, "bio_guide_id = ?", d.MemberId)
+	}
 
 	return c.Render("htmx/most_travel_table", fiber.Map{
 		"MostTravel":   data,
@@ -81,10 +87,10 @@ func GetDaysGiftedTravelByParty(c *fiber.Ctx) error {
 	}
 
 	db.Model(&DB_TravelDisclosure{}).
-		Where("filing_type = ?", "Original").
+		Where("filing_type in ?", []string{"Original", "Member Reimbursed Travel"}).
 		Joins("Inner Join congress_member cm ON cm.bio_guide_id = member_id").
-		Group("year, json_extract(congress_member_info, '$.terms[#-1].party')").
-		Select("year, json_extract(congress_member_info, '$.terms[#-1].party') as party, sum(julianday(return_date) - julianday(departure_date)) as count").
+		Group("year, jsonb_path_query_first(congress_member_info, '$.terms[last].party')").
+		Select("year, jsonb_path_query_first(congress_member_info, '$.terms[last].party')#>>'{}' as party, sum(EXTRACT(DAY FROM return_date - departure_date)) as count").
 		Scan(&data)
 
 	result := make(map[int]map[string]int)
@@ -128,11 +134,11 @@ func GetTravelByParty(c *fiber.Ctx) error {
 		Count int    `json:"count"`
 	}
 
-	db.Model(&DB_TravelDisclosure{}).
-		Where("filing_type = ?", "Original").
+	db.Table(DB_TravelDisclosure{}.TableName()).
+		Where("filing_type in ?", []string{"Original", "Member Reimbursed Travel"}).
 		Joins("Inner Join congress_member cm ON cm.bio_guide_id = member_id").
-		Group("year, json_extract(congress_member_info, '$.terms[#-1].party')").
-		Select("year, json_extract(congress_member_info, '$.terms[#-1].party') as party, Count(*) as count").
+		Group("year, jsonb_path_query_first(congress_member_info, '$.terms[last].party')").
+		Select("year, jsonb_path_query_first(congress_member_info, '$.terms[last].party')#>>'{}' as party, Count(*) as count").
 		Scan(&data)
 
 	result := make(map[int]map[string]int)

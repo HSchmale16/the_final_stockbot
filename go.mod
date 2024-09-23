@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/ernestosuarez/itertools v0.0.0-20190516153236-40a02c159e7b
 	github.com/gofiber/fiber/v2 v2.52.2
 	github.com/gofiber/template/handlebars/v2 v2.1.9
 	github.com/marcboeker/go-duckdb v1.7.0
@@ -18,6 +19,8 @@ require (
 	github.com/yalue/merged_fs v1.3.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	gopkg.in/yaml.v3 v3.0.1
+	gorm.io/datatypes v1.2.1
+	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.10
 	gorm.io/plugin/prometheus v0.1.0
 )
@@ -29,7 +32,6 @@ require (
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/ernestosuarez/itertools v0.0.0-20190516153236-40a02c159e7b // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
@@ -56,9 +58,7 @@ require (
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
-	gorm.io/datatypes v1.2.1 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
-	gorm.io/driver/postgres v1.5.9 // indirect
 )
 
 require (

@@ -63,6 +63,8 @@ function makeTravelPartyBarChart(svg, data, title) {
     var y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d3.max(subgroups, key => d[key]))]).nice()
         .range([height, 0]);
+
+    console.log(y);
     svg.append("g")
         .call(d3.axisLeft(y).ticks(null, "s"))
 
