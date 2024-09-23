@@ -157,7 +157,7 @@ func SetupServer() {
 
 	err = app.Listen(":8080")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Something failed during app listen", err)
 	}
 }
 

@@ -271,7 +271,7 @@ func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
 		last, first := m.SplitName(senator)
 		member, err := FuzzyFindSenator(db, last, first, "")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Failed to fuzzy find a senator", err)
 		}
 
 		for _, doc := range office.Documents {

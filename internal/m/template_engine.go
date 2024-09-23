@@ -44,7 +44,7 @@ func RegisterEmbededFS(embededFS embed.FS) {
 	}
 	subFS, err := fs.Sub(embededFS, "html_templates")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to register embeded fs", err)
 	}
 	templatesFS = append(templatesFS, subFS)
 }
@@ -91,7 +91,7 @@ func GetTemplateEngine() fiber.Views {
 		layout := "2006-01-02"
 		t, err := time.Parse(layout, date)
 		if err != nil {
-			fmt.Println(err)
+			log.Print("The date is stupid", err)
 			return "The date is stupid!"
 		}
 		return t.Format("Jan 2, 2006")
