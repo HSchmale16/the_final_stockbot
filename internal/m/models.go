@@ -337,7 +337,7 @@ func GetSqliteDB() (*gorm.DB, error) {
 
 func GetPostgresqlDB() (*gorm.DB, error) {
 	whoami := os.Getenv("USER")
-	dsn := fmt.Sprintf("host=localhost user=%s dbname=congress sslmode=disable", whoami)
+	dsn := fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: GetLogger(),
