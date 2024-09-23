@@ -1,6 +1,8 @@
 package app
 
 import (
+	"log"
+
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	henry_groq "github.com/hschmale16/the_final_stockbot/pkg/groq"
 	"golang.org/x/exp/slices"
@@ -20,7 +22,7 @@ var TagCssColorTypes = []string{
 func DoTagUpdates() {
 	db, err := m.SetupDB()
 	if err != nil {
-		panic(err)
+		log.Fatal("Failed to setup db" + err.Error())
 	}
 
 	var tags []m.Tag
@@ -45,7 +47,7 @@ func GetAiOneLine(name string) string {
 
 	x, err := henry_groq.CallGroqChatApi(henry_groq.Gemma_7b, SYS, name)
 	if err != nil {
-		panic(err)
+		log.Fatal("Failed to describe tag: " + name + " " + err.Error())
 	}
 
 	return x.Choices[0].Message.Content
@@ -69,7 +71,7 @@ The president is a person.`
 
 	x, err := henry_groq.CallGroqChatApi(henry_groq.Gemma_7b, SYS, name)
 	if err != nil {
-		panic(err)
+		log.Fatal("Failed to categorize tag: " + name + " " + err.Error())
 	}
 
 	content := x.Choices[0].Message.Content
