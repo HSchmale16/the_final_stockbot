@@ -119,7 +119,14 @@ func GetGraphNodes(db *gorm.DB, chamber, tagId string) ([]CM_Edge, []CM_GraphNod
 			UseType: "cn", // congress network usage
 		})
 	} else {
-		db.Raw(congress_network_sql, chamber).Scan(&edges)
+		dbErr := db.Debug().Raw(congress_network_sql, chamber).Scan(&edges)
+		if dbErr.Error != nil {
+			return nil, nil, dbErr.Error
+		}
+
+		if len(edges) == 0 {
+			return nil, nil, fmt.Errorf("No edges found")
+		}
 	}
 
 	// Distinctify the people in source and target
