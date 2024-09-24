@@ -125,7 +125,7 @@ func GetGraphNodes(db *gorm.DB, chamber, tagId string) ([]CM_Edge, []CM_GraphNod
 		}
 
 		if len(edges) == 0 {
-			return nil, nil, fmt.Errorf("No edges found")
+			return nil, nil, fmt.Errorf("no edges found")
 		}
 	}
 

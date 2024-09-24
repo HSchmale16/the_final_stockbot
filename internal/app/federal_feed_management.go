@@ -45,6 +45,7 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 		Title:              item.Title,
 		Link:               item.Link,
 		PubDate:            item.PubDate,
+		ProcessedOn:        time.Now(),
 	}
 
 	// Search by link
@@ -53,11 +54,6 @@ func CreateDatabaseItemFromRssItem(item LawRssItem, db *gorm.DB) (bool, GovtRssI
 
 	log.Println("Count:", count, "Link:", item.Link)
 	if count == 0 {
-		// for _, tagName := range item.Category {
-		// 	tag := GetTag(db, tagName)
-		// 	newItem.Categories = append(newItem.Categories, tag)
-		// }
-
 		fmt.Println(newItem)
 		x := db.Debug().Create(&newItem)
 		if x.Error != nil {

@@ -62,6 +62,27 @@
         role: linuxuser,final_stockbot
         state: present
 
+    - name: "Grant all privileges on database"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_privs:
+        db: congress
+        privs: ALL
+        type: database
+        objs: congress
+        role: linuxuser,final_stockbot
+        state: present
+    - name: "Grant select on all tables"
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_privs:
+        db: congress
+        privs: SELECT
+        type: table
+        objs: ALL_IN_SCHEMA
+        role: linuxuser,final_stockbot
+        state: present
+
 
 
   handlers:

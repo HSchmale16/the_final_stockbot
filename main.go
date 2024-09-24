@@ -16,7 +16,6 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/votes"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"github.com/hschmale16/the_final_stockbot/pkg/utils"
-	"github.com/robfig/cron/v3"
 )
 
 //go:generate npm run build
@@ -58,7 +57,7 @@ func main() {
 
 	db, err := m.SetupDB()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect: ", err)
 	}
 
 	if script != "" {
@@ -142,34 +141,34 @@ func main() {
 		return
 	}
 
-	if !disableFetcherService {
-		ch := make(app.LawRssItemChannel, 10)
+	// if !disableFetcherService {
+	// 	ch := make(app.LawRssItemChannel, 10)
 
-		go app.RunFetcherService(ch)
+	// 	go app.RunFetcherService(ch)
 
-		triggerRssFetch := func() {
-			log.Println("Triggering RSS fetch")
-			for _, rssLink := range app.RssLinks {
-				go app.HandleLawRss(rssLink, ch)
-			}
-		}
+	// 	triggerRssFetch := func() {
+	// 		log.Println("Triggering RSS fetch")
+	// 		for _, rssLink := range app.RssLinks {
+	// 			go app.HandleLawRss(rssLink, ch)
+	// 		}
+	// 	}
 
-		cron := cron.New()
-		cron.AddFunc("@every 4h", triggerRssFetch)
-		// cron.AddFunc("@every 12", func() {
-		// 	db.Exec("ANALYZE")
-		// })
-		//cron.AddFunc("@every 12h", app.FindUntaggedLaws)
-		app.FindUntaggedLaws()
-		triggerRssFetch()
+	// 	cron := cron.New()
+	// 	cron.AddFunc("@every 4h", triggerRssFetch)
+	// 	// cron.AddFunc("@every 12", func() {
+	// 	// 	db.Exec("ANALYZE")
+	// 	// })
+	// 	//cron.AddFunc("@every 12h", app.FindUntaggedLaws)
+	// 	app.FindUntaggedLaws()
+	// 	triggerRssFetch()
 
-		cron.Start()
-	}
+	// 	cron.Start()
+	// }
 
 	if !disableWebServer {
-		fmt.Println("Before go live do database maintenance")
-		// On start up do database maintanence
-		db.Exec("ANALYZE")
+		// fmt.Println("Before go live do database maintenance")
+		// // On start up do database maintanence
+		// db.Exec("ANALYZE")
 
 		fmt.Println("Starting up...")
 		app.SetupServer()

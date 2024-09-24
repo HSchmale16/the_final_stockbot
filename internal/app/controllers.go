@@ -41,7 +41,7 @@ type SearchQuery = m.SearchQuery
 func SetupServer() {
 	db, err := m.SetupDB()
 	if err != nil {
-		panic(err)
+		log.Fatal("Failed to setup db: ", err)
 	}
 
 	app := fiber.New(fiber.Config{
