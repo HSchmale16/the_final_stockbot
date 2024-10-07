@@ -2,6 +2,7 @@ package m
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"log"
@@ -14,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/handlebars/v2"
 	"github.com/yalue/merged_fs"
+	"gorm.io/datatypes"
 )
 
 //go:embed html_templates/*
@@ -119,6 +121,22 @@ func GetTemplateEngine() fiber.Views {
 	})
 
 	engine.AddFunc("eqTernaryShort", eqTernaryShort)
+
+	engine.AddFunc("formatJSON", func(s datatypes.JSON) string {
+		// Parse the json and return a pretty printed string
+		var x interface{}
+		err := json.Unmarshal(s, &x)
+		if err != nil {
+			log.Println("Error parsing JSON", err)
+			return "Error parsing JSON"
+		}
+		b, err := json.MarshalIndent(x, "", "  ")
+		if err != nil {
+			log.Println("Error marshalling JSON", err)
+			return "Failed to marshal"
+		}
+		return string(b)
+	})
 
 	return engine
 }

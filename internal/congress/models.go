@@ -2,6 +2,7 @@ package congress
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -19,6 +20,11 @@ type Bill struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
+	FetchedAt         time.Time
+	CosponsorsFetchAt time.Time
+	ActionsFetchAt    time.Time
+	CommitteeFetchAt  time.Time
+
 	CongressNumber int    `gorm:"uniqueIndex:idx_bill_congress_number_bill_number"`
 	BillNumber     string `gorm:"uniqueIndex:idx_bill_congress_number_bill_number"`
 	BillType       string `gorm:"uniqueIndex:idx_bill_congress_number_bill_number"`
@@ -27,6 +33,7 @@ type Bill struct {
 
 	Cosponsors []BillCosponsor
 	Actions    []BillAction
+	Committees []m.DB_CongressCommittee `gorm:"many2many:bill_committees;"`
 }
 
 func (b Bill) TableName() string {
@@ -36,6 +43,17 @@ func (b Bill) TableName() string {
 func (b Bill) FormatTitle() string {
 	return fmt.Sprintf("%d %s %s - %s", b.CongressNumber, b.BillType, b.BillNumber, b.Title)
 }
+
+func (b Bill) GetJsonBlob() map[string]interface{} {
+	var blob map[string]interface{}
+	err := json.Unmarshal(b.JsonBlob, &blob)
+	if err != nil {
+		return nil
+	}
+	return blob
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 type BillAction struct {
 	ID        uint

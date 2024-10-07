@@ -2,10 +2,15 @@ package congress
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	congressgov "github.com/hschmale16/the_final_stockbot/pkg/congress_gov"
 	"gorm.io/gorm"
 )
 
@@ -45,6 +50,14 @@ func BillList(c *fiber.Ctx) error {
 func BillView(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
+	billType := c.Params("bill_type")
+	// as int
+	congressNumber, err := c.ParamsInt("congress_number")
+	if err != nil {
+		return c.Status(400).SendString("400 Bad Request")
+	}
+	billNumber := c.Params("bill_number")
+
 	var bill Bill
 	db.Debug().Preload("Actions", func(db *gorm.DB) *gorm.DB {
 		return db.Order("bill_actions.action_time DESC")
@@ -53,11 +66,64 @@ func BillView(c *fiber.Ctx) error {
 		Preload("Actions.Vote").
 		Preload("Actions.Vote.VoteRecords").
 		Preload("Cosponsors.Member").
-		First(&bill, "bill_type = ? AND congress_number = ? AND bill_number = ?", c.Params("bill_type"), c.Params("congress_number"), c.Params("bill_number"))
+		First(&bill, "bill_type = ? AND congress_number = ? AND bill_number = ?", billType, congressNumber, billNumber)
+
+	if bill.ID == 0 || bill.FetchedAt.Before(time.Now().Add(-24*time.Hour)) {
+		go func() {
+			fmt.Println("Bill not found or stale", c.Params("bill_type"), c.Params("congress_number"), c.Params("bill_number"))
+			client := congressgov.NewClient(os.Getenv("CONGRESS_GOV_API_TOKEN"))
+
+			billBytes, err := client.GetBillDetails(congressNumber, billNumber, billType)
+			if err != nil {
+				fmt.Println("Error", err)
+				return
+			}
+
+			var bill2 congressgov.BillDetails
+			err = json.Unmarshal(billBytes, &bill2)
+			if err != nil {
+				log.Fatal("Fatal to parse", err)
+				return
+			}
+			bill2 = bill2["bill"].(map[string]interface{})
+
+			fmt.Println(bill2)
+
+			if bill.ID == 0 {
+				bill = Bill{
+					CongressNumber: congressNumber,
+					BillNumber:     billNumber,
+					BillType:       billType,
+					Title:          bill2["title"].(string),
+					JsonBlob:       billBytes,
+				}
+			} else {
+				bill.Title = bill2["title"].(string)
+				bill.JsonBlob = billBytes
+				bill.FetchedAt = time.Now()
+			}
+			db.Save(&bill)
+
+			x := bill2["sponsors"].([]interface{})[0].(map[string]interface{})["bioguideId"]
+			fmt.Println(x)
+
+			err = db.Debug().Model(&bill).Association("Cosponsors").Append(&BillCosponsor{
+				MemberId:          x.(string),
+				OriginalCosponsor: true,
+				IsSponsor:         true,
+			})
+			if err != nil {
+				fmt.Println("Error", err)
+			}
+
+		}()
+		return c.Status(404).Render("bill_loading", fiber.Map{}, "layouts/main")
+	}
 
 	return c.Render("bill_view", fiber.Map{
-		"Title": bill.FormatTitle(),
-		"Bill":  bill,
+		"Title":    bill.FormatTitle(),
+		"Bill":     bill,
+		"BillBlob": bill.GetJsonBlob(),
 	}, "layouts/main")
 }
 
