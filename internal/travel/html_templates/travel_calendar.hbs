@@ -1,7 +1,10 @@
-<p>Below we can see a calendar of the destinations of the various congress critters</p>
+{{> 'partials/title_heading' title=Title subtitle="FAQ" }}
 
-<a href="/travel/calendar/{{PrevMonth}}">Previous</a>
-<a href="/travel/calendar/{{NextMonth}}">Next</a>
+<div class="flex w-full justify-between">
+    <a href="/travel/calendar/{{PrevMonth}}">Previous</a>
+    <a href="/travel/calendar/{{NextMonth}}">Next</a>
+</div>
+
 
 <table class="w-full">
     <thead>
@@ -20,7 +23,7 @@
             <tr>
                 {{#each Dates }}
                     <td class="align-top">
-                        <b class="travelDay">{{ DayNumber }}</b>
+                        <b class="travelDay" data-month="{{ MonthNumber }}">{{ DayNumber }}</b>
                         {{#each Destinations }}
                             <p>{{ @key }} {{ this }}</p>
                         {{/each}}
@@ -30,5 +33,15 @@
         {{/each}}
     </tbody>
 </table>
+
+<div id="wrapper"></div>
+
+<script>
+    const monthInt = {{ monthInt }};
+    const yearInt = {{ yearInt}};
+
+    console.log('monthInt', monthInt);
+    console.log('yearInt', yearInt);
+</script>
 
 <script src="/static/viz-js/calendar-helper.js"></script>

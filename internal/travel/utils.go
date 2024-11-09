@@ -14,7 +14,8 @@ type TravelWeek struct {
 }
 
 type DatesStruct []struct {
-	DayNumber int
+	MonthNumber int
+	DayNumber   int
 	// Destinations to number of congress critters there
 	Destinations       map[string]int
 	DestinationsSorted []string
@@ -47,6 +48,7 @@ func GetTravelCalendarData(year, month int, db *gorm.DB) []TravelWeek {
 		for j := 0; j < 7; j++ {
 			day := firstDay.AddDate(0, 0, i*7+j)
 			week.Dates[j].DayNumber = day.Day()
+			week.Dates[j].MonthNumber = int(day.Month())
 
 			for _, t := range travels {
 				if t.DepartureDate.Day() <= day.Day() && t.ReturnDate.Day() >= day.Day() {
