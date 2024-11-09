@@ -1,6 +1,7 @@
 package travel
 
 import (
+	"sort"
 	"strconv"
 	"time"
 
@@ -19,6 +20,18 @@ type DatesStruct []struct {
 	// Destinations to number of congress critters there
 	Destinations       map[string]int
 	DestinationsSorted []string
+}
+
+func (d DatesStruct) MakeDestinationsSorted() {
+	for i := range d {
+		d[i].DestinationsSorted = make([]string, 0, len(d[i].Destinations))
+		for k := range d[i].Destinations {
+			dest := d[i].Destinations[k]
+			destStr := k + " (" + strconv.Itoa(dest) + ")"
+			d[i].DestinationsSorted = append(d[i].DestinationsSorted, destStr)
+		}
+		sort.Strings(d[i].DestinationsSorted)
+	}
 }
 
 func GetTravelCalendarData(year, month int, db *gorm.DB) []TravelWeek {
@@ -59,6 +72,7 @@ func GetTravelCalendarData(year, month int, db *gorm.DB) []TravelWeek {
 				}
 			}
 		}
+		week.Dates.MakeDestinationsSorted()
 
 		weeks[i] = week
 	}

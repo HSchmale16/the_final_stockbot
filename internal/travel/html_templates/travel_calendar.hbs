@@ -24,8 +24,8 @@
                 {{#each Dates }}
                     <td class="align-top">
                         <b class="travelDay" data-month="{{ MonthNumber }}">{{ DayNumber }}</b>
-                        {{#each Destinations }}
-                            <p>{{ @key }} {{ this }}</p>
+                        {{#each DestinationsSorted }}
+                            <p>{{ this }}</p>
                         {{/each}}
                     </td>
                 {{/each}}
