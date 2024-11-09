@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -169,7 +171,7 @@ func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {
 					FilingType:    disclosure.FilingType,
 					DepartureDate: departureDate,
 					ReturnDate:    returnDate,
-					Destination:   disclosure.Destination,
+					Destination:   NormalizeDestination(disclosure.Destination),
 					TravelSponsor: disclosure.TravelSponsor,
 					MemberId:      member.BioGuideId,
 				})
@@ -177,6 +179,16 @@ func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {
 			}
 		}
 	}
+}
+
+func NormalizeDestination(dest string) string {
+	// capitalize the first letter of each word
+	words := strings.Split(dest, " ")
+	caser := cases.Title(language.English)
+	for i, word := range words {
+		words[i] = caser.String(word)
+	}
+	return strings.TrimSpace(strings.Join(words, " "))
 }
 
 func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) {

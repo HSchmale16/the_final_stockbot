@@ -104,6 +104,7 @@
         name: "Update House Travel Disclosure"
         day: "*"
         hour: "1"
+        minute: "15"
         job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/house_gift_travel.sh"
         user: final_stockbot
         state: present
@@ -113,6 +114,7 @@
         name: "Update Senate Travel Disclosure"
         day: "*"
         hour: "2"
+        minute: "15"
         job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate_gift_travel.sh"
         user: final_stockbot
         state: present

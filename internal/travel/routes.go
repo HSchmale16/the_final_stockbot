@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
@@ -31,6 +32,41 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/htmx/travel/who-travels-most/:year", GetMostTravelTable)
 	app.Get("/json/travel-by-party", GetTravelByParty)
 	app.Get("/json/days-traveled-by-party", GetDaysGiftedTravelByParty)
+	app.Get("/json/calendar/:year/:month/:day", GetTripsIncludingDay)
+	app.Get("/travel/calendar/:year/:month", GetTravelCalendar)
+}
+
+func GetTripsIncludingDay(c *fiber.Ctx) error {
+	return nil
+}
+
+func GetTravelCalendar(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	// make ints
+	year := c.Params("year")
+	month := c.Params("month")
+
+	// Get year
+	yearInt, err := strconv.Atoi(year)
+	if err != nil {
+		return c.Status(400).SendString("Invalid year")
+	}
+
+	// Get month name
+	monthInt, err := strconv.Atoi(month)
+	if err != nil {
+		return c.Status(400).SendString("Invalid month")
+	}
+	monthName := time.Month(monthInt).String()
+
+	return c.Render("travel_calendar", fiber.Map{
+		"Title":     "Travel Calendar - " + monthName + ", " + year,
+		"PrevMonth": time.Date(yearInt, time.Month(monthInt), 1, 0, 0, 0, 0, time.UTC).AddDate(0, -1, 0).Format("2006/01"),
+		"NextMonth": time.Date(yearInt, time.Month(monthInt), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0).Format("2006/01"),
+		"weeks":     GetTravelCalendarData(yearInt, monthInt, db),
+		"yearInt":   yearInt,
+	}, "layouts/main")
 }
 
 func GetTravelHomepage(c *fiber.Ctx) error {
