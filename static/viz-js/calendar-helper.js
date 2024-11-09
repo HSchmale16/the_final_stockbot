@@ -2,11 +2,23 @@
  * Helps with the travel calendar to provide better rendering of things
  */
 
+function renderMemberName(row) {
+    const name = row.Member.CongressMemberInfo.name.official_full;
+    const lastTerm = row.Member.CongressMemberInfo.terms[row.Member.CongressMemberInfo.terms.length - 1];
+
+    if (lastTerm.type == "rep") {
+        return `${name} (${lastTerm.party}-${lastTerm.state}-${lastTerm.district})`;
+    }
+
+    return `${name} (${lastTerm.party}-${lastTerm.state})`;
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const travelDays = document.querySelectorAll('.travelDay');
 
     var grid = new gridjs.Grid({
+        pagination: true,
+        search: true,
         columns: [
             'Filer Name',
             {
@@ -21,7 +33,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     return new Date(cell).toLocaleDateString();
                 }
             }, 
-            'Destination',
+            {
+                name: 'Destination'
+            },
             {
                 name: 'Congress Person',
             }
@@ -33,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 row.DepartureDate,
                 row.ReturnDate,
                 row.Destination,
-                row.MemberName
+                gridjs.html(`<a href="/congress-member/${row.MemberId}">${renderMemberName(row)}</a>`)
             ])
         }
     })
@@ -47,6 +61,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const dayInt = parseInt(day.innerText);
         day.addEventListener('click', function () {
             console.log('clicked on day', dayInt, monthInt);
+
+            travelDays.forEach(function (day) {
+                day.classList.remove('selected');
+            });
         });
     });
 });

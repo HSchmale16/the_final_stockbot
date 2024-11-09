@@ -38,6 +38,10 @@
   .bar-segment {
     @apply text-white text-xs font-bold py-2;
   }
+
+  .selected {
+    @apply bg-blue-700;
+  }
 }
 
 
