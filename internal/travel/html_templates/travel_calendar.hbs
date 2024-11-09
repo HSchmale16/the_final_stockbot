@@ -6,23 +6,23 @@
 </div>
 
 
-<table class="w-full">
+<table class="w-full border-collapse border">
     <thead>
         <tr>
-            <th>Sunday</th>
-            <th>Monday</th>
-            <th>Tuesday</th>
-            <th>Wednesday</th>
-            <th>Thursday</th>
-            <th>Friday</th>
-            <th>Saturday</th>
+            <th class="border">Sunday</th>
+            <th class="border">Monday</th>
+            <th class="border">Tuesday</th>
+            <th class="border">Wednesday</th>
+            <th class="border">Thursday</th>
+            <th class="border">Friday</th>
+            <th class="border">Saturday</th>
         </tr>
     </thead>
     <tbody>
         {{#each weeks}}
             <tr>
                 {{#each Dates }}
-                    <td class="align-top">
+                    <td class="align-top border">
                         <b class="travelDay" data-month="{{ MonthNumber }}">{{ DayNumber }}</b>
                         {{#each DestinationsSorted }}
                             <p>{{ this }}</p>
