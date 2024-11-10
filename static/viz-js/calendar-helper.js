@@ -2,6 +2,8 @@
  * Helps with the travel calendar to provide better rendering of things
  */
 
+// import * as gridjs from 'gridjs';
+
 function renderMemberName(row) {
     const name = row.Member.CongressMemberInfo.name.official_full;
     const lastTerm = row.Member.CongressMemberInfo.terms[row.Member.CongressMemberInfo.terms.length - 1];
@@ -21,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
         search: true,
         columns: [
             'Filer Name',
+            {
+                name: 'Sponsor',
+            },
             {
                 name: 'Departure Date',
                 formatter: (cell) => {
@@ -44,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
             url: `/json/travel/calendar/${yearInt}/${monthInt}`,
             then: data => data.map(row => [
                 row.FilerName,
+                row.TravelSponsor,
                 row.DepartureDate,
                 row.ReturnDate,
                 row.Destination,
@@ -51,10 +57,14 @@ document.addEventListener('DOMContentLoaded', function () {
             ])
         }
     })
-    console.log('grid', grid);
+    // console.log('grid', grid);
+    // grid.plugin.add({
+    //     id: 'magical-filter-bullshit',
+    //     component: MagicalFilterBullshitPlugin,
+    //     position: gridjs
+    // })
 
     grid.render(document.getElementById('wrapper'));
-
 
     travelDays.forEach(function (day) {
         const monthInt = parseInt(day.getAttribute('data-month'));
@@ -68,3 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function MagicalFilterBullshitPlugin() {
+    return gridjs.h('div', {}, 'Hello World');
+}
