@@ -52,6 +52,7 @@ func GetCalendar2(c *fiber.Ctx) error {
 		// .Where("departure_date >= TO_DATE(?, 'YYYY-MM-DD')", targetDate).
 		// Where("return_date <= TO_DATE(?, 'YYYY-MM-DD')", targetDate).
 		Preload("Member").
+		Order("destination DESC").
 		Find(&disclosures)
 
 	return c.JSON(disclosures)
@@ -64,7 +65,9 @@ func GetTripsInYearMonth(c *fiber.Ctx) error {
 	month := c.Params("month")
 
 	var trips []DB_TravelDisclosure
-	db.Preload("Member").Find(&trips, "year = ? AND EXTRACT(MONTH FROM departure_date) = ?", year, month)
+	db.Preload("Member").
+		Order("destination DESC").
+		Find(&trips, "year = ? AND EXTRACT(MONTH FROM departure_date) = ?", year, month)
 
 	return c.JSON(trips)
 }

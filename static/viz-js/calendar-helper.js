@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // progressiveLoad:"scroll",
         paginationSize:20,
         height: '500px',
+        groupBy: "Destination",
         columns: [
             {
                 title: "Filer Name",
