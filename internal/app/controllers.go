@@ -88,7 +88,7 @@ func SetupServer() {
 		})
 		return c.Next()
 	})
-	app.Use(helmet.New())
+	// app.Use(helmet.New())
 
 	// Setup the Routes
 	app.Get("/", Index)
