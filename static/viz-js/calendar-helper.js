@@ -33,6 +33,13 @@ document.addEventListener('DOMContentLoaded', function () {
             filter.innerText = "IncludesDate: " + dateFilter;
             filtersDIV.appendChild(filter);
 
+            var removeBtn = document.createElement('button');
+            removeBtn.addEventListener('click', resetDateFilter);
+            removeBtn.innerText = '❌';
+
+            filter.appendChild(removeBtn);
+
+
             console.log(filtersDIV);
         }
 
