@@ -93,7 +93,7 @@ func GetTravelCalendar(c *fiber.Ctx) error {
 	monthName := time.Month(monthInt).String()
 
 	return c.Render("travel_calendar", fiber.Map{
-		"Title":     "Travel Calendar - " + monthName + " " + year,
+		"Title":     "Gifted Travel Calendar - " + monthName + " " + year,
 		"PrevMonth": time.Date(yearInt, time.Month(monthInt), 1, 0, 0, 0, 0, time.UTC).AddDate(0, -1, 0).Format("2006/01"),
 		"NextMonth": time.Date(yearInt, time.Month(monthInt), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0).Format("2006/01"),
 		"weeks":     GetTravelCalendarData(yearInt, monthInt, db),
