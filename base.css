@@ -42,6 +42,10 @@
   .selected {
     @apply bg-blue-700;
   }
+
+  .travelDay:hover {
+    cursor: help;
+  }
 }
 
 

@@ -4,9 +4,9 @@
 
 // // import * as gridjs from 'gridjs';
 
-function renderMemberName(row) {
-    const name = row.Member.CongressMemberInfo.name.official_full;
-    const lastTerm = row.Member.CongressMemberInfo.terms[row.Member.CongressMemberInfo.terms.length - 1];
+function renderMemberName(Member) {
+    const name = Member.CongressMemberInfo.name.official_full;
+    const lastTerm = Member.CongressMemberInfo.terms[Member.CongressMemberInfo.terms.length - 1];
 
     if (lastTerm.type == "rep") {
         return `${name} (${lastTerm.party}-${lastTerm.state}-${lastTerm.district})`;
@@ -16,7 +16,36 @@ function renderMemberName(row) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    function updateFilters() {
+        // Generate the url and set the data value
+        var url = `/json/travel/calendar/${yearInt}/${monthInt}`;
+        if (dateFilter !== null) {
+            url = '/json/travel/calendar2?' + new URLSearchParams({ targetDate: dateFilter });
+        }
+
+        table.setData(url);
+
+        filtersDIV.innerHTML = '';
+        if (dateFilter !== null) {
+            const filter = document.createElement('div');
+            filter.classList.add('badge');
+            filter.classList.add('bg-gray-500');
+            filter.innerText = "IncludesDate: " + dateFilter;
+            filtersDIV.appendChild(filter);
+
+            console.log(filtersDIV);
+        }
+
+    }
+
+    function resetDateFilter() {
+        dateFilter = null;
+        updateFilters();
+    }
+
     const travelDays = document.querySelectorAll('.travelDay');
+    var filtersDIV = document.getElementById('filtersApplied');
+    var dateFilter = null;
 
     var table = new Tabulator("#wrapper", {
         ajaxURL: `/json/travel/calendar/${yearInt}/${monthInt}`,
@@ -30,66 +59,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 field: 'FilerName',
             },
             {
+                title: 'Congress Person',
+                field: 'Member',
+                formatter: (cell, formatterParams) => {
+                    var value = cell.getValue();
+                    return `<a href="/congress-member/${value.BioGuideId}">${renderMemberName(value)}</a>`;
+                 },
+            },
+            {
                 title: 'Sponsor',
                 field: 'TravelSponsor',
             },
             {
                 title: 'Departure Date',
                 field: 'DepartureDate',
-                formatter: 'date',
+                formatter: shittyDateFormat,
             },
             {
                 title: 'Return Date',
                 field: 'ReturnDate',
-                formatter: 'date',
+                formatter: shittyDateFormat,
             },
             {
                 title: 'Destination',
                 field: 'Destination'
             },
         ]
-    })
+    });
 
-    console.log('table', table);
+    console.log(table);
 
-    // var grid = new gridjs.Grid({
-    //     pagination: true,
-    //     search: true,
-    //     columns: [
-    //         'Filer Name',
-    //         {
-    //             name: 'Sponsor',
-    //         },
-    //         {
-    //             name: 'Departure Date',
-    //             formatter: (cell) => {
-    //                 return new Date(cell).toLocaleDateString();
-    //             }
-    //         },
-    //         {
-    //             name: 'Return Date',
-    //             formatter: (cell) => {
-    //                 return new Date(cell).toLocaleDateString();
-    //             }
-    //         }, 
-    //         {
-    //             name: 'Destination'
-    //         },
-    //         {
-    //             name: 'Congress Person',
-    //         }
-    //     ],
-    //     server: {
-    //         url: `/json/travel/calendar/${yearInt}/${monthInt}`,
-    //         then: data => data.map(row => [
-    //             row.FilerName,
-    //             row.TravelSponsor,
-    //             row.DepartureDate,
-    //             row.ReturnDate,
-    //             row.Destination,
-    //             gridjs.html(`<a href="/congress-member/${row.MemberId}">${renderMemberName(row)}</a>`)
-    //         ])
-    //     }
-    // })
+    travelDays.forEach((day) => {
+        day.addEventListener('click', (e) => {
+            const day = e.target.innerText;
+            const month = e.target.getAttribute('data-month');
+            const year = yearInt; // from global scope
 
+            dateFilter = `${year}-${month}-${day}`;
+            updateFilters();
+
+            
+        });
+    });
 });
+
+function shittyDateFormat(cell, formatterParams) {
+    var value = cell.getValue();
+    return new Date(value).toLocaleDateString();
+}

@@ -35,6 +35,26 @@ func SetupRoutes(app *fiber.App) {
 
 	app.Get("/travel/calendar/:year/:month", GetTravelCalendar)
 	app.Get("/json/travel/calendar/:year/:month", GetTripsInYearMonth)
+	app.Get("/json/travel/calendar2", GetCalendar2)
+}
+
+func GetCalendar2(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	targetDate := c.Query("targetDate")
+	if targetDate == "" {
+		return c.Status(400).SendString("Invalid targetDate")
+	}
+
+	var disclosures []DB_TravelDisclosure
+	db.Debug().
+		Where("TO_DATE(?, 'YYYY-MM-DD') BETWEEN SYMMETRIC DATE(departure_date) AND DATE(return_date)", targetDate).
+		// .Where("departure_date >= TO_DATE(?, 'YYYY-MM-DD')", targetDate).
+		// Where("return_date <= TO_DATE(?, 'YYYY-MM-DD')", targetDate).
+		Preload("Member").
+		Find(&disclosures)
+
+	return c.JSON(disclosures)
 }
 
 func GetTripsInYearMonth(c *fiber.Ctx) error {
