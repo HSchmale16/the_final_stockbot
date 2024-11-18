@@ -48,9 +48,9 @@ func GetCalendar2(c *fiber.Ctx) error {
 
 	var disclosures []DB_TravelDisclosure
 	db.Debug().
-		Where("TO_DATE(?, 'YYYY-MM-DD') BETWEEN SYMMETRIC DATE(departure_date) AND DATE(return_date)", targetDate).
-		// .Where("departure_date >= TO_DATE(?, 'YYYY-MM-DD')", targetDate).
-		// Where("return_date <= TO_DATE(?, 'YYYY-MM-DD')", targetDate).
+		// Where("TO_DATE(?, 'YYYY-MM-DD') BETWEEN SYMMETRIC DATE(departure_date) AND DATE(return_date)", targetDate).
+		Where("departure_date::date <= ?::date", targetDate).
+		Where("return_date::date >= ?::date", targetDate).
 		Preload("Member").
 		Order("destination ASC").
 		Find(&disclosures)
