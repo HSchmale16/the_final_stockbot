@@ -65,9 +65,9 @@ func GetTripsInYearMonth(c *fiber.Ctx) error {
 	month := c.Params("month")
 
 	var trips []DB_TravelDisclosure
-	db.Preload("Member").
-		Order("destination ASC").
-		Find(&trips, "year = ? AND EXTRACT(MONTH FROM departure_date) = ?", year, month)
+	db.Debug().
+		Preload("Member").
+		Where("year = ? AND (EXTRACT(MONTH FROM departure_date) = ? OR EXTRACT(MONTH FROM return_date) = ?)", year, month, month).Find(&trips)
 
 	return c.JSON(trips)
 }
@@ -98,7 +98,7 @@ func GetTravelCalendar(c *fiber.Ctx) error {
 		"NextMonth": time.Date(yearInt, time.Month(monthInt), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0).Format("2006/01"),
 		"weeks":     GetTravelCalendarData(yearInt, monthInt, db),
 		"yearInt":   yearInt,
-		"monthInt":  monthInt + 1,
+		"monthInt":  monthInt,
 	}, "layouts/main")
 }
 
