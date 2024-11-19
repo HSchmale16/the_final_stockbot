@@ -2,6 +2,7 @@ package travel
 
 import (
 	"embed"
+	"fmt"
 	"log"
 	"net/url"
 	"sort"
@@ -64,10 +65,13 @@ func GetTripsInYearMonth(c *fiber.Ctx) error {
 	year := c.Params("year")
 	month := c.Params("month")
 
+	dateStr := fmt.Sprintf("%s-%s-01", year, month)
+
 	var trips []DB_TravelDisclosure
 	db.Debug().
 		Preload("Member").
-		Where("year = ? AND (EXTRACT(MONTH FROM departure_date) = ? OR EXTRACT(MONTH FROM return_date) = ?)", year, month, month).Find(&trips)
+		Where("?::date in (date_trunc('month', departure_date)::date, date_trunc('month', return_date)::date)", dateStr).
+		Find(&trips)
 
 	return c.JSON(trips)
 }

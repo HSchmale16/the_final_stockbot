@@ -1,6 +1,7 @@
 package travel
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"time"
@@ -38,8 +39,12 @@ func GetTravelCalendarData(year, month int, db *gorm.DB) []TravelWeek {
 	yearStr := strconv.Itoa(year)
 	monthStr := strconv.Itoa(month)
 
+	dateStr := fmt.Sprintf("%s-%s-01", yearStr, monthStr)
+
 	var travels []DB_TravelDisclosure
-	db.Debug().Where("year = ? AND (EXTRACT(MONTH FROM departure_date) = ? OR EXTRACT(MONTH FROM return_date) = ?)", yearStr, monthStr, monthStr).Find(&travels)
+	db.Debug().
+		Where("?::date in (date_trunc('month', departure_date)::date, date_trunc('month', return_date)::date)", dateStr).
+		Find(&travels)
 
 	weeks := make([]TravelWeek, 5)
 	MAX_WEEKS_IN_MONTH := 5
