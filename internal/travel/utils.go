@@ -69,7 +69,9 @@ func GetTravelCalendarData(year, month int, db *gorm.DB) []TravelWeek {
 			week.Dates[j].MonthNumber = int(day.Month())
 
 			for _, t := range travels {
-				if t.DepartureDate.Day() <= day.Day() && t.ReturnDate.Day() >= day.Day() {
+				inRange := t.DepartureDate.Day() <= day.Day() && t.ReturnDate.Day() >= day.Day()
+				inMonth := t.DepartureDate.Month() == day.Month() || t.ReturnDate.Month() == day.Month()
+				if inRange && inMonth {
 					if week.Dates[j].Destinations == nil {
 						week.Dates[j].Destinations = make(map[string]int)
 					}
