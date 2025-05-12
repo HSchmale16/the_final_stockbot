@@ -290,10 +290,15 @@ func GetTopDestinations(c *fiber.Ctx) error {
 		Destination string
 		Count       int
 	}
+	a := time.Now().Year()
+	b := a - 1
+	aStr := fmt.Sprint(a)
+	bStr := fmt.Sprint(b)
+
 	x := db.Table("travel_disclosures").
 		Select("destination, count(destination) as count").
 		Where("destination != ''").
-		Where("year in (?, ?)", time.Now().Year(), time.Now().Year()-1).
+		Where("year in (?, ?)", aStr, bStr).
 		Group("destination").
 		Order("count DESC").
 		Limit(limit).
