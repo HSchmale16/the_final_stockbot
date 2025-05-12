@@ -293,6 +293,7 @@ func GetTopDestinations(c *fiber.Ctx) error {
 	x := db.Table("travel_disclosures").
 		Select("destination, count(destination) as count").
 		Where("destination != ''").
+		Where("year in (?, ?)", time.Now().Year(), time.Now().Year()-1).
 		Group("destination").
 		Order("count DESC").
 		Limit(limit).
