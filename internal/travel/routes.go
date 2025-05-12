@@ -146,7 +146,7 @@ func GetMostTravelTable(c *fiber.Ctx) error {
 	return c.Render("htmx/most_travel_table", fiber.Map{
 		"MostTravel":   data,
 		"SelectedYear": year,
-		"Years":        []int{2018, 2019, 2020, 2021, 2022, 2023, 2024},
+		"Years":        []int{2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025},
 	})
 }
 
