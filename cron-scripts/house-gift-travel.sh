@@ -5,9 +5,6 @@ pwd
 YEAR=$(date +"%Y")
 if [ -n "$1" ]; then
     YEAR=$1
-else
-    echo "FAILED TO GET YEAR"
-    exit 1
 fi
 
 filePath=$(mktemp)
