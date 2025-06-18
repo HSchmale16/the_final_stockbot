@@ -6,16 +6,19 @@
 
 
 pwd
-wget -O giftruledata.zip https://giftrule-disclosure.senate.gov/media/giftruledownloads/giftruledata.zip
-if [[ ! -x ./the_final_stockbot/the_final_stockbot ]]; then
+filePath=$(mktemp)
+BINARY=~final_stockbot/the_final_stockbot/the_final_stockbot
 
-    if [[ ! -f ./the_final_stockbot ]]; then
+wget -O "$filePath" https://giftrule-disclosure.senate.gov/media/giftruledownloads/giftruledata.zip
+if [[ ! -x "$BINARY" ]]; then
+
+    if [[ ! -f "$BINARY" ]]; then
         echo "Error: the_final_stockbot binary not found."
     else
-        ./the_final_stockbot -script senate-travel -file giftruledata.zip
+        "$BINARY" -script senate-travel -file $filePath
     fi
 
 else
-    ./the_final_stockbot/the_final_stockbot -script senate-travel -file giftruledata.zip
+    $BINARY -script senate-travel -file $filePath
 fi
-rm giftruledata.zip
+rm $filePath

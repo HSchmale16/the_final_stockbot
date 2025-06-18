@@ -10,16 +10,17 @@ fi
 filePath=$(mktemp)
 
 wget -O $filePath https://disclosures-clerk.house.gov/public_disc/gift-pdfs/${YEAR}Travel.zip
+BINARY=~final_stockbot/the_final_stockbot/the_final_stockbot
 
-if [[ ! -x ./the_final_stockbot/the_final_stockbot ]]; then
+if [[ ! -x "$BINARY" ]]; then
 
     if [[ ! -f ./the_final_stockbot ]]; then
         echo "Error: the_final_stockbot binary not found."
     else
-        ./the_final_stockbot -script house-travel -file $filePath
+        "$BINARY" -script house-travel -file $filePath
     fi
 
 else
-    ./the_final_stockbot/the_final_stockbot -script house-travel -file $filePath
+    "$BINARY" -script house-travel -file $filePath
 fi
 rm $filePath
