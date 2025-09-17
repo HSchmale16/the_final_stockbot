@@ -1,0 +1,30 @@
+---
+- name: Download Database
+  hosts: all
+  remote_user: linuxuser
+  gather_facts: false
+
+  tasks:
+    - ansible.builtin.setup:
+        gather_subset:
+          - min
+    - name: Create temp file
+      become: true
+      become_user: final_stockbot
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .sql
+        prefix: "congress{{ '%Y-%m-%d' | strftime(ansible_date_time.epoch) }}_"
+      register: tempfile_1
+    - name: Dump an existing database to a file
+      become: true
+      become_user: final_stockbot
+      ansible.builtin.shell:
+        cmd: "pg_dump congress > {{ tempfile_1.path }}"
+      changed_when: true
+    - name: Download Dump to hosts
+      become: true
+      become_user: final_stockbot
+      ansible.builtin.fetch:
+        src: "{{ tempfile_1.path }}"
+        dest: ./remote_data
