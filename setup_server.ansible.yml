@@ -40,27 +40,27 @@
         rule: allow
         name: "Nginx Full"
 
-    - name: Install and Setup do_litestream
-      when: do_litestream
-      block:
-        - name: Clone Litestream To Build From Source
-          become: true
-          ansible.builtin.git:
-            repo: https://github.com/benbjohnson/litestream
-            dest: /root/litestream
-            version: master
-          notify:
-            - Install Litestream
-        - name: Conditionally load the secrets for litestream
-          ansible.builtin.include_vars: secrets.vault.yml
-        - name: Template the litestream file
-          become: true
-          ansible.builtin.template:
-            src: litestream.yml.j2
-            dest: /etc/litestream.yml
-            mode: "0644"
-          notify:
-            - Start and Reload Litestream via Systemd
+#    - name: Install and Setup do_litestream
+#      when: do_litestream
+#      block:
+#        - name: Clone Litestream To Build From Source
+#          become: true
+#          ansible.builtin.git:
+#            repo: https://github.com/benbjohnson/litestream
+#            dest: /root/litestream
+#            version: master
+#          notify:
+#            - Install Litestream
+#        - name: Conditionally load the secrets for litestream
+#          ansible.builtin.include_vars: secrets.vault.yml
+#        - name: Template the litestream file
+#          become: true
+#          ansible.builtin.template:
+#            src: litestream.yml.j2
+#            dest: /etc/litestream.yml
+#            mode: "0644"
+#          notify:
+#            - Start and Reload Litestream via Systemd
 
     # Add a user and group
     - name: Add a service user
@@ -104,7 +104,7 @@
         day: "*"
         hour: "1"
         minute: "15"
-        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/house_gift_travel.sh"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/house-gift-travel.sh"
         user: final_stockbot
         state: present
     - name: Add the senate travel disclosure cron job
@@ -114,7 +114,7 @@
         day: "*"
         hour: "2"
         minute: "15"
-        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate_gift_travel.sh"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate-gift-travel.sh"
         user: final_stockbot
         state: present
     - name: Add the sitemap generation cron job
@@ -125,14 +125,6 @@
         job: "~{{ service_user_name }}/the_final_stockbot/the_final_stockbot --sitemap"
         user: final_stockbot
         state: present
-    # - name: Upload the Lobbying Database
-    #   become: true
-    #   become_user: "{{ service_user_name }}"
-    #   ansible.posix.synchronize:
-    #     src: lobbying.duckdb
-    #     dest: /var/lib/{{ service_user_name }}/lobbying.duckdb
-    #     compress: true
-
     - name: Enable Nginx Site
       become: true
       ansible.builtin.file:
