@@ -97,6 +97,14 @@
         job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}report.html --ignore-crawlers"
         user: root
         state: present
+    - name: Add the web analytics cron job
+      become: true
+      ansible.builtin.cron:
+        name: "Update Web Analytics-WithCrawlers"
+        minute: "*/15"
+        job: "goaccess --log-format=COMBINED -f /var/log/nginx/access.log /var/log/nginx/access.log.1 -a -o {{ static_root }}crawl-report.html"
+        user: root
+        state: present
     - name: Add the house travel disclosure cron job
       become: true
       ansible.builtin.cron:

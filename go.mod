@@ -3,8 +3,6 @@ module github.com/hschmale16/the_final_stockbot
 go 1.21
 
 require (
-	cloud.google.com/go/storage v1.46.0
-	cloud.google.com/go/vertexai v0.13.2
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/ernestosuarez/itertools v0.0.0-20190516153236-40a02c159e7b
 	github.com/gofiber/fiber/v2 v2.52.2

@@ -8,10 +8,6 @@ import (
 
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
 	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
-	"github.com/ncruces/go-sqlite3"
-	"github.com/ncruces/go-sqlite3/driver"
-	_ "github.com/ncruces/go-sqlite3/embed"
-	"github.com/ncruces/go-sqlite3/gormlite"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
@@ -316,7 +312,7 @@ func GetLogger() logger.Interface {
 		},
 	)
 }
-
+/*
 func GetSqliteDB() (*gorm.DB, error) {
 	conn, err := driver.Open("congress.sqlite", func(conn *sqlite3.Conn) error {
 		return nil
@@ -334,6 +330,7 @@ func GetSqliteDB() (*gorm.DB, error) {
 	}
 	return db, nil
 }
+*/
 
 func GetPostgresqlDB() (*gorm.DB, error) {
 	whoami := os.Getenv("USER")
