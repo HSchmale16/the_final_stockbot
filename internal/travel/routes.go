@@ -37,9 +37,20 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/travel/calendar/:year/:month", GetTravelCalendar)
 	app.Get("/json/travel/calendar/:year/:month", GetTripsInYearMonth)
 	app.Get("/json/travel/calendar2", GetCalendar2)
+	app.Get("/json/travel/calendar_data/:year/:month", GetTravelCalendarDataAsJson)
 
 	app.Get("/gifted-travel2", GetGiftedTravel2)
 	app.Get("/htmx/gifted-travel-rows/:date/:sponsor", GetGiftedTravelRows)
+}
+
+func GetTravelCalendarDataAsJson(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	year, _ := strconv.Atoi(c.Params("year"))
+	month, _ := strconv.Atoi(c.Params("month"))
+
+	weeks := GetTravelCalendarData(year, month, db)
+	return c.JSON(weeks)
 }
 
 type TravelGroup struct {

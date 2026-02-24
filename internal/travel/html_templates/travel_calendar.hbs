@@ -12,27 +12,92 @@
 
 <p>This table contains all gifted travel for the month displayed above for your perusal. Gifted travel is obtained from the house disclosure site.</p>
 
-<table class="w-full border-collapse border">
+<style>
+.calendar-table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+}
+.calendar-table th, .calendar-table td {
+    border: 1px solid #ccc;
+    width: 14.28%;
+    vertical-align: top;
+    height: 8rem; /* h-32 */
+    position: relative;
+}
+.trip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5rem; /* h-6 */
+    margin-top: 0.25rem; /* mt-1 */
+    color: white;
+    padding: 0.25rem; /* p-1 */
+    font-size: 0.75rem; /* text-xs */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index: 1;
+}
+.trip-start {
+    border-top-left-radius: 0.5rem; /* rounded-l-lg */
+    border-bottom-left-radius: 0.5rem;
+    z-index: 2;
+}
+.trip-end {
+    border-top-right-radius: 0.5rem; /* rounded-r-lg */
+    border-bottom-right-radius: 0.5rem;
+}
+.trip-middle-left {
+    margin-left: -1px;
+}
+.trip-middle-right {
+    margin-right: -1px;
+}
+.other-month {
+    background-color: #f7fafc; /* bg-gray-100 */
+}
+.day-number {
+    position: relative;
+    z-index: 3;
+}
+</style>
+
+<table class="calendar-table">
     <thead>
         <tr>
-            <th class="border">Sunday</th>
-            <th class="border">Monday</th>
-            <th class="border">Tuesday</th>
-            <th class="border">Wednesday</th>
-            <th class="border">Thursday</th>
-            <th class="border">Friday</th>
-            <th class="border">Saturday</th>
+            <th>Sunday</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
         </tr>
     </thead>
     <tbody>
         {{#each weeks}}
             <tr>
                 {{#each Dates }}
-                    <td class="align-top border">
-                        <b class="travelDay" data-month="{{ MonthNumber }}">{{ DayNumber }}</b>
-                        {{#each DestinationsSorted }}
-                            <p>{{ this }}</p>
-                        {{/each}}
+                    <td data-month="{{this.MonthNumber}}">
+                        <b class="day-number">{{ DayNumber }}</b>
+                        <div class="w-full">
+                            {{#each Trips}}
+                            <div class="trip
+                                {{#if this.IsFirstDay}}trip-start{{/if}}
+                                {{#if this.IsLastDay}}trip-end{{/if}}
+                                {{#unless this.IsFirstDay}}trip-middle-left{{/unless}}
+                                {{#unless this.IsLastDay}}trip-middle-right{{/unless}}"
+                                style="background-color: {{this.Color}}; top: {{this.TopOffset}};">
+                                
+                                {{#if this.IsFirstDay}}
+                                    {{this.Destination}}
+                                {{else}}
+                                    &nbsp;
+                                {{/if}}
+                            </div>
+                            {{/each}}
+                        </div>
                     </td>
                 {{/each}}
             </tr>
@@ -47,10 +112,12 @@
     const monthInt = {{ monthInt }};
     const yearInt = {{ yearInt}};
 
-    console.log('monthInt', monthInt);
-    console.log('yearInt', yearInt);
-
-
+    // gray out other months
+    document.querySelectorAll('.calendar-table td').forEach(td => {
+        if (td.dataset.month != monthInt) {
+            td.classList.add('other-month');
+        }
+    });
 </script>
 
 <script src="/static/viz-js/calendar-helper.js?cache-bust={{ CacheBust }}"></script>
