@@ -1,0 +1,37 @@
+---
+- name: Create Development User
+  hosts: all
+  remote_user: linuxuser
+  become: true
+  gather_facts: false
+
+  vars_prompt:
+    - name: dev_username
+      prompt: "Enter the username for the new development user"
+      private: no
+    - name: dev_password
+      prompt: "Enter the password for the new development user"
+      private: yes
+
+  tasks:
+    - name: Create the development user
+      ansible.builtin.user:
+        name: "{{ dev_username }}"
+        password: "{{ dev_password | password_hash('sha512') }}"
+        state: present
+        shell: /bin/bash
+        create_home: true
+
+
+    - name: Allow md5 authentication for the new user
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/16/main/pg_hba.conf
+        line: "host    congress     {{ dev_username }}     127.0.0.1/32            md5"
+        insertbefore: "^# DO NOT DISABLE!"
+      notify: Restart Postgresql
+
+  handlers:
+    - name: Restart Postgresql
+      ansible.builtin.systemd:
+        name: postgresql
+        state: restarted

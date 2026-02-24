@@ -14,7 +14,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"gorm.io/plugin/prometheus"
+	// "gorm.io/plugin/prometheus"
 )
 
 type GovtRssItem struct {
@@ -302,10 +302,10 @@ func (f FeedbackItem) TableName() string {
 
 func GetLogger() logger.Interface {
 	return logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		log.New(os.Stdout, "\r\n", log.LstdFlags|log.Lshortfile), // io writer
 		logger.Config{
 			SlowThreshold:             70 * time.Millisecond, // Slow SQL threshold
-			LogLevel:                  logger.Silent,         // Log level
+			LogLevel:                  logger.Warn,         // Log level
 			IgnoreRecordNotFoundError: true,                  // Ignore ErrRecordNotFound error for logger
 			ParameterizedQueries:      false,                 // Don't include params in the SQL log
 			Colorful:                  true,                  // Disable color
@@ -334,7 +334,15 @@ func GetSqliteDB() (*gorm.DB, error) {
 
 func GetPostgresqlDB() (*gorm.DB, error) {
 	whoami := os.Getenv("USER")
-	dsn := fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
+	var dsn string
+	if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
+		// Socket file exists, use it
+		dsn = fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
+	} else {
+		// Socket file does not exist, use localhost for tunnel
+		pgpass := os.Getenv("PGPASS")
+		dsn = fmt.Sprintf("host=localhost port=5432 user=%s dbname=congress password=%s sslmode=disable", whoami, pgpass)
+	}
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: GetLogger(),
@@ -353,8 +361,9 @@ func SetupDB() (*gorm.DB, error) {
 	if err != nil {
 		log.Fatal("Failed to connect to database", err)
 	}
-
+	
 	if err := ApplyMigrations(db); err != nil {
+		log.Fatal("Failed to migrate", err)
 		return nil, err
 	}
 
@@ -362,15 +371,15 @@ func SetupDB() (*gorm.DB, error) {
 }
 
 func ApplyMigrations(db *gorm.DB) error {
-	db.Use(prometheus.New(prometheus.Config{
-		DBName:          "congress", // use `DBName` as metrics label
-		RefreshInterval: 15,         // Refresh metrics interval (default 15 seconds)
-		StartServer:     true,       // start http server to expose metrics
-		HTTPServerPort:  2112,       // configure http server port, default port 8080 (if you have configured multiple instances, only the first `HTTPServerPort` will be used to start server)
-		MetricsCollector: []prometheus.MetricsCollector{
-			&prometheus.Postgres{},
-		}, // user defined metrics
-	}))
+	// db.Use(prometheus.New(prometheus.Config{
+	// 	DBName:          "congress", // use `DBName` as metrics label
+	// 	RefreshInterval: 15,         // Refresh metrics interval (default 15 seconds)
+	// 	StartServer:     true,       // start http server to expose metrics
+	// 	HTTPServerPort:  2112,       // configure http server port, default port 8080 (if you have configured multiple instances, only the first `HTTPServerPort` will be used to start server)
+	// 	MetricsCollector: []prometheus.MetricsCollector{
+	// 		&prometheus.Postgres{},
+	// 	}, // user defined metrics
+	// }))
 
 	// Auto migrate models
 	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}, &LawOffset{}); err != nil {

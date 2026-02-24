@@ -37,6 +37,54 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/travel/calendar/:year/:month", GetTravelCalendar)
 	app.Get("/json/travel/calendar/:year/:month", GetTripsInYearMonth)
 	app.Get("/json/travel/calendar2", GetCalendar2)
+
+	app.Get("/gifted-travel2", GetGiftedTravel2)
+	app.Get("/htmx/gifted-travel-rows/:date/:sponsor", GetGiftedTravelRows)
+}
+
+type TravelGroup struct {
+	DepartureDate time.Time
+	TravelSponsor string
+	Count         int
+}
+
+func GetGiftedTravelRows(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+	date := c.Params("date")
+	sponsor, err := url.QueryUnescape(c.Params("sponsor"))
+	if err != nil {
+		return c.Status(400).SendString("Invalid sponsor")
+	}
+
+	fmt.Println(sponsor, date)
+	var disclosures []DB_TravelDisclosure
+	db.
+		Where("departure_date = ?", date).
+		Where("travel_sponsor = ?", sponsor).
+		Preload("Member").
+		Order("member_id DESC").
+		Find(&disclosures)
+
+	return c.Render("htmx/gifted_travel_rows", fiber.Map{
+		"GiftTravel": disclosures,
+	})
+}
+
+func GetGiftedTravel2(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var travelGroups []TravelGroup
+	db.Model(&DB_TravelDisclosure{}).
+		Select("departure_date, travel_sponsor, COUNT(*) as count").
+		Group("departure_date, travel_sponsor").
+		Order("departure_date DESC").
+		Limit(50).
+		Find(&travelGroups)
+
+	return c.Render("gifted_travel2", fiber.Map{
+		"Title":        "Grouped Gifted Travel",
+		"TravelGroups": travelGroups,
+	}, "layouts/main")
 }
 
 func GetCalendar2(c *fiber.Ctx) error {

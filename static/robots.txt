@@ -11,6 +11,8 @@ User-agent: AhrefsBot
 Disallow:/
 
 # ChatGPT is the worst
+User-agent: Amazonbot
+Disallow: /
 User-agent: ChatGPT-User
 Disallow: /
 User-agent: GPTBot

@@ -1,0 +1,32 @@
+<tr class="bg-gray-50">
+    <td colspan="4" class="p-4">
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg shadow-md">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Filer</th>
+                        <th class="py-3 px-6 text-left">Congress Member</th>
+                        <th class="py-3 px-6 text-left">Destination</th>
+                        <th class="py-3 px-6 text-left">Departure</th>
+                        <th class="py-3 px-6 text-left">Return</th>
+                        <th class="py-3 px-6 text-left">Sponsor</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {{#each GiftTravel}}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left whitespace-nowrap">{{this.FilerName}}</td>
+                        <td class="py-3 px-6 text-left">
+                            <a href="/congress-member/{{this.Member.BioGuideId}}" class="text-blue-600 hover:underline">{{this.Member.Name}}</a>
+                        </td>
+                        <td class="py-3 px-6 text-left">{{this.Destination}}</td>
+                        <td class="py-3 px-6 text-left">{{this.DepartureDate.Format "Jan 2, 2006"}}</td>
+                        <td class="py-3 px-6 text-left">{{this.ReturnDate.Format "Jan 2, 2006"}}</td>
+                        <td class="py-3 px-6 text-left">{{this.TravelSponsor}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </td>
+</tr>

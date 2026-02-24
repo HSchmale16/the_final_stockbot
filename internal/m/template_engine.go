@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -136,6 +137,10 @@ func GetTemplateEngine() fiber.Views {
 			return "Failed to marshal"
 		}
 		return string(b)
+	})
+
+	engine.AddFunc("urlencode", func(s string) string {
+		return url.QueryEscape(s)
 	})
 
 	return engine
