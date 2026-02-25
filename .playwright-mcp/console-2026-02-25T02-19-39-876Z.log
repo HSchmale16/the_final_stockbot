@@ -1,6 +1,0 @@
-[    3490ms] TypeError: Cannot read properties of null (reading 'querySelectorAll')
-    at fixTable (http://localhost:8080/congress-members:6606:40)
-[  127989ms] TypeError: Cannot read properties of null (reading 'querySelectorAll')
-    at fixTable (http://localhost:8080/congress-members:6606:40)
-[  129623ms] TypeError: Cannot read properties of null (reading 'querySelectorAll')
-    at fixTable (http://localhost:8080/congress-members:6606:40)
