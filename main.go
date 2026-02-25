@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
@@ -15,6 +16,10 @@ import (
 	"github.com/hschmale16/the_final_stockbot/internal/votes"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"github.com/hschmale16/the_final_stockbot/pkg/utils"
+
+	_ "net/http/pprof"
+
+	_ "github.com/grafana/pyroscope-go/godeltaprof/http/pprof"
 )
 
 //go:generate npm run build
@@ -164,6 +169,16 @@ func main() {
 		// fmt.Println("Before go live do database maintenance")
 		// // On start up do database maintanence
 		// db.Exec("ANALYZE")
+
+		// Start pprof debug server on loopback only.
+		// Handlers are registered by the net/http/pprof blank import above.
+		// Nginx proxies /debug/pprof/ here after checking the secret header.
+		go func() {
+			log.Println("pprof debug server listening on 127.0.0.1:6060")
+			if err := http.ListenAndServe("127.0.0.1:6060", nil); err != nil {
+				log.Println("pprof server error:", err)
+			}
+		}()
 
 		fmt.Println("Starting up...")
 		app.SetupServer()

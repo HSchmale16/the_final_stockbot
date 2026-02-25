@@ -81,6 +81,10 @@
       notify:
         - Build my application
 
+    - name: Load vault secrets (provides pprof_secret_key for nginx template)
+      ansible.builtin.include_vars: secrets.vault.yml
+      no_log: true
+
     - name: Create nginx configuration
       become: true
       ansible.builtin.template:

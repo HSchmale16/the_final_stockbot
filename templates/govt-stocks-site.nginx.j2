@@ -45,6 +45,18 @@ server {
             stub_status on;
     }
 
+    # Hidden pprof endpoints — only accessible with the correct secret header.
+    # Usage: curl -H "X-Pprof-Key: <secret>" https://{{ server_name }}/debug/pprof/
+    location /debug/pprof/ {
+        if ($http_x_pprof_key != "{{ pprof_secret_key }}") {
+            return 403;
+        }
+        proxy_pass         http://127.0.0.1:6060/debug/pprof/;
+        proxy_set_header   Host        localhost;
+        proxy_set_header   X-Pprof-Key "";  # strip secret before forwarding
+        proxy_read_timeout 90s;             # profiling requests can take time
+    }
+
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/{{ server_name }}/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/{{ server_name }}/privkey.pem; # managed by Certbot
