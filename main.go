@@ -166,10 +166,6 @@ func main() {
 	// }
 
 	if !disableWebServer {
-		// fmt.Println("Before go live do database maintenance")
-		// // On start up do database maintanence
-		// db.Exec("ANALYZE")
-
 		// Start pprof debug server on loopback only.
 		// Handlers are registered by the net/http/pprof blank import above.
 		// Nginx proxies /debug/pprof/ here after checking the secret header.
