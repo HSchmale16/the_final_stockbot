@@ -1,16 +1,22 @@
-<nav class="border border-gray-700 px-2 sm:px-4 py-2.5 bg-gray-800 shadow">
+<nav class="bg-gray-800 dark:bg-gray-950 px-4 py-4 shadow-md border-b border-gray-700">
   <div class="container flex flex-wrap justify-between items-center mx-auto">
     <a href="/" class="flex items-center">
-      <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
+      <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
         <img width="200px" height="66px" src="/static/img/D_CongressLarge.png" alt="DirtyCongress.com" class="d-inline-block align-text-top" />
       </span>
     </a>
 
-    <div class="flex items-center">
+    <div class="flex items-center space-x-3">
+      <button id="theme-toggle" type="button" class="text-gray-400 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded-lg text-sm p-2.5">
+        <!-- Sun icon for light mode -->
+        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 00-.707-.707l-.707.707a1 1 0 00.707.707.999.999 0 00.707-.707zM10 15a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-4 0a1 1 0 01-.707.293l-.707.707a1 1 0 01-1.414-1.414l.707-.707A1 1 0 016 15zm-2.12-10.607a1 1 0 01.707-.707l.707.707a1 1 0 01-.707.707.999.999 0 01-.707-.707z"></path></svg>
+        <!-- Moon icon for dark mode -->
+        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+      </button>
       <button
         id="menu-toggle"
         type="button"
-        class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 md:hidden"
+        class="inline-flex items-center p-2 ml-3 text-sm text-gray-400 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 md:hidden"
       >
         <span class="sr-only">Open main menu</span>
         <!-- Hamburger icon -->
@@ -29,11 +35,11 @@
       class="w-full md:block md:w-auto hidden"
       id="mobile-menu"
     >
-      <ul class="flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium">
+      <ul class="flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-base md:font-medium">
         <li>
           <a
             href="/"
-            class="{{ eqTernaryShort Url2 "/" "nav-item-selected" "nav-item"}}"
+            class="{{ eqTernaryShort Url2 "/" "bg-primary-900 text-white" "text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"}} px-4 py-3 rounded-lg text-lg font-medium"
             aria-current="{{ eqTernaryShort Url2 "/" "page" "false"}}"
           >
             Home
@@ -42,7 +48,7 @@
         <li>
           <a
             href="/laws"
-            class="{{ eqTernaryShort Url2 "/laws" "nav-item-selected" "nav-item"}}"
+            class="{{ eqTernaryShort Url2 "/laws" "bg-primary-900 text-white" "text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"}} px-4 py-3 rounded-lg text-lg font-medium"
             aria-current="{{ eqTernaryShort Url2 "/laws" "page" "false"}}"
           >
             Laws
@@ -51,7 +57,7 @@
         <li>
           <a
             href="/congress-members"
-            class="{{ eqTernaryShort Url2 "/congress-member" "nav-item-selected" "nav-item"}}"
+            class="{{ eqTernaryShort Url2 "/congress-member" "bg-primary-900 text-white" "text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"}} px-4 py-3 rounded-lg text-lg font-medium"
             aria-current="{{ eqTernaryShort Url2 "/congress-member" "page" "false"}}"
           >
             Congress Members
@@ -60,7 +66,7 @@
         <li>
           <a
             href="/committees"
-            class="{{ eqTernaryShort Url2 "/committee" "nav-item-selected" "nav-item"}}"
+            class="{{ eqTernaryShort Url2 "/committee" "bg-primary-900 text-white" "text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"}} px-4 py-3 rounded-lg text-lg font-medium"
             aria-current="{{ eqTernaryShort Url2 "/committee" "page" "false"}}"
           >
             Committees
@@ -69,7 +75,7 @@
         <li>
           <a
             href="/travel"
-            class="{{ eqTernaryShort Url2 "/travel" "nav-item-selected" "nav-item"}}"
+            class="{{ eqTernaryShort Url2 "/travel" "bg-primary-900 text-white" "text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"}} px-4 py-3 rounded-lg text-lg font-medium"
             aria-current="{{ eqTernaryShort Url2 "/travel" "page" "false"}}"
           >
             Gifted Travel
@@ -88,7 +94,7 @@
         <li>
           <a
             href="/help/faq"
-            class="{{ eqTernaryShort Url2 "/help/faq" "nav-item-selected" "nav-item"}}"
+            class="{{ eqTernaryShort Url2 "/help/faq" "bg-primary-900 text-white" "text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"}} px-4 py-3 rounded-lg text-lg font-medium"
             aria-current="{{ eqTernaryShort Url2 "/help/faq" "page" "false"}}"
           >
             FAQ
@@ -99,7 +105,7 @@
 
   </div>
 </nav>
-<div class="bg-red-500 text-center m-0-auto">
+<div class="bg-red-600 text-white text-center py-2 text-sm dark:bg-red-800">
   <p><strong>WARNING</strong>: This site is under construction. Please take anything found here with a massive grain of salt.</p>
 
   {{!-- <p>🚨 <strong>Important:</strong> If you're in the US, remember to vote on Tuesday November 5th! 🗳️</p>

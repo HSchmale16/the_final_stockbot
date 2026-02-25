@@ -7,7 +7,7 @@
 {{> 'partials/ad-roll' }}
 
 {{#each Laws }}
-<div class="prose-xl" {{#if EnableLoad }}{{#if @last}} hx-get="/laws?page={{ PubDate }}&type={{ LawType }}"
+<div class="bg-white rounded-lg shadow-md p-6 mb-4 hover:shadow-lg transition-shadow duration-300 ease-in-out" {{#if EnableLoad }}{{#if @last}} hx-get="/laws?page={{ PubDate }}&type={{ LawType }}"
     hx-trigger="revealed" hx-swap="afterend" {{/if}}{{/if}}>
     <h2><a href="/law/{{ ID }}">{{{ Title }}}</a></h2>
     {{> 'partials/sponsorship-bar' Law=this }}

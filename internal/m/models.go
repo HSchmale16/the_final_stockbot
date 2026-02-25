@@ -221,6 +221,7 @@ type DB_CongressMember struct {
 	UpdatedAt          time.Time
 	CongressMemberInfo US_CongressLegislator `gorm:"type:jsonb"`
 	Name               string
+	IsActive           bool                     `gorm:"index"`
 	Sponsored          []GovtRssItem            `gorm:"many2many:congress_member_sponsored;"`
 	Committees         []DB_CommitteeMembership `gorm:"foreignKey:CongressMemberId"`
 }

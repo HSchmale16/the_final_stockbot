@@ -461,24 +461,17 @@ func CongressMemberList(c *fiber.Ctx) error {
 	var members []DB_CongressMember
 	state := c.Query("state")
 
+	query := db.Where("is_active = ?", true)
+
 	if state != "" {
-		db.Where("json_extract(congress_member_info, '$.terms[#-1].state') = ?", state).Find(&members)
-	} else {
-		db.Find(&members)
+		query.Where("json_extract(congress_member_info, '$.terms[#-1].state') = ?", state).Find(&members)
 	}
 
-	// Partition the members by being active
-	// TODO: Expose more of the terms via the sql database
-	var activeMembers []DB_CongressMember
-	for _, member := range members {
-		if member.IsActiveMember() {
-			activeMembers = append(activeMembers, member)
-		}
-	}
+	query.Find(&members)
 
 	// Sort each by state
-	sort.Slice(activeMembers, func(i, j int) bool {
-		return activeMembers[i].State() < activeMembers[j].State()
+	sort.Slice(members, func(i, j int) bool {
+		return members[i].State() < members[j].State()
 	})
 
 	title := "Current Congress Members"
@@ -487,7 +480,7 @@ func CongressMemberList(c *fiber.Ctx) error {
 	}
 
 	return c.Render("congress_member_list", fiber.Map{
-		"ActiveMembers": activeMembers,
+		"ActiveMembers": members,
 		"Description":   "A list of the current congress members",
 		"Title":         title,
 	}, "layouts/main")

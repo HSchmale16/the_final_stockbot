@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"gorm.io/gorm"
@@ -65,6 +66,11 @@ func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) 
 		if myCongMember.Name == "" {
 			myCongMember.Name = fmt.Sprintf("%s %s", cong.Name.First, cong.Name.Last)
 		}
+
+		// set the is_active flag
+		lastTerm := myCongMember.CongressMemberInfo.Terms[len(myCongMember.CongressMemberInfo.Terms)-1]
+		termEnd, _ := time.Parse("2006-01-02", lastTerm.End)
+		myCongMember.IsActive = time.Now().Before(termEnd)
 
 		fmt.Println(myCongMember.CongressMemberInfo.Terms)
 		tx.Save(&myCongMember)

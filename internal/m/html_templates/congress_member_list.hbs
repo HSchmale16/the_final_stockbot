@@ -1,35 +1,35 @@
 {{> 'partials/title_heading' title="Current Members of Congress" subtitle="The 117th Congress" }}
 
 
-<table class="source" >
-    <thead class="">
+<table class="min-w-full table-auto divide-y divide-gray-200 shadow-md">
+    <thead class="bg-gray-50">
         <tr>
-            <th>Role</th>
-            <th>Name</th>
-            <th>State</th>
-            <th dataType="date">First Took Office</th>
-            <th>Party</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" dataType="date">First Took Office</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Party</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="bg-white divide-y divide-gray-200">
         {{#each ActiveMembers}}
-        <tr>
-            <td class="px-4 py-2">
+        <tr class="odd:bg-white even:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{#if this.IsSenator }}
-                <span class="badge bg-blue-500 ">Senator</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">Senator</span>
                 {{else}}
-                <span class="badge bg-gray-500">Representative</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800">Representative</span>
                 {{/if}}
             </td>
-            <td class="px-4 py-2"><a href="/congress-member/{{this.BioGuideId}}"
-                    class="text-blue-500 hover:underline">{{this.Name}}</a></td>
-            <td class="px-4 py-2">{{ this.State }}
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><a href="/congress-member/{{this.BioGuideId}}"
+                    class="text-blue-600 hover:text-blue-800">{{this.Name}}</a></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ this.State }}
                 {{#unless this.IsSenator }}
                 {{ this.District }}
                 {{/unless}}
             </td>
-            <td class="px-4 py-2" sorttable_customkey="{{ this.TookOfficeOn }}">{{ formatDate this.TookOfficeOn }}</td>
-            <td class="px-4 py-2">{{firstChar this.Party }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" sorttable_customkey="{{ this.TookOfficeOn }}">{{ formatDate this.TookOfficeOn }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{firstChar this.Party }}</td>
         </tr>
         {{/each}}
     </tbody>
