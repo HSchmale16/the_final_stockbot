@@ -45,16 +45,27 @@ server {
             stub_status on;
     }
 
-    # Hidden pprof endpoints — only accessible with the correct secret header.
-    # Usage: curl -H "X-Pprof-Key: <secret>" https://{{ server_name }}/debug/pprof/
+    # Hidden pprof endpoints — only accessible with a Bearer token.
+    # Usage: curl -H "Authorization: Bearer <secret>" https://{{ server_name }}/debug/pprof/
     location /debug/pprof/ {
-        if ($http_x_pprof_key != "{{ pprof_secret_key }}") {
+        if ($http_authorization != "Bearer {{ pprof_secret_key }}") {
             return 403;
         }
-        proxy_pass         http://127.0.0.1:6060/debug/pprof/;
-        proxy_set_header   Host        localhost;
-        proxy_set_header   X-Pprof-Key "";  # strip secret before forwarding
-        proxy_read_timeout 90s;             # profiling requests can take time
+        proxy_pass          http://127.0.0.1:6060/debug/pprof/;
+        proxy_set_header    Host          localhost;
+        proxy_set_header    Authorization "";  # strip before forwarding
+        proxy_read_timeout  90s;
+    }
+
+    # Hidden Prometheus UI — Basic auth: user from secrets, password = pprof_secret_key.
+    # Usage: curl -u "{{ prometheus_user }}:<pprof_secret_key>" https://{{ server_name }}/prometheus/
+    location /prometheus/ {
+        if ($http_authorization != "Basic {{ (prometheus_user + ':' + pprof_secret_key) | b64encode }}") {
+            return 403;
+        }
+        proxy_pass          http://127.0.0.1:9090/;
+        proxy_set_header    Host          localhost;
+        proxy_set_header    Authorization "";  # strip before forwarding
     }
 
     listen 443 ssl; # managed by Certbot

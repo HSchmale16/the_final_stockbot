@@ -141,44 +141,20 @@ func main() {
 		return
 	}
 
-	// if !disableFetcherService {
-	// 	ch := make(app.LawRssItemChannel, 10)
-
-	// 	go app.RunFetcherService(ch)
-
-	// 	triggerRssFetch := func() {
-	// 		log.Println("Triggering RSS fetch")
-	// 		for _, rssLink := range app.RssLinks {
-	// 			go app.HandleLawRss(rssLink, ch)
-	// 		}
-	// 	}
-
-	// 	cron := cron.New()
-	// 	cron.AddFunc("@every 4h", triggerRssFetch)
-	// 	// cron.AddFunc("@every 12", func() {
-	// 	// 	db.Exec("ANALYZE")
-	// 	// })
-	// 	//cron.AddFunc("@every 12h", app.FindUntaggedLaws)
-	// 	app.FindUntaggedLaws()
-	// 	triggerRssFetch()
-
-	// 	cron.Start()
-	// }
-
 	if !disableWebServer {
-		// Start pprof debug server on loopback only.
-		// Handlers are registered by the net/http/pprof blank import above.
-		// Nginx proxies /debug/pprof/ here after checking the secret header.
-		go func() {
-			log.Println("pprof debug server listening on 127.0.0.1:6060")
-			if err := http.ListenAndServe("127.0.0.1:6060", nil); err != nil {
-				log.Println("pprof server error:", err)
-			}
-		}()
-
+		go runProfilerServer()
 		fmt.Println("Starting up...")
 		app.SetupServer()
-		fmt.Println("The FUCK")
 	}
 	fmt.Println("Done!")
+}
+
+// Start pprof debug server on loopback only.
+// Handlers are registered by the net/http/pprof blank import above.
+// Nginx proxies /debug/pprof/ here after checking the secret header.
+func runProfilerServer() {
+	log.Println("pprof debug server listening on 127.0.0.1:6060")
+	if err := http.ListenAndServe("127.0.0.1:6060", nil); err != nil {
+		log.Println("pprof server error:", err)
+	}
 }

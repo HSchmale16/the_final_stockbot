@@ -67,17 +67,19 @@ func SetupServer() {
 		Format: "${pid} ${latency} ${status} - ${method} ${path}?${queryParams}\n",
 	}))
 
-	// Middleware to pass db instance
-	app.Use(func(c *fiber.Ctx) error {
+	passDatabase := func(c *fiber.Ctx) error {
 		c.Locals("db", db)
 		return c.Next()
-	})
+	}
+
+	// Middleware to pass db instance
+	app.Use(passDatabase)
 
 	CacheBustTimestamp := time.Now().Unix()
 
 	IsDebug := os.Getenv("DEBUG") == "true"
 
-	app.Use(func(c *fiber.Ctx) error {
+	configureDefaultTemplateVars := func(c *fiber.Ctx) error {
 		c.Bind(fiber.Map{
 			"CacheBust":   CacheBustTimestamp,
 			"Title":       "Dirty Congress",
@@ -87,7 +89,8 @@ func SetupServer() {
 			"Url2":        c.OriginalURL(),
 		})
 		return c.Next()
-	})
+	}
+	app.Use(configureDefaultTemplateVars)
 	// app.Use(helmet.New())
 
 	// Setup the Routes
@@ -134,19 +137,6 @@ func SetupServer() {
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
-
-	// Helper to double check the sqlite pragmas
-	app.Get("/meta/sqlite_info", func(c *fiber.Ctx) error {
-		db := c.Locals("db").(*gorm.DB)
-
-		var data []struct {
-			CompileOptions string
-		}
-
-		db.Raw("Pragma compile_options").Scan(&data)
-
-		return c.JSON(data)
-	})
 
 	faq.SetupRoutes(app)
 	// lobbying.SetupRoutes(app)
