@@ -51,7 +51,6 @@ func init() {
 	flag.StringVar(&committeeMembershipsFile, "committee-memberships-file", "", "The file to load committee memberships from")
 }
 
-
 func main() {
 	flag.Parse()
 
