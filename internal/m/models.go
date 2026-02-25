@@ -334,16 +334,10 @@ func GetSqliteDB() (*gorm.DB, error) {
 */
 
 func GetPostgresqlDB() (*gorm.DB, error) {
-	whoami := os.Getenv("USER")
-	var dsn string
-	if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
-		// Socket file exists, use it
-		dsn = fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
-	} else {
-		// Socket file does not exist, use localhost for tunnel
-		pgpass := os.Getenv("PGPASS")
-		dsn = fmt.Sprintf("host=localhost port=5432 user=%s dbname=congress password=%s sslmode=disable", whoami, pgpass)
-	}
+	// For local Docker Compose development, we'll hardcode the connection details
+	// to match the 'congress-postgres' service defined in docker-compose.yml.
+	// In a production environment, these would typically come from environment variables.
+	dsn := fmt.Sprintf("host=localhost port=5432 user=user dbname=congress password=password sslmode=disable")
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: GetLogger(),

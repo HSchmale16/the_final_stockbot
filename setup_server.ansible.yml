@@ -123,7 +123,17 @@
         hour: "2"
         minute: "15"
         job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate-gift-travel.sh"
-        user: final_stockbot
+        user: "{{ service_user_name }}"
+        state: present
+    - name: Add the congress members update cron job
+      become: true
+      ansible.builtin.cron:
+        name: "Update Congress Members"
+        day: "*"
+        hour: "3"
+        minute: "0"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/update-congress-members.sh"
+        user: "{{ service_user_name }}"
         state: present
     - name: Add the sitemap generation cron job
       become: true

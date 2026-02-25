@@ -25,11 +25,10 @@ type US_CongressLegislator = m.US_CongressLegislator
  * https://github.com/unitedstates/congress-legislators?tab=readme-ov-file
  *
  * Legislators can be pulled from this github repo. The data is available from this json file:
-* https://theunitedstates.io/congress-legislators/legislators-current.json
 */
 
 func GetCurrentLegislatorJson() []US_CongressLegislator {
-	resp, err := http.Get("https://theunitedstates.io/congress-legislators/legislators-current.json")
+	resp, err := http.Get("https://unitedstates.github.io/congress-legislators/legislators-current.json")
 	if err != nil {
 		panic(err)
 	}
