@@ -339,7 +339,7 @@ func GetPostgresqlDB() (*gorm.DB, error) {
 	// In a production environment, these would typically come from environment variables.
 	var dsn string
 	if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
-		whoami := os.GetEnv("USER")
+		whoami := os.Getenv("USER")
 		dsn = fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
 
 	} else {
