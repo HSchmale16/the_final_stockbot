@@ -46,8 +46,10 @@ func SetupRoutes(app *fiber.App) {
 
 func RedirectToCurrentMonthCalendar(c *fiber.Ctx) error {
 	now := time.Now()
-	year := now.Year()
-	month := int(now.Month())
+	// Redirect to the previous month as there is never data for the current month
+	previousMonth := now.AddDate(0, -1, 0)
+	year := previousMonth.Year()
+	month := int(previousMonth.Month())
 	return c.Redirect(fmt.Sprintf("/travel/calendar/%d/%d", year, month))
 }
 
