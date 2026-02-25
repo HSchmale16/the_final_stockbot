@@ -41,6 +41,14 @@ func SetupRoutes(app *fiber.App) {
 
 	app.Get("/gifted-travel2", GetGiftedTravel2)
 	app.Get("/htmx/gifted-travel-rows/:date/:sponsor", GetGiftedTravelRows)
+	app.Get("/travel/calendar", RedirectToCurrentMonthCalendar)
+}
+
+func RedirectToCurrentMonthCalendar(c *fiber.Ctx) error {
+	now := time.Now()
+	year := now.Year()
+	month := int(now.Month())
+	return c.Redirect(fmt.Sprintf("/travel/calendar/%d/%d", year, month))
 }
 
 func GetTravelCalendarDataAsJson(c *fiber.Ctx) error {
