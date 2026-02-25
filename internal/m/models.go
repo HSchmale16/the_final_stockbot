@@ -99,16 +99,16 @@ func (FederalRegisterTag) TableName() string {
 }
 
 /**
- * Create a 2nd relationship to cover built in categories
- */
+* Create a 2nd relationship to cover built in categories
+*/
 type RssCategory struct {
 	GovtRssItemId uint `gorm:"index:,unique,composite:unique_per_item"`
 	TagId         uint `gorm:"index:,unique,composite:unique_per_item"`
 }
 
 /**
- * GovtLawText is the full text of a law item fetched from the FullTextUrl
- */
+* GovtLawText is the full text of a law item fetched from the FullTextUrl
+*/
 type GovtLawText struct {
 	gorm.Model
 
@@ -197,8 +197,8 @@ func (GenerationError) TableName() string {
 }
 
 /**
- * SearchQuery is a record of a search query done on the front page
- */
+* SearchQuery is a record of a search query done on the front page
+*/
 type SearchQuery struct {
 	ID         uint
 	CreatedAt  time.Time
@@ -337,15 +337,13 @@ func GetPostgresqlDB() (*gorm.DB, error) {
 	// For local Docker Compose development, we'll hardcode the connection details
 	// to match the 'congress-postgres' service defined in docker-compose.yml.
 	// In a production environment, these would typically come from environment variables.
-	dsn := fmt.Sprintf("host=localhost port=5432 user=user dbname=congress password=password sslmode=disable")
-if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
-
-		// Socket file exists, use it
-
+	var dsn string
+	if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
+		whoami := os.GetEnv("USER")
 		dsn = fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
 
 	} else {
-		dsn := fmt.Sprintf("host=localhost port=5432 user=user dbname=congress password=password sslmode=disable")
+		dsn = fmt.Sprintf("host=localhost port=5432 user=user dbname=congress password=password sslmode=disable")
 	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: GetLogger(),
@@ -357,14 +355,14 @@ if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
 }
 
 /**
- * Sets up the stupid database
- */
+* Sets up the stupid database
+*/
 func SetupDB() (*gorm.DB, error) {
 	db, err := GetPostgresqlDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database", err)
 	}
-	
+
 	if err := ApplyMigrations(db); err != nil {
 		log.Fatal("Failed to migrate", err)
 		return nil, err
