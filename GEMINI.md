@@ -27,6 +27,7 @@ The application is structured as a **modular monolith**. While it is deployed as
 - **Frontend:**
     - **Templating:** [Handlebars](https://handlebarsjs.com/) is used for server-side rendering of HTML.
     - **Dynamic UI:** [HTMX](https://htmx.org/) is used to provide dynamic, client-side updates without writing complex JavaScript.
+    - **Styling:** [Tailwind CSS](https://tailwindcss.com/) is used for utility-first styling.
 - **Database:**
     - The specific database is not explicitly defined in the core configuration, but the use of GORM allows for flexibility. The presence of Ansible scripts suggests a production deployment likely uses a robust database like PostgreSQL, while local development might use SQLite.
 - **AI & Data Processing:**
