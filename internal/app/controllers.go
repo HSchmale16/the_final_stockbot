@@ -67,31 +67,7 @@ func SetupServer() {
 		Format: "${pid} ${latency} ${status} - ${method} ${path}?${queryParams}\n",
 	}))
 
-	passDatabase := func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		return c.Next()
-	}
-
-	// Middleware to pass db instance
-	app.Use(passDatabase)
-
-	CacheBustTimestamp := time.Now().Unix()
-
-	IsDebug := os.Getenv("DEBUG") == "true"
-
-	configureDefaultTemplateVars := func(c *fiber.Ctx) error {
-		c.Bind(fiber.Map{
-			"CacheBust":   CacheBustTimestamp,
-			"Title":       "Dirty Congress",
-			"DEBUG":       IsDebug,
-			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
-			"Url":         DOMAIN + c.OriginalURL(),
-			"Url2":        c.OriginalURL(),
-		})
-		return c.Next()
-	}
-	app.Use(configureDefaultTemplateVars)
-	// app.Use(helmet.New())
+	app.Use(configureDefaultTemplateVars(db))
 
 	// Setup the Routes
 	app.Get("/", Index)
@@ -148,6 +124,24 @@ func SetupServer() {
 	err = app.Listen(":8080")
 	if err != nil {
 		log.Fatal("Something failed during app listen", err)
+	}
+}
+
+func configureDefaultTemplateVars(db *gorm.DB) func(c *fiber.Ctx) error {
+	CacheBustTimestamp := time.Now().Unix()
+
+	IsDebug := os.Getenv("DEBUG") == "true"
+	return func(c *fiber.Ctx) error {
+		c.Locals("db", db)
+		c.Bind(fiber.Map{
+			"CacheBust":   CacheBustTimestamp,
+			"Title":       "Dirty Congress",
+			"DEBUG":       IsDebug,
+			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
+			"Url":         DOMAIN + c.OriginalURL(),
+			"Url2":        c.OriginalURL(),
+		})
+		return c.Next()
 	}
 }
 
