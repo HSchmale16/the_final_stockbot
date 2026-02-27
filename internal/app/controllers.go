@@ -116,21 +116,11 @@ func SetupServer() *fiber.App {
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
 
-	pprof.Do(context.Background(), pprof.Labels("controller", "FAQ"), func(c context.Context) {
-		faq.SetupRoutes(app)
-	})
-	pprof.Do(context.Background(), pprof.Labels("controller", "Congress"), func(c context.Context) {
-		congress.SetupRoutes(app)
-	})
-	pprof.Do(context.Background(), pprof.Labels("controller", "Stocks"), func(c context.Context) {
-		stocks.SetupRoutes(app)
-	})
-	pprof.Do(context.Background(), pprof.Labels("controller", "Travel"), func(c context.Context) {
-		travel.SetupRoutes(app)
-	})
-	pprof.Do(context.Background(), pprof.Labels("controller", "Votes"), func(c context.Context) {
-		votes.SetupRoutes(app)
-	})
+	faq.SetupRoutes(app)
+	congress.SetupRoutes(app)
+	stocks.SetupRoutes(app)
+	travel.SetupRoutes(app)
+	votes.SetupRoutes(app)
 
 	return app
 }
@@ -140,16 +130,23 @@ func configureDefaultTemplateVars(db *gorm.DB) func(c *fiber.Ctx) error {
 	IsDebug := os.Getenv("DEBUG") == "true"
 
 	return func(c *fiber.Ctx) error {
-		c.Locals("db", db)
-		c.Bind(fiber.Map{
-			"CacheBust":   CacheBustTimestamp,
-			"Title":       "Dirty Congress",
-			"DEBUG":       IsDebug,
-			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
-			"Url":         DOMAIN + c.OriginalURL(),
-			"Url2":        c.OriginalURL(),
+		labels := pprof.Labels(
+			"method", c.Method(),
+			"route", c.Route().Path,
+		)
+		pprof.Do(context.Background(), labels, func(_ context.Context) {
+			c.Locals("db", db)
+			c.Bind(fiber.Map{
+				"CacheBust":   CacheBustTimestamp,
+				"Title":       "Dirty Congress",
+				"DEBUG":       IsDebug,
+				"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
+				"Url":         DOMAIN + c.OriginalURL(),
+				"Url2":        c.OriginalURL(),
+			})
+			c.Next()
 		})
-		return c.Next()
+		return nil
 	}
 }
 
