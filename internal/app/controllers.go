@@ -1,12 +1,10 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"html"
 	"log"
 	"os"
-	"runtime/pprof"
 	"sort"
 	"strings"
 	"time"
@@ -65,7 +63,6 @@ func SetupServer() *fiber.App {
 
 	// Logging Request ID
 	app.Use(logger.New(logger.Config{
-		// For more options, see the Config section
 		Format: "${pid} ${latency} ${status} - ${method} ${path}?${queryParams}\n",
 	}))
 
@@ -130,23 +127,16 @@ func configureDefaultTemplateVars(db *gorm.DB) func(c *fiber.Ctx) error {
 	IsDebug := os.Getenv("DEBUG") == "true"
 
 	return func(c *fiber.Ctx) error {
-		labels := pprof.Labels(
-			"method", c.Method(),
-			"route", c.Route().Path,
-		)
-		pprof.Do(context.Background(), labels, func(_ context.Context) {
-			c.Locals("db", db)
-			c.Bind(fiber.Map{
-				"CacheBust":   CacheBustTimestamp,
-				"Title":       "Dirty Congress",
-				"DEBUG":       IsDebug,
-				"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
-				"Url":         DOMAIN + c.OriginalURL(),
-				"Url2":        c.OriginalURL(),
-			})
-			c.Next()
+		c.Locals("db", db)
+		c.Bind(fiber.Map{
+			"CacheBust":   CacheBustTimestamp,
+			"Title":       "Dirty Congress",
+			"DEBUG":       IsDebug,
+			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
+			"Url":         DOMAIN + c.OriginalURL(),
+			"Url2":        c.OriginalURL(),
 		})
-		return nil
+		return c.Next()
 	}
 }
 
