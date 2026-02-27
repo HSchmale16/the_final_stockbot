@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"runtime/pprof"
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/app"
@@ -142,7 +144,9 @@ func main() {
 	}
 
 	if !disableWebServer {
-		go runProfilerServer()
+		pprof.Do(context.Background(), pprof.Labels("controller", "profiler"), func(c context.Context) {
+			go runProfilerServer()
+		})
 		fmt.Println("Starting up...")
 		app.SetupServer()
 	}
