@@ -116,12 +116,19 @@ func SetupServer() *fiber.App {
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
 
-	pprof.Do(context.Background(), pprof.Labels("controller", "app routes"), func(c context.Context) {
+	pprof.Do(context.Background(), pprof.Labels("controller", "FAQ"), func(c context.Context) {
 		faq.SetupRoutes(app)
-		// lobbying.SetupRoutes(app)
+	})
+	pprof.Do(context.Background(), pprof.Labels("controller", "Congress"), func(c context.Context) {
 		congress.SetupRoutes(app)
+	})
+	pprof.Do(context.Background(), pprof.Labels("controller", "Stocks"), func(c context.Context) {
 		stocks.SetupRoutes(app)
+	})
+	pprof.Do(context.Background(), pprof.Labels("controller", "Travel"), func(c context.Context) {
 		travel.SetupRoutes(app)
+	})
+	pprof.Do(context.Background(), pprof.Labels("controller", "Votes"), func(c context.Context) {
 		votes.SetupRoutes(app)
 	})
 
