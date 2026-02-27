@@ -147,8 +147,16 @@ func main() {
 		pprof.Do(context.Background(), pprof.Labels("controller", "profiler"), func(c context.Context) {
 			go runProfilerServer()
 		})
-		fmt.Println("Starting up...")
-		app.SetupServer()
+		pprof.Do(context.Background(), pprof.Labels("controller", "app setup"), func(c context.Context) {
+			localApp := app.SetupServer()
+			pprof.Do(context.Background(), pprof.Labels("controller", "app listen"), func(c context.Context) {
+				err = localApp.Listen(":8080")
+				if err != nil {
+					log.Fatal("Something failed during app listen", err)
+				}
+			})
+		})
+
 	}
 	fmt.Println("Done!")
 }

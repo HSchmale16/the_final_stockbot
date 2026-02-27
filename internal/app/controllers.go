@@ -1,10 +1,12 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"html"
 	"log"
 	"os"
+	"runtime/pprof"
 	"sort"
 	"strings"
 	"time"
@@ -38,7 +40,7 @@ type CongressMemberSponsored = m.CongressMemberSponsored
 type DB_CongressMember = m.DB_CongressMember
 type SearchQuery = m.SearchQuery
 
-func SetupServer() {
+func SetupServer() *fiber.App {
 	db, err := m.SetupDB()
 	if err != nil {
 		log.Fatal("Failed to setup db: ", err)
@@ -114,23 +116,22 @@ func SetupServer() {
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
 	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
 
-	faq.SetupRoutes(app)
-	// lobbying.SetupRoutes(app)
-	congress.SetupRoutes(app)
-	stocks.SetupRoutes(app)
-	travel.SetupRoutes(app)
-	votes.SetupRoutes(app)
+	pprof.Do(context.Background(), pprof.Labels("controller", "app routes"), func(c context.Context) {
+		faq.SetupRoutes(app)
+		// lobbying.SetupRoutes(app)
+		congress.SetupRoutes(app)
+		stocks.SetupRoutes(app)
+		travel.SetupRoutes(app)
+		votes.SetupRoutes(app)
+	})
 
-	err = app.Listen(":8080")
-	if err != nil {
-		log.Fatal("Something failed during app listen", err)
-	}
+	return app
 }
 
 func configureDefaultTemplateVars(db *gorm.DB) func(c *fiber.Ctx) error {
 	CacheBustTimestamp := time.Now().Unix()
-
 	IsDebug := os.Getenv("DEBUG") == "true"
+
 	return func(c *fiber.Ctx) error {
 		c.Locals("db", db)
 		c.Bind(fiber.Map{
