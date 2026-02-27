@@ -1,25 +1,31 @@
-<footer class="bg-gray-800 py-6 mt-8">
-    <details class="max-w-6xl mx-auto mt-20 divide-y  shadow shadow-blue-600 rounded-xl group">
-        <summary class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
-            <svg class="w-15 h-5 text-gray-500 transition group-open:rotate-90"
-                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
-                        </path>
-                    </svg>
-            <span>Leave Feedback About This Page</span>
-        </summary>
+<footer class="bg-gray-800 py-8 mt-8" role="contentinfo">
+    <div class="max-w-6xl mx-auto px-4">
+        <details class="divide-y divide-gray-600 shadow shadow-blue-600 rounded-xl group mb-6">
+            <summary
+                class="flex items-center gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer text-gray-200 list-none">
+                <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-90 shrink-0" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
+                    </path>
+                </svg>
+                <span>Leave Feedback About This Page</span>
+            </summary>
 
-        {{> 'htmx/feedback_form' }}
-    </details>
+            {{> 'htmx/feedback_form' }}
+        </details>
 
-    <div class="container mx-auto text-center text-gray-400">
-        <p class="text-sm">&copy; 2024 All Rights Reserved - Information Gathered From Public Sources. No Guarantee of Accuracy or Completeness</p>
-        <div class="mt-2">
-            <a href="/tos" class="text-primary-400 hover:text-primary-200 text-sm">Terms of Service / Privacy Policy</a>
-            <span class="mx-2 text-gray-500">|</span>
-            <a href="/help/faq" class="text-primary-400 hover:text-primary-200 text-sm">FAQ</a>
+        <div class="text-center text-gray-400">
+            <p class="text-sm">&copy; 2024 All Rights Reserved &mdash; Information gathered from public sources. No
+                guarantee of accuracy or completeness.</p>
+            <nav class="mt-2" aria-label="Footer navigation">
+                <a href="/tos"
+                    class="text-blue-400 hover:text-blue-200 text-sm underline-offset-2 hover:underline focus:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded">Terms
+                    of Service / Privacy Policy</a>
+                <span class="mx-2 text-gray-500" aria-hidden="true">|</span>
+                <a href="/help/faq"
+                    class="text-blue-400 hover:text-blue-200 text-sm underline-offset-2 hover:underline focus:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded">FAQ</a>
+            </nav>
         </div>
     </div>
 </footer>
