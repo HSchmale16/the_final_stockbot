@@ -1,15 +1,20 @@
 <div class="container mx-auto prose-xl">
     {{> 'partials/title_heading' title="Watch Our Congress! Help Keep Them Clean and Accountable!" }}
+
+
     <p>
-        Congress travels a lot to support various initiatives and be informated on topics. 
+        Congress travels a lot to support various initiatives and be informated on topics.
         We the people must watch and understand what these initiatives are and why they are traveling.
     </p>
     <p>
         Inform yourself below with filters on where they are traveling and who is sponsoring it.
     </p>
 
-</div>
-    {{!-- <h3>Interesting Bedfellows Plotting Together</h3> --}}
+
+
+    {{!--
+</div> --}}
+{{!-- <h3>Interesting Bedfellows Plotting Together</h3> --}}
 
 {{!-- {{> 'partials/congress-network' }} --}}
 
@@ -43,6 +48,7 @@
 
 <div class="container mx-auto prose-xl">
     <h2>Find out about recent gifted travel</h2>
+    <div hx-get="/htmx/travel-gauge-cluster" hx-trigger="load"></div>
     <p>
         Find out about the most recent travel that has been gifted to our congress members. This is a great way to see
         who is
@@ -56,7 +62,7 @@
 
 
 
-{{!-- 
+{{!--
 <div class="container mx-auto prose-xl">
     <h2>View Recent Proposals &amp; Actions by Congress</h2>
     <p>
@@ -71,23 +77,24 @@
     </p>
 
     <div class="md:columns-3">
-        {{> 'partials/law-col' 
-            Title="Recent Appropriations" 
-            Laws=Approprations 
-            Desc="These are the most recent spending bills. How the money flows is where you find the dirt."}}
-        {{> 'partials/law-col' Title="Public Laws" 
-            Laws=PublicLaws
-            Desc="These are the most recent laws that have been passed. These are laws that affect everyone and are not specific to any one group." }}
-        {{> 'partials/law-col' Title="House Bills" 
-            Laws=House
-            Desc="These are the most recent bills that have been proposed in the House."}}
+        {{> 'partials/law-col'
+        Title="Recent Appropriations"
+        Laws=Approprations
+        Desc="These are the most recent spending bills. How the money flows is where you find the dirt."}}
+        {{> 'partials/law-col' Title="Public Laws"
+        Laws=PublicLaws
+        Desc="These are the most recent laws that have been passed. These are laws that affect everyone and are not
+        specific to any one group." }}
+        {{> 'partials/law-col' Title="House Bills"
+        Laws=House
+        Desc="These are the most recent bills that have been proposed in the House."}}
 
-            
+
         {{> 'partials/law-col' Title="Senate Bills" Laws=Senate
-            Desc="These are the most recent bills that have been proposed in the Senate."}}
+        Desc="These are the most recent bills that have been proposed in the Senate."}}
         {{> 'partials/law-col' Title="House Resolutions" Laws=HouseRes
-            Desc="These are the most recent resolutions that have been proposed in the House."}}
+        Desc="These are the most recent resolutions that have been proposed in the House."}}
         {{> 'partials/law-col' Title="Senate Resolutions" Laws=SenateRes
-            Desc="These are the most recent resolutions that have been proposed in the Senate."}}
+        Desc="These are the most recent resolutions that have been proposed in the Senate."}}
     </div>
 </div> --}}

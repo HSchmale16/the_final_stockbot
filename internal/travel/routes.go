@@ -41,10 +41,38 @@ func SetupRoutes(app *fiber.App) {
 
 	app.Get("/gifted-travel2", GetGiftedTravel2)
 	app.Get("/htmx/gifted-travel-rows/:date/:sponsor", GetGiftedTravelRows)
-	app.Get("/travel/calendar", RedirectToCurrentMonthCalendar)
+	app.Get("/travel/calendar", RedirectToPriorMonthCalendar)
+	app.Get("/htmx/travel-gauge-cluster", TravelGaugeCluster)
 }
 
-func RedirectToCurrentMonthCalendar(c *fiber.Ctx) error {
+func TravelGaugeCluster(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	var totalTravelers int64
+	db.Model(&DB_TravelDisclosure{}).
+		Where("filing_type != ?", "Ammendment").
+		Distinct("member_id").
+		Count(&totalTravelers)
+
+	var totalTrips int64
+	db.Model(&DB_TravelDisclosure{}).
+		Where("filing_type != ?", "Ammendment").
+		Count(&totalTrips)
+
+	var totalDays int64
+	db.Model(&DB_TravelDisclosure{}).
+		Where("filing_type != ?", "Ammendment").
+		Select("COALESCE(SUM(return_date::date - departure_date::date), 0)").
+		Scan(&totalDays)
+
+	return c.Render("htmx/travel_gauge_cluster", fiber.Map{
+		"TotalTravelers": totalTravelers,
+		"TotalTrips":     totalTrips,
+		"TotalDays":      totalDays,
+	})
+}
+
+func RedirectToPriorMonthCalendar(c *fiber.Ctx) error {
 	now := time.Now()
 	// Redirect to the previous month as there is never data for the current month
 	previousMonth := now.AddDate(0, -1, 0)
@@ -117,7 +145,7 @@ func GetCalendar2(c *fiber.Ctx) error {
 	}
 
 	var disclosures []DB_TravelDisclosure
-	db.Debug().
+	db.
 		// Where("TO_DATE(?, 'YYYY-MM-DD') BETWEEN SYMMETRIC DATE(departure_date) AND DATE(return_date)", targetDate).
 		Where("departure_date::date <= ?::date", targetDate).
 		Where("return_date::date >= ?::date", targetDate).
@@ -137,7 +165,7 @@ func GetTripsInYearMonth(c *fiber.Ctx) error {
 	dateStr := fmt.Sprintf("%s-%s-01", year, month)
 
 	var trips []DB_TravelDisclosure
-	db.Debug().
+	db.
 		Preload("Member").
 		Where("?::date in (date_trunc('month', departure_date)::date, date_trunc('month', return_date)::date)", dateStr).
 		Find(&trips)
@@ -176,9 +204,14 @@ func GetTravelCalendar(c *fiber.Ctx) error {
 }
 
 func GetTravelHomepage(c *fiber.Ctx) error {
+	year := c.Query("year")
+	if year == "" {
+		year = fmt.Sprint(time.Now().Year())
+	}
 	return c.Render("travel_homepage", fiber.Map{
 		"Title":   "Gifted Travel Disclosures",
 		"OgImage": "static/img/og-travel-plots.png",
+		"Year":    year,
 	}, "layouts/main")
 }
 
@@ -215,7 +248,7 @@ func GetMostTravelTable(c *fiber.Ctx) error {
 	return c.Render("htmx/most_travel_table", fiber.Map{
 		"MostTravel":   data,
 		"SelectedYear": year,
-		"Years":        []int{2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025},
+		"Years":        []int{2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026},
 	})
 }
 
@@ -348,8 +381,39 @@ func GetTravelByCommittee(c *fiber.Ctx) error {
 	})
 }
 
+// GetTopDestinations returns the top travel destinations for congress members.
+//
+// Parameters (via query string):
+//   - limit: The maximum number of destinations to return (range: 15-150, default: 15).
+//   - since: A starting date in YYYY-MM-DD format. Mutually exclusive with 'year'.
+//   - year:  A specific year to filter by. Mutually exclusive with 'since'.
+//
+// Returns:
+//   - 400 Bad Request if both 'since' and 'year' are provided.
+//   - 400 Bad Request if 'since' date format is invalid.
+//   - 500 Internal Server Error if the database connection is missing.
 func GetTopDestinations(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
+	since := c.Query("since")
+	year := c.Query("year")
+
+	if since != "" && year != "" {
+		return c.Status(400).SendString("Parameters 'since' and 'year' are mutually exclusive")
+	}
+
+	var sinceDate time.Time
+	if since != "" {
+		var err error
+		sinceDate, err = time.Parse("2006-01-02", since)
+		if err != nil {
+			return c.Status(400).SendString("Invalid 'since' date format. Use YYYY-MM-DD")
+		}
+	}
+
+	dbIn := c.Locals("db")
+	db, ok := dbIn.(*gorm.DB)
+	if !ok || db == nil {
+		return c.Status(500).SendString("Database not found")
+	}
 
 	// Get limit param
 	limitStr, _ := strconv.Atoi(c.Query("limit"))
@@ -359,16 +423,28 @@ func GetTopDestinations(c *fiber.Ctx) error {
 		Destination string
 		Count       int
 	}
-	a := time.Now().Year()
-	b := a - 1
-	aStr := fmt.Sprint(a)
-	bStr := fmt.Sprint(b)
 
-	x := db.Table("travel_disclosures").
+	query := db.Table("travel_disclosures").
 		Select("destination, count(destination) as count").
-		Where("destination != ''").
-		Where("year in (?, ?)", aStr, bStr).
-		Group("destination").
+		Where("destination != ''")
+
+	if db.Config != nil && db.Config.Logger != nil {
+		query = query.Debug()
+	}
+
+	if since != "" {
+		query = query.Where("departure_date >= ?", sinceDate)
+	} else if year != "" {
+		query = query.Where("year = ?", year)
+	} else {
+		a := time.Now().Year()
+		b := a - 1
+		aStr := fmt.Sprint(a)
+		bStr := fmt.Sprint(b)
+		query = query.Where("year in (?, ?)", aStr, bStr)
+	}
+
+	x := query.Group("destination").
 		Order("count DESC").
 		Limit(limit).
 		Scan(&topDestinations)
@@ -380,6 +456,8 @@ func GetTopDestinations(c *fiber.Ctx) error {
 
 	return c.Render("htmx/top_destinations", fiber.Map{
 		"TopDestinations": topDestinations,
+		"Since":           since,
+		"Year":            year,
 	})
 }
 

@@ -1,71 +1,83 @@
-<div class="prose-xl">
-    <h2>Which Congress Person's Office Received the Most Gifted Travel in {{ SelectedYear }}?</h2>
+<div class="prose-xl max-w-none">
+    <h2 class="mb-4">Which Congress Person's Office Received the Most Gifted Travel in {{ SelectedYear }}?</h2>
 
     <div class="tablist" role="tablist">
         {{#each Years }}
-        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" aria-selected="{{eqTernary SelectedYear this 'true' 'false'}}"
-            class="btn-tab {{eqTernary SelectedYear this "underline" ""}}">{{ this }}</button>
+        <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" hx-push-url="/travel?year={{ this }}"
+            aria-selected="{{eqTernary SelectedYear this 'true' 'false'}}"
+            class="btn-tab {{eqTernary SelectedYear this " underline" "" }}">{{ this }}</button>
         {{/each}}
     </div>
 
+    <!-- Main Content (Table) -->
     <div id="tab-content" role="tabpanel" class="overflow-auto">
-        <table class="min-w-full divide-y divide-gray-200 ">
-            <thead>
-                <tr>
-                    <th scope="col"
-                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Member
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        State
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Party
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Number of Trips
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {{#each MostTravel }}
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {{#if this.IsSenator }}
-                        <span
-                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Senator
-                        </span>
-                        {{else}}
-                        <span
-                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                            Representative
-                        </span>
-                        {{/if}}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="/congress-member/{{ this.Member.BioGuideId}}">{{ this.Member.Name }}</a>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {{ this.Member.State }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {{ this.Member.Party }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                        {{ this.count }}
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        </table>
+
+        <div class="md:flex md:flex-row md:gap-8 mt-12">
+            <!-- Desktop Sidebar (Hidden on Mobile) -->
+            <div class="hidden md:block md:w-1/4">
+                <div hx-get="/htmx/top-destinations?year={{ SelectedYear }}&limit=10" hx-trigger="load" hx-target="this"
+                    class="border rounded p-4 bg-gray-50 sticky top-4">
+                    Loading Top Destinations...
+                </div>
+            </div>
+            <table class="md:w-3/4 divide-y divide-gray-200 border">
+                <thead>
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                            Type
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                            Member
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                            State
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                            Party
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                            Trips
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {{#each MostTravel }}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{#if this.IsSenator }}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                Senator
+                            </span>
+                            {{else}}
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                Representative
+                            </span>
+                            {{/if}}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="/congress-member/{{ this.Member.BioGuideId}}"
+                                class="text-blue-600 hover:underline">{{ this.Member.Name }}</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                            {{ this.Member.State }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            {{ this.Member.Party }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right font-mono">
+                            {{ this.count }}
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

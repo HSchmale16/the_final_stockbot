@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "gotest": "go test -cover ./internal/... ./pkg/...",
     "watch": "tailwindcss build -o static/css/tailwind.css -i base.css --watch",
     "build": "tailwindcss build -o static/css/tailwind.css -i base.css --minify"
   },

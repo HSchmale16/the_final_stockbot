@@ -100,7 +100,7 @@ func (FederalRegisterTag) TableName() string {
 
 /**
 * Create a 2nd relationship to cover built in categories
-*/
+ */
 type RssCategory struct {
 	GovtRssItemId uint `gorm:"index:,unique,composite:unique_per_item"`
 	TagId         uint `gorm:"index:,unique,composite:unique_per_item"`
@@ -108,7 +108,7 @@ type RssCategory struct {
 
 /**
 * GovtLawText is the full text of a law item fetched from the FullTextUrl
-*/
+ */
 type GovtLawText struct {
 	gorm.Model
 
@@ -198,7 +198,7 @@ func (GenerationError) TableName() string {
 
 /**
 * SearchQuery is a record of a search query done on the front page
-*/
+ */
 type SearchQuery struct {
 	ID         uint
 	CreatedAt  time.Time
@@ -265,13 +265,13 @@ func (d DB_CongressMember) IsSenator() bool {
 }
 
 type CongressMemberSponsored struct {
-	ID                          uint
+	ID                          uint `gorm:"column:id"`
 	CreatedAt                   time.Time
 	CongressNumber              string
 	Chamber                     string
 	Role                        string
-	DB_CongressMemberBioGuideId string `gorm:"index:,unique,composite:unique_per_item"`
-	GovtRssItemId               uint   `gorm:"index:,unique,composite:unique_per_item"`
+	DB_CongressMemberBioGuideId string `gorm:"primaryKey;index:,unique,composite:unique_per_item"`
+	GovtRssItemId               uint   `gorm:"primaryKey;index:,unique,composite:unique_per_item"`
 }
 
 func (CongressMemberSponsored) TableName() string {
@@ -306,32 +306,13 @@ func GetLogger() logger.Interface {
 		log.New(os.Stdout, "\r\n", log.LstdFlags|log.Lshortfile), // io writer
 		logger.Config{
 			SlowThreshold:             70 * time.Millisecond, // Slow SQL threshold
-			LogLevel:                  logger.Warn,         // Log level
+			LogLevel:                  logger.Warn,           // Log level
 			IgnoreRecordNotFoundError: true,                  // Ignore ErrRecordNotFound error for logger
 			ParameterizedQueries:      false,                 // Don't include params in the SQL log
 			Colorful:                  true,                  // Disable color
 		},
 	)
 }
-/*
-func GetSqliteDB() (*gorm.DB, error) {
-	conn, err := driver.Open("congress.sqlite", func(conn *sqlite3.Conn) error {
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := gorm.Open(gormlite.OpenDB(conn), &gorm.Config{
-		Logger:      GetLogger(),
-		PrepareStmt: true,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
-}
-*/
 
 func GetPostgresqlDB() (*gorm.DB, error) {
 	// For local Docker Compose development, we'll hardcode the connection details
@@ -343,7 +324,7 @@ func GetPostgresqlDB() (*gorm.DB, error) {
 		dsn = fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
 
 	} else {
-		dsn = fmt.Sprintf("host=localhost port=5432 user=user dbname=congress password=password sslmode=disable")
+		dsn = "host=localhost port=5432 user=user dbname=congress password=password sslmode=disable"
 	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: GetLogger(),
@@ -356,7 +337,7 @@ func GetPostgresqlDB() (*gorm.DB, error) {
 
 /**
 * Sets up the stupid database
-*/
+ */
 func SetupDB() (*gorm.DB, error) {
 	db, err := GetPostgresqlDB()
 	if err != nil {
@@ -372,16 +353,6 @@ func SetupDB() (*gorm.DB, error) {
 }
 
 func ApplyMigrations(db *gorm.DB) error {
-	// db.Use(prometheus.New(prometheus.Config{
-	// 	DBName:          "congress", // use `DBName` as metrics label
-	// 	RefreshInterval: 15,         // Refresh metrics interval (default 15 seconds)
-	// 	StartServer:     true,       // start http server to expose metrics
-	// 	HTTPServerPort:  2112,       // configure http server port, default port 8080 (if you have configured multiple instances, only the first `HTTPServerPort` will be used to start server)
-	// 	MetricsCollector: []prometheus.MetricsCollector{
-	// 		&prometheus.Postgres{},
-	// 	}, // user defined metrics
-	// }))
-
 	// Auto migrate models
 	if err := db.AutoMigrate(&GovtRssItem{}, &GovtLawText{}, &Tag{}, &GovtRssItemTag{}, &GenerationError{}, &RssCategory{}, &LawOffset{}); err != nil {
 		return err

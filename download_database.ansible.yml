@@ -28,3 +28,10 @@
       ansible.builtin.fetch:
         src: "{{ tempfile_1.path }}"
         dest: ./remote_data
+    - name: Remove temp file
+      become: true
+      become_user: final_stockbot
+      ansible.builtin.file:
+        path: "{{ tempfile_1.path }}"
+        state: absent
+

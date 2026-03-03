@@ -116,7 +116,7 @@
         day: "*"
         hour: "1"
         minute: "15"
-        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/house-gift-travel.sh"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/house-gift-travel.sh > house.log 2>&1"
         user: final_stockbot
         state: present
     - name: Add the senate travel disclosure cron job
@@ -126,7 +126,7 @@
         day: "*"
         hour: "2"
         minute: "15"
-        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate-gift-travel.sh"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/senate-gift-travel.sh > senate.log 2>&1"
         user: "{{ service_user_name }}"
         state: present
     - name: Add the congress members update cron job
@@ -136,7 +136,7 @@
         day: "*"
         hour: "3"
         minute: "0"
-        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/update-congress-members.sh"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/update-congress-members.sh > congress.log 2>&1"
         user: "{{ service_user_name }}"
         state: present
     - name: Add the sitemap generation cron job
@@ -144,7 +144,7 @@
       ansible.builtin.cron:
         name: "Generate Sitemap"
         minute: "45"
-        job: "~{{ service_user_name }}/the_final_stockbot/the_final_stockbot --sitemap"
+        job: "~{{ service_user_name }}/the_final_stockbot/the_final_stockbot --sitemap > sitemap.log 2>&1"
         user: final_stockbot
         state: present
     - name: Enable Nginx Site

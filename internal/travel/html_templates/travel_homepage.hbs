@@ -10,7 +10,7 @@
 </div>
 
 
-<div id="tabs" hx-get="/htmx/travel/who-travels-most/2024" hx-trigger="load delay:100ms" hx-target="#tabs"
+<div id="tabs" hx-get="/htmx/travel/who-travels-most/{{ Year }}" hx-trigger="load delay:100ms" hx-target="#tabs"
     hx-swap="innerHTML"></div>
 
 <script src="/static/js/d3.v7.min.js?cache-bust={{ CacheBust }}"></script>
