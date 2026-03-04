@@ -21,6 +21,8 @@ We are wrangling the travel disclosures of the congress critters.
 
 func init() {
 	m.RegisterModels(&DB_TravelDisclosure{})
+	m.RegisterModels(&DB_TravelBackgroundProcessingResult{})
+	m.RegisterModels(&DB_TravelDisclosureInvoiceLineItem{})
 }
 
 type TravelDisclosure struct {
@@ -71,6 +73,42 @@ type DB_TravelDisclosure struct {
 
 func (d DB_TravelDisclosure) TableName() string {
 	return "travel_disclosures"
+}
+
+type DB_TravelBackgroundProcessingResult struct {
+	ID        uint `gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	LlmModel string
+	JobName  string
+
+	DocId string              `gorm:"index"`
+	Doc   DB_TravelDisclosure `gorm:"foreignKey:DocId;references:DocId"`
+}
+
+func (d DB_TravelBackgroundProcessingResult) TableName() string {
+	return "travel_background_processing_results"
+}
+
+type DB_TravelDisclosureInvoiceLineItem struct {
+	ID        uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	// The amount of the line item
+	Amount float64
+	// The description of the line item
+	Description string
+	// The type of the line item
+	Type string
+
+	DocId string              `gorm:"index"`
+	Doc   DB_TravelDisclosure `gorm:"foreignKey:DocId;references:DocId"`
+}
+
+func (d DB_TravelDisclosureInvoiceLineItem) TableName() string {
+	return "travel_disclosure_invoice_line_items"
 }
 
 func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {

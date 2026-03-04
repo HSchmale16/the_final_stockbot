@@ -1,0 +1,80 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "DirtyCongress.com" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "DirtyCongress.com" [ref=e6]
+      - button "Open main menu" [ref=e8] [cursor=pointer]:
+        - generic [ref=e9]: Open main menu
+        - img [ref=e10]
+  - paragraph [ref=e13]:
+    - strong [ref=e14]: WARNING
+    - text: ": This site is under construction. Please take anything found here with a massive grain of salt."
+  - main [ref=e15]:
+    - heading "Gifted Travel" [level=1] [ref=e16]
+    - paragraph [ref=e17]: Travel can be gifted to congress people to learn about new topics or issues affecting their constituients. This travel can also be to just go party and see the political equivalent of a time share presentation. In other cases especially with international travel it's about foreign aid.
+    - generic [ref=e18]:
+      - img [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: Number of Trips by Party
+          - generic [ref=e23]:
+            - generic [ref=e25]: "2018"
+            - generic [ref=e27]: "2019"
+            - generic [ref=e29]: "2020"
+            - generic [ref=e31]: "2021"
+            - generic [ref=e33]: "2022"
+            - generic [ref=e35]: "2023"
+            - generic [ref=e37]: "2024"
+            - generic [ref=e39]: "2025"
+            - generic [ref=e41]: "2026"
+          - generic [ref=e42]:
+            - generic [ref=e45]: 0.0k
+            - generic [ref=e47]: 0.2k
+            - generic [ref=e49]: 0.4k
+            - generic [ref=e51]: 0.6k
+            - generic [ref=e53]: 0.8k
+            - generic [ref=e55]: 1.0k
+            - generic [ref=e57]: 1.2k
+            - generic [ref=e59]: 1.4k
+            - generic [ref=e61]: 1.6k
+      - img [ref=e96]:
+        - generic [ref=e97]:
+          - generic [ref=e98]: Days Traveled by Party
+          - generic [ref=e99]:
+            - generic [ref=e101]: "2018"
+            - generic [ref=e103]: "2019"
+            - generic [ref=e105]: "2020"
+            - generic [ref=e107]: "2021"
+            - generic [ref=e109]: "2022"
+            - generic [ref=e111]: "2023"
+            - generic [ref=e113]: "2024"
+            - generic [ref=e115]: "2025"
+            - generic [ref=e117]: "2026"
+          - generic [ref=e118]:
+            - generic [ref=e121]: 0.0k
+            - generic [ref=e123]: 0.5k
+            - generic [ref=e125]: 1.0k
+            - generic [ref=e127]: 1.5k
+            - generic [ref=e129]: 2.0k
+            - generic [ref=e131]: 2.5k
+            - generic [ref=e133]: 3.0k
+            - generic [ref=e135]: 3.5k
+            - generic [ref=e137]: 4.0k
+  - contentinfo [ref=e171]:
+    - generic [ref=e172]:
+      - group [ref=e173]:
+        - generic "Leave Feedback About This Page" [ref=e174]:
+          - img [ref=e175]
+          - generic [ref=e176]: Leave Feedback About This Page
+      - generic [ref=e177]:
+        - paragraph [ref=e178]: © 2024 All Rights Reserved — Information gathered from public sources. No guarantee of accuracy or completeness.
+        - navigation "Footer navigation" [ref=e179]:
+          - link "Terms of Service / Privacy Policy" [ref=e180] [cursor=pointer]:
+            - /url: /tos
+          - text: "|"
+          - link "FAQ" [ref=e181] [cursor=pointer]:
+            - /url: /help/faq
+```
