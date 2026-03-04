@@ -29,3 +29,5 @@ node_modules
 *.pdf
 
 remote_data
+
+test-results
