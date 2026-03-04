@@ -37,6 +37,7 @@ var loadCclFile = ""
 var doSenateLobbyingMain = false
 var committeesFile = ""
 var committeeMembershipsFile = ""
+var doTravelBackgroundProcessing = false
 
 // New things will define a value in my switch case below for a script to run.
 var script = ""
@@ -56,6 +57,7 @@ func init() {
 	flag.BoolVar(&doSenateLobbyingMain, "senate-lobbying-main", false, "Run the senate lobbying main")
 	flag.StringVar(&committeesFile, "committees-file", "", "The file to load committees from")
 	flag.StringVar(&committeeMembershipsFile, "committee-memberships-file", "", "The file to load committee memberships from")
+	flag.BoolVar(&doTravelBackgroundProcessing, "travel-background-processing", false, "Run the travel background processing")
 }
 
 func main() {
@@ -143,10 +145,19 @@ func main() {
 		return
 	}
 
-	if !disableWebServer {
-		pprof.Do(context.Background(), pprof.Labels("controller", "profiler"), func(c context.Context) {
-			go runProfilerServer()
+	pprof.Do(context.Background(), pprof.Labels("controller", "profiler"), func(c context.Context) {
+		go runProfilerServer()
+	})
+
+	if doTravelBackgroundProcessing {
+		pprof.Do(context.Background(), pprof.Labels("controller", "travel background processing"), func(c context.Context) {
+			processor := travel.NewBackgroundProcessor(db)
+			processor.ProcessDisclosuresInBackground()
 		})
+		return
+	}
+
+	if !disableWebServer {
 		pprof.Do(context.Background(), pprof.Labels("controller", "app setup"), func(c context.Context) {
 			localApp := app.SetupServer()
 			pprof.Do(context.Background(), pprof.Labels("controller", "app listen"), func(c context.Context) {

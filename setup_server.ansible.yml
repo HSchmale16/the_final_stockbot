@@ -32,6 +32,7 @@
           - poppler-utils
           - awscli
           - rclone
+          - postgresql-16-pgvector
         state: present
         update_cache: false
     - name: Configure Firewall

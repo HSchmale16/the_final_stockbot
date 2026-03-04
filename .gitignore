@@ -31,3 +31,4 @@ node_modules
 remote_data
 
 test-results
+.env.local

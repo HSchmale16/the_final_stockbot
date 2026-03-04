@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/pgvector/pgvector-go"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"gorm.io/gorm"
@@ -19,10 +20,17 @@ import (
 We are wrangling the travel disclosures of the congress critters.
 */
 
+const (
+	META_KEY_S3_PDF_PATH   = "s3_pdf_path"
+	META_KEY_S3_IMAGE_LIST = "s3_image_list"
+)
+
 func init() {
 	m.RegisterModels(&DB_TravelDisclosure{})
 	m.RegisterModels(&DB_TravelBackgroundProcessingResult{})
 	m.RegisterModels(&DB_TravelDisclosureInvoiceLineItem{})
+	m.RegisterModels(&DB_TravelDisclosureMeta{})
+	m.RegisterModels(&DB_TravelDisclosurePage{})
 }
 
 type TravelDisclosure struct {
@@ -64,7 +72,7 @@ type DB_TravelDisclosure struct {
 
 	// A url to download the original document from
 	DocURL string
-	// WHere it's stored on the local system
+	// Where it's stored on the local system
 	Filepath string
 
 	MemberId string `gorm:"index"`
@@ -75,13 +83,38 @@ func (d DB_TravelDisclosure) TableName() string {
 	return "travel_disclosures"
 }
 
+/**
+ * Meta data associated with a travel disclosure
+ * Things like where we stored the downloaded pdf, and if we have downloaded it.
+ */
+type DB_TravelDisclosureMeta struct {
+	ID        uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	DocId string              `gorm:"index"`
+	Doc   DB_TravelDisclosure `gorm:"foreignKey:DocId;references:DocId"`
+
+	Key   string
+	Value string
+}
+
+func (d DB_TravelDisclosureMeta) TableName() string {
+	return "travel_disclosure_meta"
+}
+
+/**
+ * The result of processing a travel disclosure
+ */
 type DB_TravelBackgroundProcessingResult struct {
 	ID        uint `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	LlmModel string
+	Status   string // enumeration of Pending, Processing, Complete, Error
 	JobName  string
+	Answer   string // JSON blob of the answer.
 
 	DocId string              `gorm:"index"`
 	Doc   DB_TravelDisclosure `gorm:"foreignKey:DocId;references:DocId"`
@@ -105,10 +138,43 @@ type DB_TravelDisclosureInvoiceLineItem struct {
 
 	DocId string              `gorm:"index"`
 	Doc   DB_TravelDisclosure `gorm:"foreignKey:DocId;references:DocId"`
+
+	// Do not include any records in any queries where the result is not complete
+	ResultId uint
+	Result   DB_TravelBackgroundProcessingResult `gorm:"foreignKey:ResultId;references:ID"`
 }
 
 func (d DB_TravelDisclosureInvoiceLineItem) TableName() string {
 	return "travel_disclosure_invoice_line_items"
+}
+
+// DB_TravelDisclosurePage represents a single rendered page from a downloaded
+// travel disclosure PDF. The page image is OCR'd by Gemma3 via Ollama and the
+// resulting text is embedded with nomic-embed-text for semantic search.
+type DB_TravelDisclosurePage struct {
+	ID        uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	DocId string              `gorm:"index"`
+	Doc   DB_TravelDisclosure `gorm:"foreignKey:DocId;references:DocId"`
+
+	PageNumber int
+	// Absolute path, e.g. $DOCUMENT_MOUNTPOINT/images/2024/<docBase>/page-001.png
+	ImagePath string
+
+	// Raw text transcribed by Gemma3 via Ollama
+	OcrText string
+
+	// Parsed from Gemma3 response: standardized_form | itinerary | lodging_detail | approval_letter | unknown
+	PageType string
+
+	// 768-dim vector of OcrText via nomic-embed-text; enables pgvector cosine search
+	Embedding pgvector.Vector `gorm:"type:vector(768)"`
+}
+
+func (d DB_TravelDisclosurePage) TableName() string {
+	return "travel_disclosure_pages"
 }
 
 func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {

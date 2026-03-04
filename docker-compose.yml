@@ -1,7 +1,7 @@
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     container_name: congress-postgres
     environment:
       POSTGRES_DB: congress
@@ -14,6 +14,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
       # Mount the remote_data directory to make the dump file accessible
       - ./remote_data:/remote_data_mount
+      # Init scripts: 00_load_dump.sh restores the latest dump, 01_pgvector.sql enables vector extension
+      - ./db/init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d congress"]
       interval: 5s
