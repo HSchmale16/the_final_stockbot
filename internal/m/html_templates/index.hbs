@@ -10,43 +10,28 @@
         Inform yourself below with filters on where they are traveling and who is sponsoring it.
     </p>
 
-
-
-    {{!--
-</div> --}}
-{{!-- <h3>Interesting Bedfellows Plotting Together</h3> --}}
-
-{{!-- {{> 'partials/congress-network' }} --}}
-
-{{!-- <div class="mt-12 container mx-auto">
-    <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-
-        {{> 'partials/gauge' cardTitle="Total Topics Identified" value=TotalTags Img="/static/img/chat-balloons.png"}}
-        {{> 'partials/gauge' cardTitle="Total Tags Applied" value=TotalTopics Img="/static/img/tag.png"}}
-        {{> 'partials/gauge' cardTitle="Total Laws and Bills Indexed" value=TotalLaws Img="/static/img/book.png"}}
-    </div>
 </div>
 
-<hr /> --}}
+<hr />
 
-{{!-- <div class="container mx-auto prose-xl" id="search-section">
-    <h3>
-        Search Topics &amp; Bills
-        <span class="htmx-indicator">
-            <img class="inline m-1" src="/static/img/bars.svg" alt="Loading Icon" /> Searching...
-        </span>
-    </h3>
-    <p>Search for the topics most important to you! Also search for the bills that matter to your community by title</p>
-    <input class="form-control" style="width:100%" type="search" name="search" value="{{ SearchValue }}"
-        placeholder="Begin Typing To Search Tags and Topics..." hx-get="/htmx/topic-search"
-        hx-trigger="input changed delay:350ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
+<div class="container mx-auto prose-xl mt-12">
+    <h2>Explore Congressional Hearings</h2>
+    <p>
+        Stay informed about the discussions and witness testimonies that shape our legislative landscape. 
+        We have indexed <strong>{{ TotalHearings }}</strong> hearings held between <strong>{{ OldestHearing }}</strong> and <strong>{{ LatestHearing }}</strong> 
+        across all House and Senate committees.
+    </p>
+    <p>
+        Our platform provides you with direct access to full transcripts and official records, allowing you to 
+        search and analyze the conversations that matter most in the 119th Congress and beyond.
+    </p>
+    <p>
+        <a href="/hearings" class="btn no-underline">View All Hearings</a>
+    </p>
+</div>
 
-    <div class="w-11/12 mx-auto" id="search-results"></div>
-
+<div class="container mx-auto prose-xl mt-12">
     <hr />
-</div> --}}
-
-<div class="container mx-auto prose-xl">
     <h2>Find out about recent gifted travel</h2>
     <div hx-get="/htmx/travel-gauge-cluster" hx-trigger="load"></div>
     <p>
@@ -59,7 +44,6 @@
         <div hx-get="/htmx/recent-gift-travel" hx-trigger="load"></div>
     </div>
 </div>
-
 
 
 {{!--

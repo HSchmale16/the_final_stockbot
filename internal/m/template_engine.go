@@ -143,6 +143,16 @@ func GetTemplateEngine() fiber.Views {
 		return url.QueryEscape(s)
 	})
 
+	engine.AddFunc("jsonToArray", func(s datatypes.JSON) []interface{} {
+		var x []interface{}
+		err := json.Unmarshal(s, &x)
+		if err != nil {
+			log.Println("Error parsing JSON", err)
+			return nil
+		}
+		return x
+	})
+
 	return engine
 }
 

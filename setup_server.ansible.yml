@@ -140,6 +140,16 @@
         job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/update-congress-members.sh > congress.log 2>&1"
         user: "{{ service_user_name }}"
         state: present
+    - name: Add the hearing loading cron job
+      become: true
+      ansible.builtin.cron:
+        name: "Load Congressional Hearings"
+        day: "*"
+        hour: "4"
+        minute: "0"
+        job: "bash ~{{ service_user_name }}/the_final_stockbot/cron-scripts/load-hearings.sh > hearings.log 2>&1"
+        user: "{{ service_user_name }}"
+        state: present
     - name: Add the sitemap generation cron job
       become: true
       ansible.builtin.cron:

@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/hschmale16/the_final_stockbot/internal/m"
@@ -16,10 +15,10 @@ const (
 <url><loc>https://www.dirtycongress.com/</loc></url>
 <url><loc>https://www.dirtycongress.com/help/faq</loc></url>
 <url><loc>https://www.dirtycongress.com/tos</loc></url>
-<url><loc>https://www.dirtycongress.com/laws</loc></url>
 <url><loc>https://www.dirtycongress.com/travel</loc></url>
 <url><loc>https://www.dirtycongress.com/congress-members</loc></url>
-<url><loc>https://www.dirtycongress.com/laws</loc></url>
+<url><loc>https://www.dirtycongress.com/committees</loc></url>
+<url><loc>https://www.dirtycongress.com/hearings</loc></url>
 `
 
 	POSTAMBLE    = `</urlset>`
@@ -48,30 +47,31 @@ func MakeSitemap() {
 		panic(err)
 	}
 	defer file.Close()
-	defer file.WriteString(POSTAMBLE)
 
 	// Write the preamble
 	file.WriteString(PREAMBLE)
 
 	SITEURL := "https://www.dirtycongress.com"
 
-	rows, err := db.Model(&GovtRssItem{}).Select("id, title, link, pub_date").Order("pub_date DESC").Rows()
-	// Gorm Scan Rows
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var govtRssItem GovtRssItem
-		db.ScanRows(rows, &govtRssItem)
+	// Laws are hidden now as per user request
+	/*
+		rows, err := db.Model(&GovtRssItem{}).Select("id, title, link, pub_date").Order("pub_date DESC").Rows()
+		if err != nil {
+			panic(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var govtRssItem GovtRssItem
+			db.ScanRows(rows, &govtRssItem)
 
-		// Write the url
-		url := SITEURL + "/law/" + strconv.Itoa(int(govtRssItem.ID))
-		tmp := fmt.Sprintf(URL_TEMPLATE, url, govtRssItem.PubDate.Format(SITEMAP_DT_FORMAT))
-		file.WriteString(tmp)
-	}
+			// Write the url
+			url := SITEURL + "/law/" + strconv.Itoa(int(govtRssItem.ID))
+			tmp := fmt.Sprintf(URL_TEMPLATE, url, govtRssItem.PubDate.Format(SITEMAP_DT_FORMAT))
+			file.WriteString(tmp)
+		}
+	*/
 
-	rows, err = db.Model(&DB_CongressMember{}).Select("bio_guide_id, congress_member_info").Rows()
+	rows, err := db.Model(&DB_CongressMember{}).Select("bio_guide_id, congress_member_info").Rows()
 	if err != nil {
 		panic(err)
 	}
@@ -90,15 +90,19 @@ func MakeSitemap() {
 		}
 	}
 
-	// Select the lobbying years
-	// for _, year := range lobbying.YearsLoaded {
-	// 	url := SITEURL + "/lobbying/" + year
-	// 	tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
-	// 	file.WriteString(tmp)
-	// 	for _, ltype := range lobbying.LobbyingTypes {
-	// 		url = SITEURL + "/lobbying/breakdown/" + year + "/" + ltype
-	// 		tmp = fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
-	// 		file.WriteString(tmp)
-	// 	}
-	// }
+	// Add Committees
+	rows, err = db.Model(&DB_CongressCommittee{}).Select("thomas_id").Rows()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var committee DB_CongressCommittee
+		db.ScanRows(rows, &committee)
+		url := SITEURL + "/committee/" + committee.ThomasId
+		tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
+		file.WriteString(tmp)
+	}
+
+	file.WriteString(POSTAMBLE)
 }

@@ -29,6 +29,33 @@
         <p>Loading...</p>
     </div>
 
+    {{#if Hearings}}
+    <h2>Recent Hearings</h2>
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden not-prose">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
+                <tr>
+                    <th class="px-4 py-2 font-semibold">Title</th>
+                    <th class="px-4 py-2 font-semibold">Date</th>
+                    <th class="px-4 py-2 font-semibold">Links</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y dark:divide-gray-700">
+                {{#each Hearings}}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition">
+                    <td class="px-4 py-2 font-medium">{{this.Title}}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{this.HeldDate}}</td>
+                    <td class="px-4 py-2 flex flex-col gap-1 text-xs">
+                        {{#if this.FullTextUrl}}<a href="{{this.FullTextUrl}}" target="_blank" class="text-blue-600 hover:underline">Full Text</a>{{/if}}
+                        {{#if this.PdfUrl}}<a href="{{this.PdfUrl}}" target="_blank" class="text-red-600 hover:underline">PDF</a>{{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{/if}}
+
 
     {{#if Committee.GovtRssItems }}
     <h2>Most Recent Bills &amp; Laws</h2>

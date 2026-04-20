@@ -1,0 +1,116 @@
+<div class="container mx-auto px-4 py-8">
+  {{> 'partials/title_heading' title="Congressional Hearings" }}
+  
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <p class="text-gray-600 dark:text-gray-400">
+      Showing page {{Page}} of {{TotalPages}} ({{Total}} total results)
+    </p>
+    
+    <form action="/hearings" method="GET" class="flex w-full md:w-auto shadow-sm">
+      <input 
+        type="text" 
+        name="search" 
+        value="{{Search}}" 
+        placeholder="Search hearings or witnesses..." 
+        class="flex-grow px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+      />
+      <button 
+        type="submit" 
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-r-lg font-medium transition duration-150"
+      >
+        Search
+      </button>
+    </form>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-900">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Committees</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Witnesses</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Links</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {{#each Hearings}}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition duration-150 odd:bg-white even:bg-gray-50 dark:odd:bg-gray-800 dark:even:bg-gray-750">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white align-top">
+              {{this.Title}}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap align-top">
+              {{this.HeldDate}}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 align-top">
+              <div class="flex flex-wrap gap-1">
+                {{#each this.Committees}}
+                <a href="/committee/{{this.ThomasId}}" class="bg-blue-100 text-blue-800 text-[10px] px-1.5 py-0.5 rounded hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 leading-tight transition duration-150 no-underline">
+                  {{this.Name}}
+                </a>
+                {{/each}}
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 align-top">
+              <ul class="list-disc list-inside text-[11px] leading-relaxed">
+                {{#each (jsonToArray this.Witnesses)}}
+                <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            </td>
+            <td class="px-6 py-4 text-sm whitespace-nowrap align-top text-center">
+              <div class="flex flex-col space-y-1">
+                {{#if this.FullTextUrl}}
+                <a href="{{this.FullTextUrl}}" target="_blank" class="text-blue-600 hover:text-blue-800 font-semibold underline">Full Text</a>
+                {{/if}}
+                {{#if this.PdfUrl}}
+                <a href="{{this.PdfUrl}}" target="_blank" class="text-red-600 hover:text-red-800 font-semibold underline">PDF</a>
+                {{/if}}
+                <a href="{{this.ModsUrl}}" target="_blank" class="text-gray-500 hover:text-gray-700 text-xs no-underline">Metadata</a>
+              </div>
+            </td>
+          </tr>
+          {{/each}}
+          {{#unless Hearings}}
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+              No hearings found matching your criteria.
+            </td>
+          </tr>
+          {{/unless}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {{!-- Pagination --}}
+  <div class="mt-8 flex flex-col sm:flex-row justify-center items-center text-gray-600 dark:text-gray-400 gap-4">
+    <div class="flex space-x-2">
+      {{#if HasPrev}}
+      <a href="/hearings?page={{PrevPage}}&search={{Search}}" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium text-blue-600 no-underline">
+        &larr; Previous
+      </a>
+      {{else}}
+      <span class="px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded text-gray-400 cursor-not-allowed">
+        &larr; Previous
+      </span>
+      {{/if}}
+      
+      <span class="px-4 py-2 font-medium text-gray-900 dark:text-white">
+        Page {{Page}} of {{TotalPages}}
+      </span>
+
+      {{#if HasNext}}
+      <a href="/hearings?page={{NextPage}}&search={{Search}}" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium text-blue-600 no-underline">
+        Next &rarr;
+      </a>
+      {{else}}
+      <span class="px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded text-gray-400 cursor-not-allowed">
+        Next &rarr;
+      </span>
+      {{/if}}
+    </div>
+  </div>
+</div>

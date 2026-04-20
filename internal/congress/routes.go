@@ -205,11 +205,20 @@ func CommitteeView(c *fiber.Ctx) error {
 	if committee.ParentCommitteeId != nil {
 		db.First(&committee.ParentCommittee, "thomas_id = ?", committee.ParentCommitteeId)
 	}
+
+	var hearings []Hearing
+	db.Joins("JOIN hearing_committees ON hearing_committees.hearing_id = hearings.id").
+		Where("hearing_committees.db_congress_committee_thomas_id = ?", committee.ThomasId).
+		Order("held_date DESC, pub_date DESC").
+		Limit(25).
+		Find(&hearings)
+
 	db.Limit(5).Order("pub_date desc").Model(&committee).Association("GovtRssItems").Find(&committee.GovtRssItems)
 
 	return c.Render("committee_view", fiber.Map{
 		"Title":       committee.Name,
 		"Description": "View the " + committee.Name + " in the US Congress, understand their scope and membership.",
 		"Committee":   committee,
+		"Hearings":    hearings,
 	}, "layouts/main")
 }

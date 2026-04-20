@@ -2,7 +2,6 @@ package congress
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 
@@ -33,9 +32,6 @@ func LoadCongressCommittees(file string) {
 	// Read it
 	var committees []JSON_CongressCommittee
 	json.Unmarshal(data, &committees)
-
-	fmt.Println("Committees:", len(committees))
-	fmt.Println("First Committee:", committees[0])
 
 	// Save it
 
@@ -82,15 +78,9 @@ func LoadCommitteeMemberships(file string) {
 	var memberships map[string][]json_CommitteeMembership
 	json.Unmarshal(data, &memberships)
 
-	fmt.Println("Memberships:", len(memberships))
-
 	for committeeId, committeeMembers := range memberships {
-		fmt.Println("Committee:", committeeId, "Members:", len(committeeMembers))
-
 		// Save the committee members
 		for _, member := range committeeMembers {
-			fmt.Println("Member:", member)
-
 			membership := DB_CommitteeMembership{
 				CongressMemberId: member.Bioguide,
 				CommitteeId:      committeeId,

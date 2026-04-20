@@ -1,11 +1,12 @@
 package app
 
 import (
-	"fmt"
 	"html"
 	"log"
+	"math"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -36,7 +37,9 @@ type GovtRssItemTag = m.GovtRssItemTag
 type GovtLawText = m.GovtLawText
 type CongressMemberSponsored = m.CongressMemberSponsored
 type DB_CongressMember = m.DB_CongressMember
+type DB_CongressCommittee = m.DB_CongressCommittee
 type SearchQuery = m.SearchQuery
+type Hearing = congress.Hearing
 
 func SetupServer() *fiber.App {
 	db, err := m.SetupDB()
@@ -87,6 +90,7 @@ func SetupServer() *fiber.App {
 		}, "layouts/main")
 	})
 	app.Get("/tos", TermsOfService)
+	app.Get("/hearings", HearingIndex)
 
 	// HTMX End Point
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
@@ -228,10 +232,15 @@ func TagDataList(c *fiber.Ctx) error {
 func Index(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var articleTags, totalTags, totalLaws int64
+	var articleTags, totalTags, totalLaws, totalHearings int64
 	db.Model(&GovtRssItemTag{}).Count(&articleTags)
 	db.Model(&Tag{}).Count(&totalTags)
 	db.Model(&GovtRssItem{}).Count(&totalLaws)
+	db.Model(&Hearing{}).Count(&totalHearings)
+
+	var oldestHearing, latestHearing string
+	db.Model(&Hearing{}).Where("held_date != ''").Select("MIN(held_date)").Scan(&oldestHearing)
+	db.Model(&Hearing{}).Where("held_date != ''").Select("MAX(held_date)").Scan(&latestHearing)
 
 	var Approprations, Senate, Public, House, HouseRes, SenateRes []GovtRssItem
 
@@ -255,6 +264,9 @@ func Index(c *fiber.Ctx) error {
 		"TotalTopics":   p.Sprintf("%d", articleTags),
 		"TotalTags":     p.Sprintf("%d", totalTags),
 		"TotalLaws":     p.Sprintf("%d", totalLaws),
+		"TotalHearings": p.Sprintf("%d", totalHearings),
+		"OldestHearing": oldestHearing,
+		"LatestHearing": latestHearing,
 		"Approprations": Approprations,
 		"House":         House,
 		"Senate":        Senate,
@@ -321,6 +333,45 @@ func TagIndex(c *fiber.Ctx) error {
 		"Description": "View bills tagged with " + tag.Name + " --- " + tag.ShortLine,
 		"Tag":         tag,
 		"Items":       items,
+	}, "layouts/main")
+}
+
+func HearingIndex(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	search := c.Query("search")
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+	pageSize := 20
+	offset := (page - 1) * pageSize
+
+	var hearings []Hearing
+	var total int64
+
+	query := db.Model(&Hearing{}).Preload("Committees")
+	if search != "" {
+		s := "%" + search + "%"
+		query = query.Where("title ILIKE ? OR witnesses::text ILIKE ?", s, s)
+	}
+
+	query.Count(&total)
+	query.Order("held_date DESC, pub_date DESC").Limit(pageSize).Offset(offset).Find(&hearings)
+
+	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+
+	return c.Render("hearing_index", fiber.Map{
+		"Title":      "Congressional Hearings",
+		"Hearings":   hearings,
+		"Search":     search,
+		"Page":       page,
+		"TotalPages": totalPages,
+		"Total":      total,
+		"HasPrev":    page > 1,
+		"HasNext":    page < totalPages,
+		"PrevPage":   page - 1,
+		"NextPage":   page + 1,
 	}, "layouts/main")
 }
 
@@ -486,7 +537,6 @@ func ViewCongressMember(c *fiber.Ctx) error {
 	}
 	for _, child := range childs {
 		for i, parent := range parents {
-			fmt.Println(parent.Committee.ThomasId)
 			if *child.Committee.ParentCommitteeId == parent.Committee.ThomasId {
 				parents[i].Committee.Subcommittees = append(parents[i].Committee.Subcommittees, child.Committee)
 			}

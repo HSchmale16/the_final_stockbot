@@ -43,6 +43,16 @@ type LawModsData struct {
 	IsPrivate          bool
 }
 
+type HearingModsData struct {
+	Title              string
+	HeldDate           string
+	FullTextUrl        string
+	PdfUrl             string
+	Witnesses          []string
+	CongressCommittees []XML_CongressCommittee
+	CongressMembers    []CongressMember
+}
+
 type BillReference struct {
 	Congress  string `xml:"congress,attr"`
 	Context   string `xml:"context,attr"`
@@ -119,6 +129,62 @@ func ReadLawModsData(xmlString string) LawModsData {
 				var bill BillReference
 				decoder.DecodeElement(&bill, &se)
 				modsData.BillReferences = append(modsData.BillReferences, bill)
+			}
+		}
+	}
+	return modsData
+}
+
+func ReadHearingModsData(xmlString string) HearingModsData {
+	decoder := xml.NewDecoder(strings.NewReader(xmlString))
+	modsData := HearingModsData{}
+
+	for {
+		t, err := decoder.Token()
+		if err != nil {
+			break
+		}
+
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "congMember" {
+				var member CongressMember
+				decoder.DecodeElement(&member, &se)
+				modsData.CongressMembers = append(modsData.CongressMembers, member)
+			}
+			if se.Name.Local == "congCommittee" {
+				var committee XML_CongressCommittee
+				decoder.DecodeElement(&committee, &se)
+				modsData.CongressCommittees = append(modsData.CongressCommittees, committee)
+			}
+			if se.Name.Local == "title" && modsData.Title == "" {
+				decoder.DecodeElement(&modsData.Title, &se)
+			}
+			if se.Name.Local == "heldDate" {
+				decoder.DecodeElement(&modsData.HeldDate, &se)
+			}
+			if se.Name.Local == "url" {
+				isHtml := false
+				isPdf := false
+				for _, attr := range se.Attr {
+					if attr.Name.Local == "displayLabel" && attr.Value == "HTML rendition" {
+						isHtml = true
+					}
+					if attr.Name.Local == "displayLabel" && attr.Value == "PDF rendition" {
+						isPdf = true
+					}
+				}
+				if isHtml {
+					decoder.DecodeElement(&modsData.FullTextUrl, &se)
+				}
+				if isPdf {
+					decoder.DecodeElement(&modsData.PdfUrl, &se)
+				}
+			}
+			if se.Name.Local == "witness" {
+				var witness string
+				decoder.DecodeElement(&witness, &se)
+				modsData.Witnesses = append(modsData.Witnesses, witness)
 			}
 		}
 	}

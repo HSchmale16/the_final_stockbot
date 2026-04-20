@@ -12,7 +12,30 @@ import (
 )
 
 func init() {
-	m.RegisterModels(Bill{}, BillAction{}, BillCosponsor{})
+	m.RegisterModels(Bill{}, BillAction{}, BillCosponsor{}, Hearing{})
+}
+
+type Hearing struct {
+	ID        uint `gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	Title       string
+	Link        string `gorm:"uniqueIndex"`
+	PubDate     time.Time
+	HeldDate    string
+	FullTextUrl string
+	PdfUrl      string
+	ModsUrl     string
+	FullText    string
+	Witnesses   datatypes.JSON
+
+	Members    []m.DB_CongressMember    `gorm:"many2many:hearing_members;"`
+	Committees []m.DB_CongressCommittee `gorm:"many2many:hearing_committees;"`
+}
+
+func (h Hearing) TableName() string {
+	return "hearings"
 }
 
 type Bill struct {
