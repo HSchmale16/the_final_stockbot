@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   postgres:
@@ -21,6 +22,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  app:
+    build: .
+    container_name: congress-app
+    ports:
+      - "8080:8080"
+    environment:
+      - DEBUG=true
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
