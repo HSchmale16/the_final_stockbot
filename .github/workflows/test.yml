@@ -122,4 +122,3 @@ jobs:
           tags: |
             ghcr.io/${{ github.actor }}/the-final-stockbot:latest
             ghcr.io/${{ github.actor }}/the-final-stockbot:${{ github.sha }}
-```
