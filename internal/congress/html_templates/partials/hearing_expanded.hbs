@@ -1,0 +1,84 @@
+<tbody id="hearing-{{this.ID}}" class="bg-white dark:bg-gray-800">
+<tr class="bg-blue-50/20 dark:bg-blue-900/10 transition duration-150">
+  <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white align-top">
+    <div class="flex items-start gap-3">
+      <button hx-get="/htmx/hearing/{{this.ID}}/collapsed" hx-target="#hearing-{{this.ID}}" hx-swap="outerHTML" class="flex-shrink-0 flex items-center justify-center p-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 transition-colors focus:outline-none group shadow-sm" title="Collapse Details">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 group-hover:scale-110 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <span class="pt-1">{{this.Title}}</span>
+    </div>
+  </td>
+  <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap align-top">
+    {{this.HeldDate}}
+  </td>
+  <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 align-top">
+    <div class="flex flex-wrap gap-1">
+      {{#each this.Committees}}
+      <a href="/committee/{{this.ThomasId}}" class="bg-blue-100 text-blue-800 text-[10px] px-1.5 py-0.5 rounded hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 leading-tight transition duration-150 no-underline">
+        {{this.Name}}
+      </a>
+      {{/each}}
+    </div>
+  </td>
+  <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 align-top">
+    <ul class="list-disc list-inside text-[11px] leading-relaxed">
+      {{#each (jsonToArray this.Witnesses)}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  </td>
+  <td class="px-6 py-4 text-sm whitespace-nowrap align-top text-center">
+    <div class="flex flex-col space-y-1">
+      {{#if this.FullTextUrl}}
+      <a href="{{this.FullTextUrl}}" target="_blank" class="text-blue-600 hover:text-blue-800 font-semibold underline">Full Text</a>
+      {{/if}}
+      {{#if this.PdfUrl}}
+      <a href="{{this.PdfUrl}}" target="_blank" class="text-red-600 hover:text-red-800 font-semibold underline">PDF</a>
+      {{/if}}
+      <a href="{{this.ModsUrl}}" target="_blank" class="text-gray-500 hover:text-gray-700 text-xs no-underline">Metadata</a>
+    </div>
+  </td>
+</tr>
+<tr>
+  <td colspan="5" class="p-0 border-t-0 border-b border-gray-200 dark:border-gray-700">
+    <div class="pl-20 pr-8 py-4 pb-8">
+      <div class="pl-6 border-l-2 border-gray-200 dark:border-gray-700 max-w-4xl">
+        
+        {{#if this.IsPdfOnly}}
+        <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 dark:bg-yellow-900/30 dark:border-yellow-600 dark:text-yellow-200 rounded-r shadow-sm flex items-start">
+          <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-500 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-sm font-medium">
+            The full transcript for this hearing is not available in HTML format. Please <a href="{{this.PdfUrl}}" target="_blank" class="underline font-bold hover:text-yellow-900 dark:hover:text-yellow-100">refer to the PDF</a> to view the proceedings.
+          </p>
+        </div>
+        {{/if}}
+
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <svg class="h-5 w-5 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+            <h4 class="text-base font-semibold text-gray-900 dark:text-white">Members in Attendance</h4>
+          </div>
+          
+          <div class="flex flex-wrap gap-3">
+            {{#each this.AttendedMembers}}
+            {{> 'partials/member_pill' Member=this}}
+            {{/each}}
+            {{#unless this.AttendedMembers}}
+              <div class="w-full text-center py-4 bg-gray-50 dark:bg-gray-800/50 rounded-md border border-dashed border-gray-300 dark:border-gray-600">
+                <p class="text-sm text-gray-500 dark:text-gray-400 italic">Attendance has not been parsed or no attendees were found for this hearing.</p>
+              </div>
+            {{/unless}}
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </td>
+</tr>
+</tbody>

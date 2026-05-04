@@ -1,0 +1,4 @@
+<a href="/congress-member/{{Member.BioGuideId}}" class="relative overflow-hidden inline-flex items-center pl-3.5 pr-3 py-1 rounded-full text-xs font-medium bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 shadow-sm transition-colors no-underline group">
+  <div class="absolute left-0 top-0 bottom-0 w-2 {{#if (eq (firstChar Member.Party) 'R')}}bg-red-500{{else}}{{#if (eq (firstChar Member.Party) 'D')}}bg-blue-500{{else}}bg-purple-500{{/if}}{{/if}} group-hover:w-2.5 transition-all"></div>
+  <span>{{#if Member.IsSenator}}Sen.{{else}}Rep.{{/if}} {{Member.Name}} ({{Member.State}})</span>
+</a>

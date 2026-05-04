@@ -8,6 +8,10 @@ module.exports = {
     "./internal/votes/html_templates/*.hbs",
     "./internal/travel/html_templates/**/*.hbs",
     "./internal/travel/html_templates/*.hbs",
+    "./internal/congress/html_templates/**/*.hbs",
+    "./internal/congress/html_templates/*.hbs",
+    "./internal/stocks/html_templates/**/*.hbs",
+    "./internal/stocks/html_templates/*.hbs",
   ],
   theme: {
     extend: {

@@ -91,6 +91,8 @@ func SetupServer() *fiber.App {
 	})
 	app.Get("/tos", TermsOfService)
 	app.Get("/hearings", HearingIndex)
+	app.Get("/htmx/hearing/:id/expanded", HearingExpanded)
+	app.Get("/htmx/hearing/:id/collapsed", HearingCollapsed)
 
 	// HTMX End Point
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
@@ -373,6 +375,30 @@ func HearingIndex(c *fiber.Ctx) error {
 		"PrevPage":   page - 1,
 		"NextPage":   page + 1,
 	}, "layouts/main")
+}
+
+func HearingExpanded(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+	id := c.Params("id")
+
+	var hearing Hearing
+	db.Preload("Committees").
+		Preload("Members").
+		Preload("AttendedMembers").
+		First(&hearing, id)
+
+	return c.Render("partials/hearing_expanded", hearing)
+}
+
+func HearingCollapsed(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+	id := c.Params("id")
+
+	var hearing Hearing
+	db.Preload("Committees").
+		First(&hearing, id)
+
+	return c.Render("partials/hearing_row", hearing)
 }
 
 func TopicSearch(c *fiber.Ctx) error {

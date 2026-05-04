@@ -1,0 +1,13 @@
+---
+- name: Trigger Hearing Backfill
+  hosts: web
+  vars:
+    service_user_name: final_stockbot
+    congress_num: 119
+  tasks:
+    - name: Run the hearing backfill
+      become: true
+      become_user: "{{ service_user_name }}"
+      ansible.builtin.command:
+        cmd: "./the_final_stockbot --backfill-congress {{ congress_num }}"
+        chdir: "~{{ service_user_name }}/the_final_stockbot"

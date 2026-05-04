@@ -117,8 +117,10 @@ func RunHearingBackfill(congressNum int) {
 
 			// Check if already processed
 			var existing Hearing
-			db.Where("link = ?", link).First(&existing)
-			if existing.ID != 0 && existing.FullText != "" && existing.PdfUrl != "" {
+			db.Preload("AttendedMembers").Where("link = ?", link).First(&existing)
+			
+			isProcessed := existing.FullText != "" || existing.IsPdfOnly || len(existing.AttendedMembers) > 0
+			if existing.ID != 0 && isProcessed && existing.PdfUrl != "" {
 				continue
 			}
 
@@ -131,8 +133,10 @@ func RunHearingBackfill(congressNum int) {
 func processHearing(db *gorm.DB, title string, link string, pubDate time.Time, modsUrl string, fullTextUrl string) {
 	// Check if exists
 	var existing Hearing
-	db.Where("link = ?", link).First(&existing)
-	if existing.ID != 0 && existing.FullText != "" && existing.PdfUrl != "" {
+	db.Preload("AttendedMembers").Where("link = ?", link).First(&existing)
+	
+	isProcessed := existing.FullText != "" || existing.IsPdfOnly || len(existing.AttendedMembers) > 0
+	if existing.ID != 0 && isProcessed && existing.PdfUrl != "" {
 		return
 	}
 

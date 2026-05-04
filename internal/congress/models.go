@@ -28,10 +28,12 @@ type Hearing struct {
 	PdfUrl      string
 	ModsUrl     string
 	FullText    string
+	IsPdfOnly   bool
 	Witnesses   datatypes.JSON
 
-	Members    []m.DB_CongressMember    `gorm:"many2many:hearing_members;"`
-	Committees []m.DB_CongressCommittee `gorm:"many2many:hearing_committees;"`
+	Members         []m.DB_CongressMember    `gorm:"many2many:hearing_members;"`
+	AttendedMembers []m.DB_CongressMember    `gorm:"many2many:hearing_attended_members;"`
+	Committees      []m.DB_CongressCommittee `gorm:"many2many:hearing_committees;"`
 }
 
 func (h Hearing) TableName() string {

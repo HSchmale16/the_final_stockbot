@@ -1,1 +1,1 @@
-{{ Member.Name }} ({{firstChar Member.Party}} - {{Member.State}}{{#unless Member.IsSenator }}-{{ Member.District}}{{/unless}})
+{{#if Member.IsSenator}}Sen.{{else}}Rep.{{/if}} {{ Member.Name }} ({{firstChar Member.Party}} - {{Member.State}}{{#unless Member.IsSenator }}-{{ Member.District}}{{/unless}})
