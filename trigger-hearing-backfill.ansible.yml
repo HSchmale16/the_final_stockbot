@@ -11,3 +11,10 @@
       ansible.builtin.command:
         cmd: "./the_final_stockbot --backfill-congress {{ congress_num }}"
         chdir: "~{{ service_user_name }}/the_final_stockbot"
+
+    - name: Process hearing attendance
+      become: true
+      become_user: "{{ service_user_name }}"
+      ansible.builtin.command:
+        cmd: "./the_final_stockbot --process-hearings"
+        chdir: "~{{ service_user_name }}/the_final_stockbot"

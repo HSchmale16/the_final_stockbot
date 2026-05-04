@@ -40,6 +40,7 @@ var committeeMembershipsFile = ""
 var doTravelBackgroundProcessing = false
 var runHearingFetcher = false
 var backfillCongress int = 0
+var processHearings = false
 
 // New things will define a value in my switch case below for a script to run.
 var script = ""
@@ -62,6 +63,7 @@ func init() {
 	flag.BoolVar(&doTravelBackgroundProcessing, "travel-background-processing", false, "Run the travel background processing")
 	flag.BoolVar(&runHearingFetcher, "run-hearing-fetcher", false, "Run the hearing fetcher service")
 	flag.IntVar(&backfillCongress, "backfill-congress", 0, "Backfill hearings for a specific congress")
+	flag.BoolVar(&processHearings, "process-hearings", false, "Process hearing attendance from transcripts")
 }
 
 func main() {
@@ -168,6 +170,11 @@ func main() {
 
 	if backfillCongress != 0 {
 		app.RunHearingBackfill(backfillCongress)
+		return
+	}
+
+	if processHearings {
+		app.ProcessHearingAttendance(db)
 		return
 	}
 
