@@ -29,7 +29,7 @@
                 {{ this.District }}
                 {{/unless}}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" sorttable_customkey="{{ this.TookOfficeOn }}">{{ formatDate this.TookOfficeOn }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" sorttable_customkey="{{ this.TookOfficeOn }}">{{ formatDate this.TookOfficeOn }} ({{ this.YearsServedDisplay }})</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{firstChar this.Party }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ this.TravelCount }}</td>
         </tr>

@@ -234,6 +234,40 @@ func (d DB_CongressMember) TookOfficeOn() string {
 	return d.CongressMemberInfo.Terms[0].Start
 }
 
+func (d DB_CongressMember) YearsServed() int {
+	var totalDays float64
+	now := time.Now()
+	for _, term := range d.CongressMemberInfo.Terms {
+		start, err := time.Parse("2006-01-02", term.Start)
+		if err != nil {
+			continue
+		}
+		end, err := time.Parse("2006-01-02", term.End)
+		if err != nil {
+			continue
+		}
+
+		if end.After(now) {
+			end = now
+		}
+
+		if start.After(now) {
+			continue
+		}
+
+		totalDays += end.Sub(start).Hours() / 24
+	}
+	return int(totalDays / 365.25)
+}
+
+func (d DB_CongressMember) YearsServedDisplay() string {
+	years := d.YearsServed()
+	if years == 1 {
+		return "1 year"
+	}
+	return fmt.Sprintf("%d years", years)
+}
+
 func (d DB_CongressMember) Party() string {
 	return d.CongressMemberInfo.Terms[len(d.CongressMemberInfo.Terms)-1].Party
 }
