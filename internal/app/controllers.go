@@ -523,7 +523,7 @@ func CongressMemberList(c *fiber.Ctx) error {
 	state := c.Query("state")
 
 	query := db.Table("congress_member").
-		Select("congress_member.*, (SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id) AS travel_count").
+		Select("congress_member.*, (SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id AND CURRENT_TIMESTAMP - departure_date < interval '2 years') AS travel_count").
 		Where("is_active = ?", true)
 
 	if state != "" {
