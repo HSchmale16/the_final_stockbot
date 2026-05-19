@@ -514,13 +514,20 @@ func TermsOfService(c *fiber.Ctx) error {
 func CongressMemberList(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var members []DB_CongressMember
+	type memberWithTravel struct {
+		DB_CongressMember
+		TravelCount int `gorm:"column:travel_count"`
+	}
+
+	var members []memberWithTravel
 	state := c.Query("state")
 
-	query := db.Where("is_active = ?", true)
+	query := db.Table("congress_member").
+		Select("congress_member.*, (SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id) AS travel_count").
+		Where("is_active = ?", true)
 
 	if state != "" {
-		query.Where("json_extract(congress_member_info, '$.terms[#-1].state') = ?", state).Find(&members)
+		query = query.Where("json_extract(congress_member_info, '$.terms[#-1].state') = ?", state)
 	}
 
 	query.Find(&members)

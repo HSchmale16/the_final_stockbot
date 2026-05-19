@@ -35,18 +35,33 @@
 
         }
 
+        function sortNumbers(a, b) {
+            a = parseFloat(strip(a)) || 0;
+            b = parseFloat(strip(b)) || 0;
+            return a - b;
+        }
+
         new gridjs.Grid({
             sort: true,
             {{#if search }}
             search: true,
             {{/if}}
-            columns: Array.from(source.querySelectorAll('thead th')).map(th => ({
-                name: th.textContent,
-                formatter: (cell) => gridjs.html(cell),
-                sort: {
-                    compare: th.getAttribute("dataType") == "date" ? sortDates : sort
+            columns: Array.from(source.querySelectorAll('thead th')).map(th => {
+                const dataType = th.getAttribute("dataType");
+                let compareFunc = sort;
+                if (dataType === "date") {
+                    compareFunc = sortDates;
+                } else if (dataType === "number") {
+                    compareFunc = sortNumbers;
                 }
-            })),
+                return {
+                    name: th.textContent,
+                    formatter: (cell) => gridjs.html(cell),
+                    sort: {
+                        compare: compareFunc
+                    }
+                };
+            }),
             data: Array.from(source.querySelectorAll('tbody tr')).map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.innerHTML)),
         }).render(target);
 
