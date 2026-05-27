@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/user"
 	"time"
 
 	fecwrangling "github.com/hschmale16/the_final_stockbot/internal/fecwrangling"
@@ -355,6 +356,11 @@ func GetPostgresqlDB() (*gorm.DB, error) {
 	var dsn string
 	if _, err := os.Stat("/var/run/postgresql/.s.PGSQL.5432"); err == nil {
 		whoami := os.Getenv("USER")
+		if whoami == "" {
+			if u, err := user.Current(); err == nil {
+				whoami = u.Username
+			}
+		}
 		dsn = fmt.Sprintf("host=/var/run/postgresql/ user=%s dbname=congress sslmode=disable", whoami)
 
 	} else {

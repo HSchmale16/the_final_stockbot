@@ -516,14 +516,17 @@ func CongressMemberList(c *fiber.Ctx) error {
 
 	type memberWithTravel struct {
 		DB_CongressMember
-		TravelCount int `gorm:"column:travel_count"`
+		TravelCount    int `gorm:"column:travel_count"`
+		CommitteeCount int `gorm:"column:committee_count"`
 	}
 
 	var members []memberWithTravel
 	state := c.Query("state")
 
 	query := db.Table("congress_member").
-		Select("congress_member.*, (SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id AND CURRENT_TIMESTAMP - departure_date < interval '2 years') AS travel_count").
+		Select("congress_member.*, " +
+			"(SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id AND CURRENT_TIMESTAMP - departure_date < interval '2 years') AS travel_count, " +
+			"(SELECT COUNT(*) FROM db_committee_memberships WHERE db_committee_memberships.db_congress_member_bio_guide_id = congress_member.bio_guide_id) AS committee_count").
 		Where("is_active = ?", true)
 
 	if state != "" {
