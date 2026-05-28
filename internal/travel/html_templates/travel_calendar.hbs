@@ -1,5 +1,7 @@
 {{> 'partials/title_heading' title=Title subtitle="FAQ" }}
 
+{{> 'partials/share_buttons' }}
+
 <div class="prose-xl">
     <p>Here you can see the destinations and number of people at a given destination for a gifted trip.</p>
     <p>You may click on a date to filter the table below to just trips on that date.</p>
@@ -79,7 +81,7 @@
         {{#each weeks}}
             <tr>
                 {{#each Dates }}
-                    <td data-month="{{this.MonthNumber}}">
+                    <td data-month="{{this.MonthNumber}}" class="travelDay cursor-pointer hover:bg-blue-100 transition-colors">
                         <b class="day-number">{{ DayNumber }}</b>
                         <div class="w-full">
                             {{#each Trips}}

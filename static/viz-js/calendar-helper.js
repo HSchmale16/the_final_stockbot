@@ -16,11 +16,23 @@ function renderMemberName(Member) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    function updateFilters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    var dateFilter = urlParams.get('targetDate');
+
+    function updateFilters(updateUrl = true) {
         // Generate the url and set the data value
         var url = `/json/travel/calendar/${yearInt}/${monthInt}`;
         if (dateFilter !== null) {
             url = '/json/travel/calendar2?' + new URLSearchParams({ targetDate: dateFilter });
+            if (updateUrl) {
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('targetDate', dateFilter);
+                window.history.pushState({}, '', newUrl);
+            }
+        } else if (updateUrl) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('targetDate');
+            window.history.pushState({}, '', newUrl);
         }
 
         table.setData(url);
@@ -28,21 +40,17 @@ document.addEventListener('DOMContentLoaded', function () {
         filtersDIV.innerHTML = '';
         if (dateFilter !== null) {
             const filter = document.createElement('div');
-            filter.classList.add('badge');
-            filter.classList.add('bg-gray-500');
-            filter.innerText = "IncludesDate: " + dateFilter;
-            filtersDIV.appendChild(filter);
-
+            filter.classList.add('inline-flex', 'items-center', 'px-3', 'py-1', 'rounded-full', 'text-sm', 'font-medium', 'bg-blue-100', 'text-blue-800', 'mr-2', 'mb-2');
+            filter.innerText = "Date: " + dateFilter;
+            
             var removeBtn = document.createElement('button');
             removeBtn.addEventListener('click', resetDateFilter);
-            removeBtn.innerText = '❌';
+            removeBtn.innerText = ' ❌';
+            removeBtn.classList.add('ml-2', 'text-blue-600', 'hover:text-blue-800');
 
             filter.appendChild(removeBtn);
-
-
-            console.log(filtersDIV);
+            filtersDIV.appendChild(filter);
         }
-
     }
 
     function resetDateFilter() {
@@ -52,10 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const travelDays = document.querySelectorAll('.travelDay');
     var filtersDIV = document.getElementById('filtersApplied');
-    var dateFilter = null;
 
     var table = new Tabulator("#wrapper", {
-        ajaxURL: `/json/travel/calendar/${yearInt}/${monthInt}`,
+        ajaxURL: dateFilter ? '/json/travel/calendar2?' + new URLSearchParams({ targetDate: dateFilter }) : `/json/travel/calendar/${yearInt}/${monthInt}`,
         pagination: true,
         // progressiveLoad:"scroll",
         paginationSize:20,
@@ -71,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 field: 'Member',
                 formatter: (cell, formatterParams) => {
                     var value = cell.getValue();
+                    if (!value) return "Unknown";
                     return `<a href="/congress-member/${value.BioGuideId}">${renderMemberName(value)}</a>`;
                  },
             },
@@ -95,19 +103,35 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     });
 
-    console.log(table);
+    if (dateFilter) {
+        // Need to wait a bit for Tabulator to be ready or just use updateFilters which handles it
+        // Actually table.setData works fine if called immediately after constructor usually, 
+        // but we already set ajaxURL in constructor.
+        // Let's just run updateFilters(false) to set the filter UI.
+        updateFilters(false);
+    }
 
     travelDays.forEach((day) => {
         day.addEventListener('click', (e) => {
-            const day = e.target.innerText;
-            const month = e.target.getAttribute('data-month');
+            // Find the td element even if a child was clicked
+            const td = e.target.closest('td');
+            const dayNum = td.querySelector('.day-number').innerText.trim();
+            const month = td.getAttribute('data-month');
             const year = yearInt; // from global scope
 
-            dateFilter = `${year}-${month}-${day}`;
+            // Format as YYYY-MM-DD, ensuring 2 digits for month and day
+            const formattedMonth = month.padStart(2, '0');
+            const formattedDay = dayNum.padStart(2, '0');
+            dateFilter = `${year}-${formattedMonth}-${formattedDay}`;
             updateFilters();
-
-            
         });
+    });
+
+    // Handle back/forward buttons
+    window.addEventListener('popstate', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        dateFilter = urlParams.get('targetDate');
+        updateFilters(false);
     });
 });
 
