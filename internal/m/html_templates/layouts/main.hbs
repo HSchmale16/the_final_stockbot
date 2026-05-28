@@ -9,7 +9,8 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/static/sitemap.xml">
 
     <meta property="og:title" content="{{ Title }}" />
-    <meta property="og:logo" content="https://www.dirtycongress.com/static/icons/favicon/SVG.svg" />
+    <meta property="og:site_name" content="Dirty Congress" />
+    <meta property="og:type" content="website" />
 
     {{#if OgImage }}
     <meta property="og:image" content="https://www.dirtycongress.com/{{ OgImage }}" />
@@ -23,11 +24,11 @@
 
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="dirtycongress.com">
-    <meta property="twitter:url" content="{{ Url g}}">
-    <meta name="twitter:title" content="{{ Title}}">
-    <meta name="twitter:description"
-        content="{{ Description}}">
+    <meta property="twitter:url" content="{{ Url }}">
+    <meta name="twitter:title" content="{{ Title }}">
+    <meta name="twitter:description" content="{{ Description }}">
 
+    <link rel="canonical" href="{{ Url }}">
 
     {{!-- <link rel="stylesheet" href="/static/css/bootstrap.min.css?cache-bust={{ CacheBust }}"> --}}
     {{!-- <link rel="stylesheet" href="/static/css/custom.css?cache-bust={{ CacheBust }}"> --}}
