@@ -209,9 +209,10 @@ func GetTravelHomepage(c *fiber.Ctx) error {
 		year = fmt.Sprint(time.Now().Year())
 	}
 	return c.Render("travel_homepage", fiber.Map{
-		"Title":   "Gifted Travel Disclosures",
-		"OgImage": "static/img/og-travel-plots.png",
-		"Year":    year,
+		"Title":       "Who Travels Most in Congress? " + year + " Gifted Travel Leaderboard",
+		"Description": "Discover which members of the US Congress received the most gifted travel in " + year + ". Explore top destinations and travel trends based on official disclosures.",
+		"OgImage":     "static/img/og-travel-plots.png",
+		"Year":        year,
 	}, "layouts/main")
 }
 

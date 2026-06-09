@@ -10,10 +10,8 @@ Disallow: /
 User-agent: AhrefsBot
 Disallow:/
 
-# ChatGPT is the worst
-User-agent: Amazonbot
-Disallow: /
+# Allow AI discovery bots
 User-agent: ChatGPT-User
-Disallow: /
+Allow: /
 User-agent: GPTBot
-Disallow: /
+Allow: /

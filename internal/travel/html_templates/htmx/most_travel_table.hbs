@@ -1,6 +1,26 @@
 <div class="prose-xl max-w-none">
     <h2 class="mb-4">Which Congress Person's Office Received the Most Gifted Travel in {{ SelectedYear }}?</h2>
 
+    {{!-- Structured Data for SEO Leaderboard --}}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Most Gifted Travel in Congress {{ SelectedYear }}",
+      "description": "Ranking of US Congress members by the number of gifted trips received in {{ SelectedYear }}.",
+      "itemListElement": [
+        {{#each MostTravel }}
+        {
+          "@type": "ListItem",
+          "position": {{addOne @index}},
+          "name": "{{ this.Member.Name }}",
+          "url": "https://www.dirtycongress.com/congress-member/{{ this.Member.BioGuideId }}"
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+      ]
+    }
+    </script>
+
     <div class="tablist" role="tablist">
         {{#each Years }}
         <button hx-get="/htmx/travel/who-travels-most/{{ this }}" role="tab" hx-push-url="/travel?year={{ this }}"
@@ -20,16 +40,16 @@
                     Loading Top Destinations...
                 </div>
             </div>
-            <table class="md:w-3/4 divide-y divide-gray-200 border">
+            <table class="md:w-3/4 divide-y divide-gray-200 border" aria-label="Congress Gifted Travel Leaderboard {{ SelectedYear }}">
                 <thead>
                     <tr>
                         <th scope="col"
                             class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                            Type
+                            Chamber
                         </th>
                         <th scope="col"
                             class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                            Member
+                            Congress Member
                         </th>
                         <th scope="col"
                             class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
@@ -37,11 +57,11 @@
                         </th>
                         <th scope="col"
                             class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                            Party
+                            Political Party
                         </th>
                         <th scope="col"
                             class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                            Trips
+                            Total Trips
                         </th>
                     </tr>
                 </thead>

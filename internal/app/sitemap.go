@@ -3,10 +3,13 @@ package app
 import (
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
 	"time"
 
+	"github.com/hschmale16/the_final_stockbot/internal/lobbying"
 	"github.com/hschmale16/the_final_stockbot/internal/m"
+	"github.com/hschmale16/the_final_stockbot/internal/travel"
 )
 
 const (
@@ -53,31 +56,44 @@ func MakeSitemap() {
 
 	SITEURL := "https://www.dirtycongress.com"
 
-	// Laws are hidden now as per user request
-	/*
-		rows, err := db.Model(&GovtRssItem{}).Select("id, title, link, pub_date").Order("pub_date DESC").Rows()
-		if err != nil {
-			panic(err)
-		}
-		defer rows.Close()
-		for rows.Next() {
-			var govtRssItem GovtRssItem
-			db.ScanRows(rows, &govtRssItem)
+	today := time.Now()
 
-			// Write the url
-			url := SITEURL + "/law/" + strconv.Itoa(int(govtRssItem.ID))
-			tmp := fmt.Sprintf(URL_TEMPLATE, url, govtRssItem.PubDate.Format(SITEMAP_DT_FORMAT))
+	// Add Travel Destinations
+	rows, err := db.Model(&travel.DB_TravelDisclosure{}).Distinct("destination").Select("destination").Rows()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var disclosure travel.DB_TravelDisclosure
+		db.ScanRows(rows, &disclosure)
+		if disclosure.Destination == "" {
+			continue
+		}
+		url := SITEURL + "/travel-by-destination/" + url.QueryEscape(disclosure.Destination)
+		tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
+		file.WriteString(tmp)
+	}
+
+	// Add Lobbying Pages
+	for _, year := range lobbying.YearsLoaded {
+		url := SITEURL + "/lobbying/" + year
+		tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
+		file.WriteString(tmp)
+
+		for _, t := range lobbying.LobbyingTypes {
+			url := SITEURL + "/lobbying/breakdown/" + year + "/" + t
+			tmp := fmt.Sprintf(URL_TEMPLATE, url, today.Format(SITEMAP_DT_FORMAT))
 			file.WriteString(tmp)
 		}
-	*/
+	}
 
-	rows, err := db.Model(&DB_CongressMember{}).Select("bio_guide_id, congress_member_info").Rows()
+	rows, err = db.Model(&DB_CongressMember{}).Select("bio_guide_id, congress_member_info").Rows()
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
 
-	today := time.Now()
 	for rows.Next() {
 		var congressMember DB_CongressMember
 		db.ScanRows(rows, &congressMember)

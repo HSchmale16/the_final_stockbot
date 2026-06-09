@@ -1,3 +1,14 @@
+{{!-- Breadcrumbs --}}
+<nav class="flex text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+    <ol class="flex list-none p-0">
+        <li class="flex items-center">
+            <a href="/" class="hover:text-blue-600">Home</a>
+            <svg class="w-3 h-3 mx-2 fill-current" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </li>
+        <li class="font-bold text-gray-900 truncate" aria-current="page">{{ Title }}</li>
+    </ol>
+</nav>
+
 {{> 'partials/title_heading' title="Current Members of Congress" subtitle="The 117th Congress" }}
 
 <p>Here you can see the current members of congress. This table is sortable by how long they have been in office, and by how many gifted trips they have received recently.</p>

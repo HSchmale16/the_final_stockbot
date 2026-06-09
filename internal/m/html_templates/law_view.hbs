@@ -1,4 +1,32 @@
 <div class="container">
+    {{!-- Structured Data for SEO: Legislation --}}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Legislation",
+      "name": "{{ Law.Title }}",
+      "legislationIdentifier": "{{ Law.ID }}",
+      "legislationType": "Bill",
+      "legislationDate": "{{ Law.PubDate }}",
+      "legislationJurisdiction": "United States",
+      "url": "https://www.dirtycongress.com/law/{{ Law.ID }}"
+    }
+    </script>
+
+    {{!-- Breadcrumbs --}}
+    <nav class="flex text-sm text-gray-500 mb-6 not-prose" aria-label="Breadcrumb">
+        <ol class="flex list-none p-0">
+            <li class="flex items-center">
+                <a href="/" class="hover:text-blue-600">Home</a>
+                <svg class="w-3 h-3 mx-2 fill-current" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </li>
+            <li class="flex items-center">
+                <a href="/laws" class="hover:text-blue-600">Laws</a>
+                <svg class="w-3 h-3 mx-2 fill-current" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </li>
+            <li class="font-bold text-gray-900 truncate" aria-current="page">{{{ Law.Title }}}</li>
+        </ol>
+    </nav>
 
     <div class="prose-xl">
         <h1>{{{ Law.Title }}}</h1>

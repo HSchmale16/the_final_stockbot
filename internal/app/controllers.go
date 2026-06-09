@@ -112,6 +112,7 @@ func SetupServer() *fiber.App {
 		})
 	})
 	app.Get("/congress-members", CongressMemberList)
+	app.Get("/htmx/congress-member/:id/other-from-state", GetOtherMembersFromState)
 	app.Get("/congress-member/:bio_guide_id", ViewCongressMember)
 	app.Get("/congress-member/:bio_guide_id/embed", EmbedCongressMember)
 	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", SponsorsBillsWithPiChart)
@@ -545,11 +546,38 @@ func CongressMemberList(c *fiber.Ctx) error {
 		title = "Current Congress Members from " + state
 	}
 
+	description := "A comprehensive list of the current members of the US Congress. Explore profiles, sponsored bills, and committee memberships."
+	if state != "" {
+		description = "A comprehensive list of the current members of the US Congress from " + state + ". Explore profiles, sponsored bills, and committee memberships for " + state + " representatives."
+	}
+
 	return c.Render("congress_member_list", fiber.Map{
 		"ActiveMembers": members,
-		"Description":   "A list of the current congress members",
+		"Description":   description,
 		"Title":         title,
 	}, "layouts/main")
+}
+
+func GetOtherMembersFromState(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+	id := c.Params("id")
+
+	var member DB_CongressMember
+	db.First(&member, "bio_guide_id = ?", id)
+
+	state := member.State()
+
+	var otherMembers []DB_CongressMember
+	db.Where("bio_guide_id != ?", id).
+		Where("is_active = ?", true).
+		Where("jsonb_path_query_first(congress_member_info, '$.terms[last].state')#>>'{}' = ?", state).
+		Limit(10).
+		Find(&otherMembers)
+
+	return c.Render("partials/other_members_from_state", fiber.Map{
+		"State":   state,
+		"Members": otherMembers,
+	})
 }
 
 func ViewCongressMember(c *fiber.Ctx) error {

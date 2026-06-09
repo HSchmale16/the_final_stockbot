@@ -147,6 +147,10 @@ func GetTemplateEngine() fiber.Views {
 		return strings.Contains(s, substr)
 	})
 
+	engine.AddFunc("addOne", func(i int) int {
+		return i + 1
+	})
+
 	engine.AddFunc("jsonToArray", func(s datatypes.JSON) []interface{} {
 		var x []interface{}
 		err := json.Unmarshal(s, &x)

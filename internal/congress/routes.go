@@ -121,9 +121,10 @@ func BillView(c *fiber.Ctx) error {
 	}
 
 	return c.Render("bill_view", fiber.Map{
-		"Title":    bill.FormatTitle(),
-		"Bill":     bill,
-		"BillBlob": bill.GetJsonBlob(),
+		"Title":       bill.FormatTitle(),
+		"Description": fmt.Sprintf("View details for %s, including actions, committees, and cosponsors. Track this legislation in the US Congress.", bill.FormatTitle()),
+		"Bill":        bill,
+		"BillBlob":    bill.GetJsonBlob(),
 	}, "layouts/main")
 }
 
