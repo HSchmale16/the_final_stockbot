@@ -73,16 +73,19 @@ func SetupServer() *fiber.App {
 
 	// Setup the Routes
 	app.Get("/", Index)
-	app.Get("/tags", TagList)
-	app.Get("/tag/:tag_id", TagIndex)
+	// Module Disabled: LAW & BILL
+	app.Get("/tags", func(c *fiber.Ctx) error { return c.Redirect("/") })
+	app.Get("/tag/:tag_id", func(c *fiber.Ctx) error { return c.Redirect("/") })
 
 	app.Post("/feedback", SubmitFeedback)
 
 	app.Get("/htmx/topic-search", TopicSearch)
 	app.Get("/htmx/tag-datalist", TagDataList)
-	app.Get("/law/:law_id", LawView)
-	app.Get("/law/:law_id/mods", LawView)
-	app.Get("/laws", LawIndex)
+	// Module Disabled: LAW & BILL
+	app.Get("/law/:law_id", func(c *fiber.Ctx) error { return c.Redirect("/") })
+	app.Get("/law/:law_id/mods", func(c *fiber.Ctx) error { return c.Redirect("/") })
+	app.Get("/laws", func(c *fiber.Ctx) error { return c.Redirect("/") })
+
 	app.Get("/json/congress-network", CongressNetwork)
 	app.Get("/congress-network", func(c *fiber.Ctx) error {
 		return c.Render("congress_network", fiber.Map{
@@ -95,21 +98,9 @@ func SetupServer() *fiber.App {
 	app.Get("/htmx/hearing/:id/collapsed", HearingCollapsed)
 
 	// HTMX End Point
+	// Module Disabled: LAW & BILL
 	app.Use("/law/:law_id/tags", func(c *fiber.Ctx) error {
-		db := c.Locals("db").(*gorm.DB)
-
-		law_id := c.Params("law_id")
-
-		var tags []struct {
-			TagId    int64
-			Name     string
-			CssColor string
-		}
-		db.Raw("SELECT tag.id as tag_id, tag.name, tag.css_color FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id WHERE govt_rss_item_tag.govt_rss_item_id = ?", law_id).Scan(&tags)
-
-		return c.Render("tag_search", fiber.Map{
-			"Tags": tags,
-		})
+		return c.SendString("")
 	})
 	app.Get("/congress-members", CongressMemberList)
 	app.Get("/htmx/congress-member/:id/other-from-state", GetOtherMembersFromState)
@@ -118,7 +109,8 @@ func SetupServer() *fiber.App {
 	app.Get("/congress-member/:bio_guide_id/sponsors-bills-with-pi-chart", SponsorsBillsWithPiChart)
 	app.Get("/htmx/congress_member/:bio_guide_id/finances", CongressMemberFinances)
 	app.Get("/htmx/congress_member/:bio_guide_id/works_with", CongressMemberWorksWith)
-	app.Get("/htmx/law/:law_id/related_laws", RelatedLaws)
+	// Module Disabled: LAW & BILL
+	app.Get("/htmx/law/:law_id/related_laws", func(c *fiber.Ctx) error { return c.SendString("") })
 
 	faq.SetupRoutes(app)
 	congress.SetupRoutes(app)
@@ -139,7 +131,7 @@ func configureDefaultTemplateVars(db *gorm.DB) func(c *fiber.Ctx) error {
 			"CacheBust":   CacheBustTimestamp,
 			"Title":       "Dirty Congress",
 			"DEBUG":       IsDebug,
-			"Description": "DirtyCongress.com provides a searchable database of bills and congress members with advanced visualizations of lobbying and other contributions to congress.",
+			"Description": "DirtyCongress.com provides a searchable database of congress members with advanced visualizations of lobbying and other contributions to congress.",
 			"Url":         DOMAIN + c.OriginalURL(),
 			"Url2":        c.OriginalURL(),
 		})
@@ -170,173 +162,59 @@ func SubmitFeedback(c *fiber.Ctx) error {
 }
 
 func RelatedLaws(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	var govtLaw m.GovtRssItem
-	db.First(&govtLaw, c.Params("law_id"))
-
-	title := govtLaw.Title
-	// decode the html entities in title
-	before, _, _ := strings.Cut(title, "(")
-
-	x := strings.ReplaceAll(before, "&nbsp;", "%") + " %"
-
-	var govtLaws []m.GovtRssItem
-	db.Where("title LIKE ?", x).Where("ID != ?", govtLaw.ID).Limit(10).Find(&govtLaws)
-
-	return c.Render("partials/law-list", fiber.Map{
-		"Laws":     govtLaws,
-		"SubTitle": "Related Laws",
-	})
+	// Module Disabled: LAW & BILL
+	return c.SendString("")
 }
 
 func TagList(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	var tags []struct {
-		ID    int64
-		Name  string
-		Count int64
-	}
-	db.Raw("SELECT tag.id, tag.name, COUNT(*) as count FROM tag JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id GROUP BY tag.id ORDER BY count DESC LIMIT 1000").Scan(&tags)
-
-	return c.Render("tag_list", fiber.Map{
-		"Tags": tags,
-	}, "layouts/main")
+	// Module Disabled: LAW & BILL
+	return c.Redirect("/")
 }
 
 func TagDataList(c *fiber.Ctx) error {
-	// HERE
-	var tags []Tag
-
-	db := c.Locals("db").(*gorm.DB)
-	db.Debug().
-		Where("name LIKE ?", "%"+c.FormValue("search")+"%").
-		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.tag_id = tag.id").
-		Joins("Join congress_member_sponsored ON congress_member_sponsored.govt_rss_item_id = govt_rss_item_tag.govt_rss_item_id").
-		Group("tag.id").
-		Order("Count(*) DESC").
-		Having("COUNT(*) > 1").
-		Limit(10).
-		Find(&tags)
-
-	db.Create(&SearchQuery{
-		Query:      c.FormValue("search"),
-		NumResults: len(tags),
-		IpAddr:     c.IP(),
-		UserAgent:  c.Get("User-Agent"),
-	})
-
+	// Module Disabled: LAW & BILL
 	return c.Render("htmx/tag_datalist", fiber.Map{
-		"Tags": tags,
+		"Tags": []Tag{},
 	})
 }
 
 func Index(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	var articleTags, totalTags, totalLaws, totalHearings int64
-	db.Model(&GovtRssItemTag{}).Count(&articleTags)
-	db.Model(&Tag{}).Count(&totalTags)
-	db.Model(&GovtRssItem{}).Count(&totalLaws)
+	var totalHearings int64
 	db.Model(&Hearing{}).Count(&totalHearings)
 
 	var oldestHearing, latestHearing string
 	db.Model(&Hearing{}).Where("held_date != ''").Select("MIN(held_date)").Scan(&oldestHearing)
 	db.Model(&Hearing{}).Where("held_date != ''").Select("MAX(held_date)").Scan(&latestHearing)
 
-	var Approprations, Senate, Public, House, HouseRes, SenateRes []GovtRssItem
-
-	billLimit := 7
-
-	db.Preload("Sponsors").Order("pub_date DESC").Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").Limit(billLimit).Find(&Approprations, "tag_id = ?", 377)
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&House, "title LIKE ?", "H.R.%")
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&Senate, "title LIKE ?", "S. %")
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&Public, "title LIKE ?", "Public Law %")
-
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&HouseRes, "title LIKE ?", "H. Res.%")
-	db.Preload("Sponsors").Order("pub_date DESC").Limit(billLimit).Find(&SenateRes, "title LIKE ?", "S. Res.%")
-
-	// var recentLaws []GovtRssItem = make([]GovtRssItem, 0, 10)
-	// db.Preload("Sponsors").Order("pub_date DESC").Limit(10).Find(&recentLaws)
-
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
+	// SSR Data
+	gaugeStats := travel.GetTravelGaugeStats(db)
+	recentTravel, _ := travel.GetRecentGiftTravelData(db, 10)
+	topDestinations, _ := travel.GetTopDestinationsData(db, 15, "", "")
+
 	return c.Render("index", fiber.Map{
-		"Title":         "Dirty Congress - Explore the Laws and Connections within Congress",
-		"TotalTopics":   p.Sprintf("%d", articleTags),
-		"TotalTags":     p.Sprintf("%d", totalTags),
-		"TotalLaws":     p.Sprintf("%d", totalLaws),
-		"TotalHearings": p.Sprintf("%d", totalHearings),
-		"OldestHearing": oldestHearing,
-		"LatestHearing": latestHearing,
-		"Approprations": Approprations,
-		"House":         House,
-		"Senate":        Senate,
-		"PublicLaws":    Public,
-		"HouseRes":      HouseRes,
-		"SenateRes":     SenateRes,
-		"SearchValue":   c.FormValue("search"),
+		"Title":           "Dirty Congress - Explore the Connections within Congress",
+		"TotalHearings":   p.Sprintf("%d", totalHearings),
+		"OldestHearing":   oldestHearing,
+		"LatestHearing":   latestHearing,
+		"SearchValue":     c.FormValue("search"),
+		"GaugeStats":      gaugeStats,
+		"RecentTravel":    recentTravel,
+		"TopDestinations": topDestinations,
 	}, "layouts/main")
 }
 
 func LawIndex(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	page := c.Query("page", "missing")
-	LIMIT := 7
-
-	var laws []GovtRssItem
-	// Pub date before
-	x := db.Preload("Sponsors").Order("pub_date DESC").Limit(LIMIT)
-	lawType := c.Query("type")
-
-	if lawType != "" {
-		x.Where("title LIKE ?", lawType+"%")
-	}
-
-	if page != "missing" {
-		x.Where("pub_date < ?", page).Find(&laws)
-		// we don't use a layout here for htmx.
-		return c.Render("partials/law-list", fiber.Map{
-			"Title":      "Most Recent " + GetLawTypeDisplay(lawType),
-			"Laws":       laws,
-			"EnableLoad": true,
-			"LawType":    lawType,
-		})
-	}
-
-	x.Find(&laws)
-
-	return c.Render("law_index", fiber.Map{
-		"Title":       "Most Recent " + GetLawTypeDisplay(lawType),
-		"Description": "Understand the bills currently being debated in congress",
-		"Laws":        laws,
-		"LawType":     lawType,
-	}, "layouts/main")
+	// Module Disabled: LAW & BILL
+	return c.Redirect("/")
 }
 
 func TagIndex(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
-	var tag Tag
-	db.First(&tag, c.Params("tag_id"))
-
-	var items []GovtRssItem
-	db.Debug().Model(&GovtRssItem{}).
-		Preload("Sponsors").
-		Joins("JOIN govt_rss_item_tag ON govt_rss_item_tag.govt_rss_item_id = govt_rss_item.id").
-		Where("govt_rss_item_tag.tag_id = ?", tag.ID).
-		Order("pub_date DESC").
-		Limit(100).
-		Find(&items)
-
-	return c.Render("tag_index", fiber.Map{
-		"Title":       "View Bills Tagged With " + tag.Name,
-		"Description": "View bills tagged with " + tag.Name + " --- " + tag.ShortLine,
-		"Tag":         tag,
-		"Items":       items,
-	}, "layouts/main")
+	// Module Disabled: LAW & BILL
+	return c.Redirect("/")
 }
 
 func HearingIndex(c *fiber.Ctx) error {

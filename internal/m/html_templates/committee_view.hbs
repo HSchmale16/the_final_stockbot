@@ -73,9 +73,14 @@
 
 
     {{#if Committee.GovtRssItems }}
-    <h2>Most Recent Bills &amp; Laws</h2>
+    {{!-- <h2>Most Recent Bills &amp; Laws</h2>
 
-    {{> 'partials/law-list' Laws=Committee.GovtRssItems }}
+    {{> 'partials/law-list' Laws=Committee.GovtRssItems }} --}}
+    
+    <div class="prose-xl border-2 border-red-500 p-4 rounded-lg my-8">
+        <h3 class="text-red-700">Module Disabled</h3>
+        <p>The <strong>LAW</strong> and <strong>BILL</strong> modules are currently disabled. Sponsorship and bill tracking data is unavailable at this time.</p>
+    </div>
 
     {{/if}}
 

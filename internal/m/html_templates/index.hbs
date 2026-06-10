@@ -33,16 +33,40 @@
 <div class="container mx-auto prose-xl mt-12">
     <hr />
     <h2>Find out about recent gifted travel</h2>
-    <div hx-get="/htmx/travel-gauge-cluster" hx-trigger="load"></div>
+    {{> 'htmx/travel_gauge_cluster' GaugeStats }}
     <p>
         Find out about the most recent travel that has been gifted to our congress members. This is a great way to see
         who is
         influencing our congress members and how they are being influenced.
     </p>
 
-    <div class="overflow-auto">
-        <div hx-get="/htmx/recent-gift-travel" hx-trigger="load"></div>
+    <div class="grid md:grid-cols-4 gap-6">
+        <div class="col-span-1">
+            {{> 'htmx/top_destinations' TopDestinations=TopDestinations }}
+        </div>
+        <div class="col-span-3">
+             <div class="overflow-auto">
+                <blockquote class="text-sm italic text-gray-600 dark:text-gray-400 mb-4">
+                    <p>
+                        In accordance with House Rule 25, Members, officers, and staff must file reports
+                        detailing travel-related expenses reimbursed by non-government sources. Section 304 of the 
+                        Honest Leadership and Open Government Act of 2007 requires these reports to be public.
+                    </p>
+                </blockquote>
+                {{> 'htmx/travel_list' GiftTravel=RecentTravel }}
+            </div>
+        </div>
     </div>
+</div>
+
+<div class="container mx-auto prose-xl mt-12 border-2 border-red-500 p-6 rounded-lg">
+    <h2 class="text-red-700">Service Update: Law & Bill Tracking</h2>
+    <p>
+        The <strong>LAW</strong> and <strong>BILL</strong> tracking modules (including bill text, sponsorship lists, and topic tags) are currently disabled for maintenance and database upgrades. 
+    </p>
+    <p>
+        Hearing records and Gifted Travel data remain fully operational. We apologize for the inconvenience.
+    </p>
 </div>
 
 

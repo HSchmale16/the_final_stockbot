@@ -96,8 +96,9 @@
 
     {{!-- <div class="row" hx-get="/congress-member/{{ Member.BioGuideId }}/finances" hx-trigger="load"></div> --}}
 
-    <div class="prose-xl">
+    {{!-- <div class="prose-xl">
         <h3>Sponsored Bills</h3>
+        <p class="text-sm text-red-600 font-bold">The Law and Bill tracking modules are currently disabled for maintenance.</p>
         {{#if Member.Sponsored }}
         {{#each Member.Sponsored }}
         <div class="card">
@@ -116,6 +117,11 @@
         <p>At the moment we haven't indexed any bills sponsored by this member. Check back later to see what they are up
             to.</p>
         {{/if}}
+    </div> --}}
+
+    <div class="prose-xl border-2 border-red-500 p-4 rounded-lg my-8">
+        <h3 class="text-red-700">Module Disabled</h3>
+        <p>The <strong>LAW</strong> and <strong>BILL</strong> modules are currently disabled. Sponsorship and bill tracking data is unavailable at this time.</p>
     </div>
 
     {{!-- <div hx-get="/htmx/votes/{{ Member.BioGuideId }}" hx-trigger="load">

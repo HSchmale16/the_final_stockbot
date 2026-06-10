@@ -45,9 +45,7 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/htmx/travel-gauge-cluster", TravelGaugeCluster)
 }
 
-func TravelGaugeCluster(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
+func GetTravelGaugeStats(db *gorm.DB) fiber.Map {
 	var totalTravelers int64
 	db.Model(&DB_TravelDisclosure{}).
 		Where("filing_type != ?", "Ammendment").
@@ -65,11 +63,16 @@ func TravelGaugeCluster(c *fiber.Ctx) error {
 		Select("COALESCE(SUM(return_date::date - departure_date::date), 0)").
 		Scan(&totalDays)
 
-	return c.Render("htmx/travel_gauge_cluster", fiber.Map{
+	return fiber.Map{
 		"TotalTravelers": totalTravelers,
 		"TotalTrips":     totalTrips,
 		"TotalDays":      totalDays,
-	})
+	}
+}
+
+func TravelGaugeCluster(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+	return c.Render("htmx/travel_gauge_cluster", GetTravelGaugeStats(db))
 }
 
 func RedirectToPriorMonthCalendar(c *fiber.Ctx) error {
@@ -393,32 +396,18 @@ func GetTravelByCommittee(c *fiber.Ctx) error {
 //   - 400 Bad Request if both 'since' and 'year' are provided.
 //   - 400 Bad Request if 'since' date format is invalid.
 //   - 500 Internal Server Error if the database connection is missing.
-func GetTopDestinations(c *fiber.Ctx) error {
-	since := c.Query("since")
-	year := c.Query("year")
-
-	if since != "" && year != "" {
-		return c.Status(400).SendString("Parameters 'since' and 'year' are mutually exclusive")
-	}
-
+func GetTopDestinationsData(db *gorm.DB, limit int, since string, year string) ([]struct {
+	Destination string
+	Count       int
+}, error) {
 	var sinceDate time.Time
 	if since != "" {
 		var err error
 		sinceDate, err = time.Parse("2006-01-02", since)
 		if err != nil {
-			return c.Status(400).SendString("Invalid 'since' date format. Use YYYY-MM-DD")
+			return nil, err
 		}
 	}
-
-	dbIn := c.Locals("db")
-	db, ok := dbIn.(*gorm.DB)
-	if !ok || db == nil {
-		return c.Status(500).SendString("Database not found")
-	}
-
-	// Get limit param
-	limitStr, _ := strconv.Atoi(c.Query("limit"))
-	limit := min(150, max(15, limitStr))
 
 	var topDestinations []struct {
 		Destination string
@@ -428,10 +417,6 @@ func GetTopDestinations(c *fiber.Ctx) error {
 	query := db.Table("travel_disclosures").
 		Select("destination, count(destination) as count").
 		Where("destination != ''")
-
-	if db.Config != nil && db.Config.Logger != nil {
-		query = query.Debug()
-	}
 
 	if since != "" {
 		query = query.Where("departure_date >= ?", sinceDate)
@@ -445,14 +430,35 @@ func GetTopDestinations(c *fiber.Ctx) error {
 		query = query.Where("year in (?, ?)", aStr, bStr)
 	}
 
-	x := query.Group("destination").
+	err := query.Group("destination").
 		Order("count DESC").
 		Limit(limit).
-		Scan(&topDestinations)
+		Scan(&topDestinations).Error
 
-	if x.Error != nil {
-		log.Default().Print(x.Error)
-		return x.Error
+	return topDestinations, err
+}
+
+func GetTopDestinations(c *fiber.Ctx) error {
+	since := c.Query("since")
+	year := c.Query("year")
+
+	if since != "" && year != "" {
+		return c.Status(400).SendString("Parameters 'since' and 'year' are mutually exclusive")
+	}
+
+	dbIn := c.Locals("db")
+	db, ok := dbIn.(*gorm.DB)
+	if !ok || db == nil {
+		return c.Status(500).SendString("Database not found")
+	}
+
+	// Get limit param
+	limitStr, _ := strconv.Atoi(c.Query("limit"))
+	limit := min(150, max(15, limitStr))
+
+	topDestinations, err := GetTopDestinationsData(db, limit, since, year)
+	if err != nil {
+		return c.Status(400).SendString(err.Error())
 	}
 
 	return c.Render("htmx/top_destinations", fiber.Map{
@@ -490,16 +496,23 @@ func GetTravelByDestination(c *fiber.Ctx) error {
 	}, "layouts/main")
 }
 
+func GetRecentGiftTravelData(db *gorm.DB, limit int) ([]DB_TravelDisclosure, error) {
+	var disclosures []DB_TravelDisclosure
+	err := db.
+		Order("departure_date DESC").
+		Preload("Member").
+		Limit(limit).
+		Find(&disclosures).Error
+	return disclosures, err
+}
+
 func GetRecentGiftTravel(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
-	// Get the travel disclosures
-	var disclosures []DB_TravelDisclosure
-	db.
-		Order("departure_date DESC").
-		Preload("Member").
-		Limit(10).
-		Find(&disclosures)
+	disclosures, err := GetRecentGiftTravelData(db, 10)
+	if err != nil {
+		return c.Status(500).SendString(err.Error())
+	}
 
 	return c.Render("htmx/recent_gift_travel", fiber.Map{
 		"GiftTravel": disclosures,

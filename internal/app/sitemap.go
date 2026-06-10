@@ -120,5 +120,20 @@ func MakeSitemap() {
 		file.WriteString(tmp)
 	}
 
+	// Add Hearings
+	rows, err = db.Model(&Hearing{}).Select("id").Rows()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var hearing Hearing
+		db.ScanRows(rows, &hearing)
+		// We don't actually have individual hearing pages yet that are indexed?
+		// Checking routes... app.Get("/hearings", HearingIndex) is a list.
+		// Expanded hearings are HTMX. So maybe just the list?
+		// Preamble already has /hearings.
+	}
+
 	file.WriteString(POSTAMBLE)
 }

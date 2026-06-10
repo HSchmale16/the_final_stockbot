@@ -30,8 +30,9 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/committee_explorer", CommitteeExplorer)
 	app.Get("/committee/:thomas_id", CommitteeView)
 	app.Get("/committees", CommitteeList)
-	app.Get("/bills", BillList)
-	app.Get("/bill/:congress_number/:bill_type/:bill_number", BillView)
+	// Module Disabled: LAW & BILL
+	app.Get("/bills", func(c *fiber.Ctx) error { return c.Redirect("/") })
+	app.Get("/bill/:congress_number/:bill_type/:bill_number", func(c *fiber.Ctx) error { return c.Redirect("/") })
 }
 
 func BillList(c *fiber.Ctx) error {

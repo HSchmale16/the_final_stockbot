@@ -15,3 +15,5 @@ User-agent: ChatGPT-User
 Allow: /
 User-agent: GPTBot
 Allow: /
+
+Sitemap: https://www.dirtycongress.com/sitemap.xml
