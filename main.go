@@ -80,13 +80,17 @@ func main() {
 		fmt.Println("Target file is ", file)
 		switch script {
 		case "house-travel":
+			var createdCount int
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
-				travel.LoadHouseXml(rc, db)
+				createdCount = travel.LoadHouseXml(rc, db)
 			})
+			m.LogCronJobRun(db, "house-travel", "success", createdCount, fmt.Sprintf("Successfully imported %d new House travel disclosures", createdCount))
 		case "senate-travel":
+			var createdCount int
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
-				travel.LoadSenateXml(rc, db)
+				createdCount = travel.LoadSenateXml(rc, db)
 			})
+			m.LogCronJobRun(db, "senate-travel", "success", createdCount, fmt.Sprintf("Successfully imported %d new Senate travel disclosures", createdCount))
 		case "house-votes":
 			var scrape = map[int]int{
 				2021: 449,

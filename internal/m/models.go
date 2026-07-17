@@ -402,7 +402,7 @@ func ApplyMigrations(db *gorm.DB) error {
 		return err
 	}
 
-	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressMember{}, &CongressMemberSponsored{}, &TagUse{}); err != nil {
+	if err := db.AutoMigrate(&SearchQuery{}, &DB_CongressMember{}, &CongressMemberSponsored{}, &TagUse{}, &CronJobRun{}); err != nil {
 		return err
 	}
 
@@ -456,4 +456,29 @@ func RegisterModels(models ...interface{}) {
 	// for i, m := range additionalModels {
 	// 	log.Printf("Registering model %d: %T", i, m)
 	// }
+}
+
+type CronJobRun struct {
+	ID         uint      `gorm:"primaryKey"`
+	CreatedAt  time.Time `gorm:"index"`
+	JobName    string    `gorm:"index"` // "update-congress-members", "load-hearings", "house-travel", "senate-travel"
+	Status     string    // "success", "failed"
+	ItemsFound int
+	Message    string
+}
+
+func (CronJobRun) TableName() string {
+	return "cron_job_runs"
+}
+
+func LogCronJobRun(db *gorm.DB, jobName string, status string, itemsFound int, message string) {
+	run := CronJobRun{
+		JobName:    jobName,
+		Status:     status,
+		ItemsFound: itemsFound,
+		Message:    message,
+	}
+	if err := db.Create(&run).Error; err != nil {
+		log.Printf("Failed to log cron job run: %v", err)
+	}
 }

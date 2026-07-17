@@ -30,9 +30,11 @@ func RunHearingFetcherService() {
 	feed, err := parser.ParseURL(HearingRssFeed)
 	if err != nil {
 		fmt.Println("Failed to parse RSS feed:", err)
+		m.LogCronJobRun(db, "load-hearings", "failed", 0, fmt.Sprintf("Failed to parse RSS feed: %v", err))
 		return
 	}
 
+	var newCount int
 	for _, item := range feed.Items {
 		// Find URLs
 		FullTextUrl := findHTMLTagWithText(item.Description, "TEXT")
@@ -53,8 +55,12 @@ func RunHearingFetcherService() {
 		}
 
 		// Use the core processing function
-		processHearing(db, item.Title, item.Link, datetime, ModsUrl, FullTextUrl)
+		created := processHearing(db, item.Title, item.Link, datetime, ModsUrl, FullTextUrl)
+		if created {
+			newCount++
+		}
 	}
+	m.LogCronJobRun(db, "load-hearings", "success", newCount, fmt.Sprintf("Successfully processed %d new hearings", newCount))
 }
 
 func RunHearingBackfill(congressNum int) {
@@ -118,7 +124,7 @@ func RunHearingBackfill(congressNum int) {
 			// Check if already processed
 			var existing Hearing
 			db.Preload("AttendedMembers").Where("link = ?", link).First(&existing)
-			
+
 			isProcessed := existing.FullText != "" || existing.IsPdfOnly || len(existing.AttendedMembers) > 0
 			if existing.ID != 0 && isProcessed && existing.PdfUrl != "" {
 				continue
@@ -130,14 +136,14 @@ func RunHearingBackfill(congressNum int) {
 	}
 }
 
-func processHearing(db *gorm.DB, title string, link string, pubDate time.Time, modsUrl string, fullTextUrl string) {
+func processHearing(db *gorm.DB, title string, link string, pubDate time.Time, modsUrl string, fullTextUrl string) bool {
 	// Check if exists
 	var existing Hearing
 	db.Preload("AttendedMembers").Where("link = ?", link).First(&existing)
-	
+
 	isProcessed := existing.FullText != "" || existing.IsPdfOnly || len(existing.AttendedMembers) > 0
 	if existing.ID != 0 && isProcessed && existing.PdfUrl != "" {
-		return
+		return false
 	}
 
 	// Download MODS
@@ -176,11 +182,12 @@ func processHearing(db *gorm.DB, title string, link string, pubDate time.Time, m
 	if existing.ID != 0 {
 		hearing.ID = existing.ID
 		db.Save(&hearing)
+		return false
 	} else {
 		err := db.Create(&hearing).Error
 		if err != nil {
 			log.Println("Failed to create hearing:", err)
-			return
+			return false
 		}
 
 		// Add Members
@@ -202,4 +209,5 @@ func processHearing(db *gorm.DB, title string, link string, pubDate time.Time, m
 			}
 		}
 	}
+	return true
 }

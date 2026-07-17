@@ -117,7 +117,7 @@ func MatchMembers(activeMembers []m.DB_CongressMember, rawNames []string, hearin
 
 func ProcessHearingAttendance(db *gorm.DB) error {
 	var hearings []congress.Hearing
-	
+
 	// Preload Members (the committee members) so we can prioritize matching against them
 	if err := db.Preload("Members").Where("full_text != ''").Find(&hearings).Error; err != nil {
 		return fmt.Errorf("failed to query hearings: %w", err)
@@ -134,7 +134,7 @@ func ProcessHearingAttendance(db *gorm.DB) error {
 	clearedCount := 0
 
 	for _, h := range hearings {
-		// We could skip if it already has AttendedMembers, but since it's an association table, 
+		// We could skip if it already has AttendedMembers, but since it's an association table,
 		// it's easier to just check if we have any existing associations.
 		var count int64
 		db.Table("hearing_attended_members").Where("hearing_id = ?", h.ID).Count(&count)
@@ -155,7 +155,7 @@ func ProcessHearingAttendance(db *gorm.DB) error {
 			if year == 0 {
 				year = h.PubDate.Year()
 			}
-			
+
 			var activeMembers []m.DB_CongressMember
 			for _, member := range allMembers {
 				if member.CongressMemberInfo.ServedDuringYear(year) {
@@ -164,7 +164,7 @@ func ProcessHearingAttendance(db *gorm.DB) error {
 			}
 
 			matchedMembers := MatchMembers(activeMembers, rawNames, &h)
-			
+
 			if len(matchedMembers) > 0 {
 				err := db.Model(&h).Association("AttendedMembers").Append(matchedMembers)
 				if err != nil {
@@ -172,12 +172,12 @@ func ProcessHearingAttendance(db *gorm.DB) error {
 					continue
 				}
 				// Save to save the association
-				
+
 				processedCount++
 			}
 		}
-		
-		// Clear the full text to save space now that we've extracted what we need, 
+
+		// Clear the full text to save space now that we've extracted what we need,
 		// or if we already flagged it as IsPdfOnly
 		if h.FullText != "" {
 			h.FullText = ""

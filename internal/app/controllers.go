@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"html"
 	"log"
 	"math"
@@ -178,6 +179,86 @@ func TagDataList(c *fiber.Ctx) error {
 	})
 }
 
+type JobSummaryDay struct {
+	Date          string
+	DisplayDate   string
+	CongressCount int
+	HearingCount  int
+	HouseTravel   int
+	SenateTravel  int
+	HasFailures   bool
+	Message       string
+}
+
+func GetDailyJobSummaries(db *gorm.DB) []JobSummaryDay {
+	var runs []m.CronJobRun
+	sevenDaysAgo := time.Now().AddDate(0, 0, -7)
+	db.Where("created_at >= ?", sevenDaysAgo).Order("created_at DESC").Find(&runs)
+
+	daysMap := make(map[string]*JobSummaryDay)
+	var orderedDates []string
+
+	for _, run := range runs {
+		dateStr := run.CreatedAt.Format("2006-01-02")
+		day, exists := daysMap[dateStr]
+		if !exists {
+			day = &JobSummaryDay{
+				Date:        dateStr,
+				DisplayDate: run.CreatedAt.Format("Mon, Jan _2"),
+			}
+			daysMap[dateStr] = day
+			orderedDates = append(orderedDates, dateStr)
+		}
+
+		if run.Status == "failed" {
+			day.HasFailures = true
+		}
+
+		switch run.JobName {
+		case "update-congress-members":
+			day.CongressCount += run.ItemsFound
+		case "load-hearings":
+			day.HearingCount += run.ItemsFound
+		case "house-travel":
+			day.HouseTravel += run.ItemsFound
+		case "senate-travel":
+			day.SenateTravel += run.ItemsFound
+		}
+	}
+
+	var result []JobSummaryDay
+	for _, date := range orderedDates {
+		day := daysMap[date]
+		var parts []string
+		if day.CongressCount > 0 {
+			parts = append(parts, fmt.Sprintf("%d congress member updates", day.CongressCount))
+		}
+		if day.HearingCount > 0 {
+			parts = append(parts, fmt.Sprintf("%d hearings indexed", day.HearingCount))
+		}
+		totalTravel := day.HouseTravel + day.SenateTravel
+		if totalTravel > 0 {
+			parts = append(parts, fmt.Sprintf("%d new travel records", totalTravel))
+		}
+
+		if day.HasFailures {
+			day.Message = "Sync failed with errors."
+		} else if len(parts) == 0 {
+			day.Message = "Database up to date."
+		} else {
+			if len(parts) == 1 {
+				day.Message = parts[0] + "."
+			} else if len(parts) == 2 {
+				day.Message = parts[0] + " and " + parts[1] + "."
+			} else {
+				day.Message = strings.Join(parts[:len(parts)-1], ", ") + ", and " + parts[len(parts)-1] + "."
+			}
+		}
+		result = append(result, *day)
+	}
+	return result
+}
+
 func Index(c *fiber.Ctx) error {
 	db := c.Locals("db").(*gorm.DB)
 
@@ -194,6 +275,7 @@ func Index(c *fiber.Ctx) error {
 	gaugeStats := travel.GetTravelGaugeStats(db)
 	recentTravel, _ := travel.GetRecentGiftTravelData(db, 10)
 	topDestinations, _ := travel.GetTopDestinationsData(db, 15, "", "")
+	jobSummaries := GetDailyJobSummaries(db)
 
 	return c.Render("index", fiber.Map{
 		"Title":           "Dirty Congress - Explore the Connections within Congress",
@@ -204,6 +286,7 @@ func Index(c *fiber.Ctx) error {
 		"GaugeStats":      gaugeStats,
 		"RecentTravel":    recentTravel,
 		"TopDestinations": topDestinations,
+		"JobSummaries":    jobSummaries,
 	}, "layouts/main")
 }
 
@@ -403,8 +486,8 @@ func CongressMemberList(c *fiber.Ctx) error {
 	state := c.Query("state")
 
 	query := db.Table("congress_member").
-		Select("congress_member.*, " +
-			"(SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id AND CURRENT_TIMESTAMP - departure_date < interval '2 years') AS travel_count, " +
+		Select("congress_member.*, "+
+			"(SELECT COUNT(*) FROM travel_disclosures WHERE travel_disclosures.member_id = congress_member.bio_guide_id AND CURRENT_TIMESTAMP - departure_date < interval '2 years') AS travel_count, "+
 			"(SELECT COUNT(*) FROM db_committee_memberships WHERE db_committee_memberships.db_congress_member_bio_guide_id = congress_member.bio_guide_id) AS committee_count").
 		Where("is_active = ?", true)
 

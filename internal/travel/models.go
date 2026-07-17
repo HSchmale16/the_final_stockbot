@@ -177,7 +177,8 @@ func (d DB_TravelDisclosurePage) TableName() string {
 	return "travel_disclosure_pages"
 }
 
-func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {
+func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) int {
+	var createdCount int
 	// Parse the XML file
 	decoder := xml.NewDecoder(rc)
 	for {
@@ -279,10 +280,11 @@ func LoadHouseXml(rc io.ReadCloser, db *gorm.DB) {
 					TravelSponsor: disclosure.TravelSponsor,
 					MemberId:      member.BioGuideId,
 				})
-
+				createdCount++
 			}
 		}
 	}
+	return createdCount
 }
 
 func NormalizeDestination(dest string) string {
@@ -295,7 +297,8 @@ func NormalizeDestination(dest string) string {
 	return strings.TrimSpace(strings.Join(words, " "))
 }
 
-func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) {
+func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) int {
+	var createdCount int
 	decoder := xml.NewDecoder(rc)
 	for {
 		t, _ := decoder.Token()
@@ -309,11 +312,12 @@ func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) {
 				var filer senateFilerXml
 				decoder.DecodeElement(&filer, &se)
 
-				loadSenateFiler(db, filer)
+				createdCount += loadSenateFiler(db, filer)
 
 			}
 		}
 	}
+	return createdCount
 }
 
 func FuzzyFindSenator(db *gorm.DB, last, first, state string) (m.DB_CongressMember, error) {
@@ -369,8 +373,9 @@ func FuzzyFindSenator(db *gorm.DB, last, first, state string) (m.DB_CongressMemb
 	return member, nil
 }
 
-func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
+func loadSenateFiler(db *gorm.DB, filer senateFilerXml) int {
 	filerName := filer.FirstName + " " + filer.LastName
+	var createdCount int
 
 	// fmt.Println(filerName, senator)
 
@@ -436,9 +441,10 @@ func loadSenateFiler(db *gorm.DB, filer senateFilerXml) {
 			}
 
 			db.Create(&x)
+			createdCount++
 		}
 	}
-
+	return createdCount
 }
 
 type senateFilerXml struct {

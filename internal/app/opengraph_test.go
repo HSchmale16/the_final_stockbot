@@ -12,7 +12,7 @@ import (
 func TestOpenGraphTags(t *testing.T) {
 	// Ensure we are in a clean state and have access to templates
 	os.Setenv("DEBUG", "true") // This allows using local static files and templates if needed
-	
+
 	app := SetupServer()
 
 	tests := []struct {

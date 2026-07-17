@@ -14,7 +14,7 @@ func main() {
 	}
 
 	log.Println("Starting Hearing Attendance parsing job...")
-	
+
 	err = app.ProcessHearingAttendance(db)
 	if err != nil {
 		log.Fatalf("Error processing hearing attendance: %v\n", err)

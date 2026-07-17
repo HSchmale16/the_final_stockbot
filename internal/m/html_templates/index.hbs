@@ -14,20 +14,40 @@
 
 <hr />
 
-<div class="container mx-auto prose-xl mt-12">
-    <h2>Explore Congressional Hearings</h2>
-    <p>
-        Stay informed about the discussions and witness testimonies that shape our legislative landscape. 
-        We have indexed <strong>{{ TotalHearings }}</strong> hearings held between <strong>{{ OldestHearing }}</strong> and <strong>{{ LatestHearing }}</strong> 
-        across all House and Senate committees.
-    </p>
-    <p>
-        Our platform provides you with direct access to full transcripts and official records, allowing you to 
-        search and analyze the conversations that matter most in the 119th Congress and beyond.
-    </p>
-    <p>
-        <a href="/hearings" class="btn no-underline">View All Hearings</a>
-    </p>
+<div class="container mx-auto mt-12 grid md:grid-cols-4 gap-8">
+    <div class="md:col-span-3 prose-xl">
+        <h2>Explore Congressional Hearings</h2>
+        <p>
+            Stay informed about the discussions and witness testimonies that shape our legislative landscape. 
+            We have indexed <strong>{{ TotalHearings }}</strong> hearings held between <strong>{{ OldestHearing }}</strong> and <strong>{{ LatestHearing }}</strong> 
+            across all House and Senate committees.
+        </p>
+        <p>
+            Our platform provides you with direct access to full transcripts and official records, allowing you to 
+            search and analyze the conversations that matter most in the 119th Congress and beyond.
+        </p>
+        <p>
+            <a href="/hearings" class="btn no-underline">View All Hearings</a>
+        </p>
+    </div>
+    <div class="md:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 h-fit">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 mt-0">Daily Sync Activity</h3>
+        <ul class="space-y-3 text-sm list-none p-0 m-0">
+            {{#each JobSummaries}}
+            <li class="flex items-start gap-2 pb-2 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
+                {{#if this.HasFailures}}
+                <span class="w-2 h-2 mt-1.5 rounded-full bg-red-600 dark:bg-red-500 shrink-0"></span>
+                {{else}}
+                <span class="w-2 h-2 mt-1.5 rounded-full bg-green-600 dark:bg-green-500 shrink-0"></span>
+                {{/if}}
+                <div class="leading-tight">
+                    <span class="font-bold text-gray-800 dark:text-gray-200 block text-xs">{{ this.DisplayDate }}</span>
+                    <span class="text-gray-600 dark:text-gray-400 text-xs">{{ this.Message }}</span>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
 </div>
 
 <div class="container mx-auto prose-xl mt-12">

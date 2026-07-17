@@ -25,7 +25,7 @@ type US_CongressLegislator = m.US_CongressLegislator
  * https://github.com/unitedstates/congress-legislators?tab=readme-ov-file
  *
  * Legislators can be pulled from this github repo. The data is available from this json file:
-*/
+ */
 
 func GetCurrentLegislatorJson() []US_CongressLegislator {
 	resp, err := http.Get("https://unitedstates.github.io/congress-legislators/legislators-current.json")
@@ -49,17 +49,17 @@ func GetCurrentLegislatorJson() []US_CongressLegislator {
 	return congMembers
 }
 
-func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) {
+func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) (int, int) {
 	// Use a database transaction to ensure that we don't have any partial data
 	// And for speed
 	tx := db.Begin()
+	var newCount, updatedCount int
 	for _, cong := range memberData {
-		myCongMember := DB_CongressMember{
-			BioGuideId:         cong.Id.Bioguide,
-			CongressMemberInfo: cong,
-		}
+		var existing DB_CongressMember
+		err := tx.First(&existing, "bio_guide_id = ?", cong.Id.Bioguide).Error
 
-		tx.FirstOrCreate(&myCongMember, DB_CongressMember{BioGuideId: myCongMember.BioGuideId})
+		var myCongMember DB_CongressMember
+		myCongMember.BioGuideId = cong.Id.Bioguide
 		myCongMember.CongressMemberInfo = cong
 		myCongMember.Name = cong.Name.Official
 		if myCongMember.Name == "" {
@@ -67,20 +67,31 @@ func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) 
 		}
 
 		// set the is_active flag
-		lastTerm := myCongMember.CongressMemberInfo.Terms[len(myCongMember.CongressMemberInfo.Terms)-1]
+		lastTerm := cong.Terms[len(cong.Terms)-1]
 		termEnd, _ := time.Parse("2006-01-02", lastTerm.End)
 		myCongMember.IsActive = time.Now().Before(termEnd)
 
-		fmt.Println(myCongMember.CongressMemberInfo.Terms)
-		tx.Save(&myCongMember)
+		if err == gorm.ErrRecordNotFound {
+			tx.Create(&myCongMember)
+			newCount++
+		} else {
+			oldJSON, _ := json.Marshal(existing.CongressMemberInfo)
+			newJSON, _ := json.Marshal(cong)
+			if string(oldJSON) != string(newJSON) || existing.Name != myCongMember.Name || existing.IsActive != myCongMember.IsActive {
+				myCongMember.CreatedAt = existing.CreatedAt
+				tx.Save(&myCongMember)
+				updatedCount++
+			}
+		}
 	}
 	tx.Commit()
+	return newCount, updatedCount
 }
 
 func LOAD_MEMBERS_JSON(db *gorm.DB, file string) {
+	var tCur []US_CongressLegislator
 	if file == "" {
-		tCur := GetCurrentLegislatorJson()
-		MangleLegislatorsAndMerge(db, tCur)
+		tCur = GetCurrentLegislatorJson()
 	} else {
 		// open file by name
 		jsonFile, err := os.Open(file)
@@ -91,10 +102,10 @@ func LOAD_MEMBERS_JSON(db *gorm.DB, file string) {
 		// read file
 
 		byteValue, _ := io.ReadAll(jsonFile)
-		var tCur []US_CongressLegislator
 		json.Unmarshal(byteValue, &tCur)
-		MangleLegislatorsAndMerge(db, tCur)
 	}
+	newCount, updatedCount := MangleLegislatorsAndMerge(db, tCur)
+	m.LogCronJobRun(db, "update-congress-members", "success", newCount+updatedCount, fmt.Sprintf("Added %d new, updated %d members", newCount, updatedCount))
 }
 
 func LOAD_Members_Mods_2_RSS(db *gorm.DB) {
