@@ -49,7 +49,8 @@
 
   <!-- High-level Callout Cards -->
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-    <!-- Longest Missed Streak Card -->
+    {{#if IsCurrentYear}}
+    <!-- Longest Missed Streak Card (Current Year) -->
     <div class="overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
       <div>
         <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Longest Missed Streak</span>
@@ -65,6 +66,24 @@
         {{/if}}
       </div>
     </div>
+    {{else}}
+    <!-- Best Attendance Rate Card (Prior Years) -->
+    <div class="overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
+      <div>
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Top Attendance Rate</span>
+        <div class="mt-2 flex items-baseline text-3xl font-extrabold text-green-600 dark:text-green-400">
+          {{#if TopLeader}}{{TopLeader.AttendanceRate}}%{{else}}N/A{{/if}}
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        {{#if TopLeader}}
+          {{> 'partials/member_pill' Member=TopLeader }}
+        {{else}}
+          <span class="text-xs text-gray-400">No data available</span>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
 
     <!-- Active Average Attendance -->
     <div class="overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">

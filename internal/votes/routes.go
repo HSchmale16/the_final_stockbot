@@ -554,18 +554,33 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 	}
 	worst5 := worstStreaks[:limitWorst]
 
-	// Members who recently missed votes in their last 50 eligible votes
+	limitRecent := 20
 	var recentlyMissing []ScoreboardItem
-	for _, s := range filtered {
-		if s.RecentMissedVotes > 0 {
-			recentlyMissing = append(recentlyMissing, s)
+	if year == currentYear {
+		for _, s := range filtered {
+			if s.RecentMissedVotes > 0 {
+				recentlyMissing = append(recentlyMissing, s)
+			}
+		}
+		sort.Slice(recentlyMissing, func(i, j int) bool {
+			if recentlyMissing[i].RecentMissedVotes == recentlyMissing[j].RecentMissedVotes {
+				return recentlyMissing[i].AttendanceRate < recentlyMissing[j].AttendanceRate
+			}
+			return recentlyMissing[i].RecentMissedVotes > recentlyMissing[j].RecentMissedVotes
+		})
+		if len(recentlyMissing) > limitRecent {
+			recentlyMissing = recentlyMissing[:limitRecent]
 		}
 	}
-	sort.Slice(recentlyMissing, func(i, j int) bool {
-		if recentlyMissing[i].RecentMissedVotes == recentlyMissing[j].RecentMissedVotes {
-			return recentlyMissing[i].AttendanceRate < recentlyMissing[j].AttendanceRate
+
+	// Sort full roster for the by-year table
+	allScoresTable := make([]ScoreboardItem, len(filtered))
+	copy(allScoresTable, filtered)
+	sort.Slice(allScoresTable, func(i, j int) bool {
+		if allScoresTable[i].AttendanceRate == allScoresTable[j].AttendanceRate {
+			return allScoresTable[i].TotalVotes > allScoresTable[j].TotalVotes
 		}
-		return recentlyMissing[i].RecentMissedVotes > recentlyMissing[j].RecentMissedVotes
+		return allScoresTable[i].AttendanceRate > allScoresTable[j].AttendanceRate
 	})
 
 	availableYears := make([]string, 0, currentYear-2020)
@@ -596,6 +611,7 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 	bindMap := fiber.Map{
 		"Title":          fmt.Sprintf("Attendance Scoreboard (%d)", year),
 		"SelectedYear":   selectedYearStr,
+		"IsCurrentYear":  year == currentYear,
 		"AvailableYears": availableYears,
 		"OverallAvg":     metadata["OverallAvg"],
 		"SenateAvg":      metadata["SenateAvg"],
@@ -605,6 +621,7 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 		"TopAttendees":   top5,
 		"WorstStreaks":   worst5,
 		"RecentMissers":  recentlyMissing,
+		"AllScores":      allScoresTable,
 		"ActiveChamber":  chamber,
 		"ActiveTenure":   tenure,
 		"ActiveAge":      age,
@@ -622,8 +639,9 @@ func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
 	yearStr := c.Params("year")
 	var year int
 	fmt.Sscanf(yearStr, "%d", &year)
+	currentYear := time.Now().Year()
 	if year < 2021 {
-		year = time.Now().Year()
+		year = currentYear
 	}
 
 	chamber := c.Query("chamber", "All")
@@ -663,22 +681,40 @@ func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
 	}
 	worst5 := worstStreaks[:limitWorst]
 
+	limitRecent := 20
 	var recentlyMissing []ScoreboardItem
-	for _, s := range filtered {
-		if s.RecentMissedVotes > 0 {
-			recentlyMissing = append(recentlyMissing, s)
+	if year == currentYear {
+		for _, s := range filtered {
+			if s.RecentMissedVotes > 0 {
+				recentlyMissing = append(recentlyMissing, s)
+			}
+		}
+		sort.Slice(recentlyMissing, func(i, j int) bool {
+			if recentlyMissing[i].RecentMissedVotes == recentlyMissing[j].RecentMissedVotes {
+				return recentlyMissing[i].AttendanceRate < recentlyMissing[j].AttendanceRate
+			}
+			return recentlyMissing[i].RecentMissedVotes > recentlyMissing[j].RecentMissedVotes
+		})
+		if len(recentlyMissing) > limitRecent {
+			recentlyMissing = recentlyMissing[:limitRecent]
 		}
 	}
-	sort.Slice(recentlyMissing, func(i, j int) bool {
-		if recentlyMissing[i].RecentMissedVotes == recentlyMissing[j].RecentMissedVotes {
-			return recentlyMissing[i].AttendanceRate < recentlyMissing[j].AttendanceRate
+
+	allScoresTable := make([]ScoreboardItem, len(filtered))
+	copy(allScoresTable, filtered)
+	sort.Slice(allScoresTable, func(i, j int) bool {
+		if allScoresTable[i].AttendanceRate == allScoresTable[j].AttendanceRate {
+			return allScoresTable[i].TotalVotes > allScoresTable[j].TotalVotes
 		}
-		return recentlyMissing[i].RecentMissedVotes > recentlyMissing[j].RecentMissedVotes
+		return allScoresTable[i].AttendanceRate > allScoresTable[j].AttendanceRate
 	})
 
 	return c.Render("attendance_rows", fiber.Map{
+		"SelectedYear":  year,
+		"IsCurrentYear": year == currentYear,
 		"TopAttendees":  top5,
 		"WorstStreaks":  worst5,
 		"RecentMissers": recentlyMissing,
+		"AllScores":     allScoresTable,
 	})
 }
