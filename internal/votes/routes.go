@@ -578,9 +578,9 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 	copy(allScoresTable, filtered)
 	sort.Slice(allScoresTable, func(i, j int) bool {
 		if allScoresTable[i].AttendanceRate == allScoresTable[j].AttendanceRate {
-			return allScoresTable[i].TotalVotes > allScoresTable[j].TotalVotes
+			return allScoresTable[i].TotalVotes < allScoresTable[j].TotalVotes
 		}
-		return allScoresTable[i].AttendanceRate > allScoresTable[j].AttendanceRate
+		return allScoresTable[i].AttendanceRate < allScoresTable[j].AttendanceRate
 	})
 
 	availableYears := make([]string, 0, currentYear-2020)
@@ -704,9 +704,9 @@ func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
 	copy(allScoresTable, filtered)
 	sort.Slice(allScoresTable, func(i, j int) bool {
 		if allScoresTable[i].AttendanceRate == allScoresTable[j].AttendanceRate {
-			return allScoresTable[i].TotalVotes > allScoresTable[j].TotalVotes
+			return allScoresTable[i].TotalVotes < allScoresTable[j].TotalVotes
 		}
-		return allScoresTable[i].AttendanceRate > allScoresTable[j].AttendanceRate
+		return allScoresTable[i].AttendanceRate < allScoresTable[j].AttendanceRate
 	})
 
 	return c.Render("attendance_rows", fiber.Map{
