@@ -143,9 +143,13 @@ func ProcessAction(billId uint, action congressgov.BillAction, db *gorm.DB) {
 	if len(action.RecordedVotes) > 0 {
 		vote := action.RecordedVotes[0]
 		if strings.Contains(vote.Url, "house.gov") {
-			votes.LoadHouseRollCallXml(vote.Url, db)
+			if err := votes.LoadHouseRollCallXml(vote.Url, db); err != nil {
+				log.Printf("Failed to load House roll call XML: %v\n", err)
+			}
 		} else if strings.Contains(vote.Url, "senate.gov") {
-			votes.LoadSenateRollCallXml(vote.Url, db)
+			if err := votes.LoadSenateRollCallXml(vote.Url, db); err != nil {
+				log.Printf("Failed to load Senate roll call XML: %v\n", err)
+			}
 		} else {
 			log.Fatal("Unknown vote URL", vote.Url)
 		}

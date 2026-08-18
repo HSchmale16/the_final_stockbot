@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Senate Travel PDF Bounding Box Schema Designer</title>
+  <!-- Load Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Load PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <style>
+    :root {
+      --bg-base: #0f0f13;
+      --bg-surface: #171721;
+      --bg-element: #222233;
+      --border-color: #33334d;
+      --text-main: #f3f3f7;
+      --text-muted: #8e8ea8;
+      --color-primary: #8b5cf6;
+      --color-primary-hover: #a78bfa;
+      --color-accent: #06b6d4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar: Field selector & target metrics */
+    .sidebar-left {
+      width: 300px;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .field-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--bg-element);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .field-item:hover, .field-item.active {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary);
+    }
+
+    .field-item.active {
+      background-color: rgba(139, 92, 246, 0.1);
+    }
+
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .field-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Middle Pane: Interactive PDF canvas */
+    .pdf-viewer-pane {
+      flex: 1;
+      background-color: #0b0b0e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: auto;
+      padding: 24px;
+      position: relative;
+    }
+
+    .pdf-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 30px;
+      align-items: center;
+    }
+
+    .btn {
+      background-color: var(--bg-element);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .viewer-container {
+      position: relative;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #pdf-canvas {
+      display: block;
+    }
+
+    #drawing-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    /* Right Sidebar: Generated JSON Schema preview & validation settings */
+    .sidebar-right {
+      width: 400px;
+      background-color: var(--bg-surface);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .json-preview {
+      background-color: #0b0b0e;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #34d399;
+      flex: 1;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .validation-rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rule-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .rule-checkbox input {
+      accent-color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Senate Travel PDF Bounding Box Schema Designer</h1>
+    <div>
+      <span style="font-size: 0.875rem; color: var(--text-muted); margin-right: 16px;">Target: Senate Post-Travel Example</span>
+      <button class="btn" onclick="exportMapping()">Export Mapping Config</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- Left Sidebar -->
+    <div class="sidebar-left">
+      <div>
+        <div class="section-title">Traveler Info</div>
+        <div class="field-list">
+          <div class="field-item active" data-field="traveler_name" data-color="#8b5cf6">
+            <span class="field-label">Traveler Name</span>
+            <div class="field-color" style="background-color: #8b5cf6;"></div>
+          </div>
+          <div class="field-item" data-field="traveler_title" data-color="#3b82f6">
+            <span class="field-label">Traveler Title</span>
+            <div class="field-color" style="background-color: #3b82f6;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Dates & Sponsor</div>
+        <div class="field-list">
+          <div class="field-item" data-field="sponsor_org" data-color="#10b981">
+            <span class="field-label">Sponsor Org</span>
+            <div class="field-color" style="background-color: #10b981;"></div>
+          </div>
+          <div class="field-item" data-field="departure_date" data-color="#f59e0b">
+            <span class="field-label">Departure Date</span>
+            <div class="field-color" style="background-color: #f59e0b;"></div>
+          </div>
+          <div class="field-item" data-field="return_date" data-color="#ec4899">
+            <span class="field-label">Return Date</span>
+            <div class="field-color" style="background-color: #ec4899;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Expected Costs</div>
+        <div class="field-list">
+          <div class="field-item" data-field="expected_airfare" data-color="#06b6d4">
+            <span class="field-label">Airfare (Expected)</span>
+            <div class="field-color" style="background-color: #06b6d4;"></div>
+          </div>
+          <div class="field-item" data-field="expected_lodging" data-color="#14b8a6">
+            <span class="field-label">Lodging (Expected)</span>
+            <div class="field-color" style="background-color: #14b8a6;"></div>
+          </div>
+          <div class="field-item" data-field="expected_meals" data-color="#84cc16">
+            <span class="field-label">Meals (Expected)</span>
+            <div class="field-color" style="background-color: #84cc16;"></div>
+          </div>
+          <div class="field-item" data-field="expected_total" data-color="#f43f5e">
+            <span class="field-label">Total (Expected)</span>
+            <div class="field-color" style="background-color: #f43f5e;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Actual Costs</div>
+        <div class="field-list">
+          <div class="field-item" data-field="actual_airfare" data-color="#6366f1">
+            <span class="field-label">Airfare (Actual)</span>
+            <div class="field-color" style="background-color: #6366f1;"></div>
+          </div>
+          <div class="field-item" data-field="actual_lodging" data-color="#a855f7">
+            <span class="field-label">Lodging (Actual)</span>
+            <div class="field-color" style="background-color: #a855f7;"></div>
+          </div>
+          <div class="field-item" data-field="actual_meals" data-color="#eab308">
+            <span class="field-label">Meals (Actual)</span>
+            <div class="field-color" style="background-color: #eab308;"></div>
+          </div>
+          <div class="field-item" data-field="actual_total" data-color="#ef4444">
+            <span class="field-label">Total (Actual)</span>
+            <div class="field-color" style="background-color: #ef4444;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Viewport -->
+    <div class="pdf-viewer-pane">
+      <div class="pdf-controls">
+        <button class="btn" id="prev-page">Previous</button>
+        <span id="page-num-display" style="font-size: 0.875rem; font-weight: 500;">Page 1 of 1</span>
+        <button class="btn" id="next-page">Next</button>
+        <button class="btn" id="clear-page-boxes" style="background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">Clear Page Bounding Boxes</button>
+      </div>
+
+      <div class="viewer-container" id="viewer-container">
+        <canvas id="pdf-canvas"></canvas>
+        <canvas id="drawing-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-right">
+      <div class="section-title">Data Validation Rules</div>
+      <div class="validation-rules-list">
+        <label class="rule-checkbox">
+          <input type="checkbox" id="val-sum-check" checked>
+          <span>Checksum Validation (Sum of parts == Total)</span>
+        </label>
+        <label class="rule-checkbox">
+          <input type="checkbox" id="val-variance-check" checked>
+          <span>Flag variance (Actual vs Expected > 10%)</span>
+        </label>
+        <label class="rule-checkbox">
+          <input type="checkbox" id="val-date-check" checked>
+          <span>Date validation (Departure < Return)</span>
+        </label>
+      </div>
+
+      <div class="section-title">Mapping Schema (Live output)</div>
+      <pre class="json-preview" id="json-schema-output">{}</pre>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

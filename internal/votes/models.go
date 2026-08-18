@@ -20,11 +20,11 @@ func init() {
 type Vote struct {
 	gorm.Model
 
-	RollCallNum      int    `gorm:"uniqueIndex:,unique,composite:votename"`
-	CongressNum      int    `gorm:"uniqueIndex:,unique,composite:votename"`
-	Session          string `gorm:"uniqueIndex:,unique,composite:votename"`
-	Chamber          string `gorm:"uniqueIndex:,unique,composite:votename"`
-	ActionAt         time.Time
+	RollCallNum      int       `gorm:"uniqueIndex:,unique,composite:votename"`
+	CongressNum      int       `gorm:"uniqueIndex:,unique,composite:votename"`
+	Session          string    `gorm:"uniqueIndex:,unique,composite:votename"`
+	Chamber          string    `gorm:"uniqueIndex:,unique,composite:votename"`
+	ActionAt         time.Time `gorm:"index"`
 	VoteType         string
 	LegisName        string
 	VoteResult       string
@@ -40,9 +40,9 @@ type VoteRecord struct {
 	ID        uint `gorm:"primaryKey"`
 	CreatedAt time.Time
 
-	VoteID     uint   `gorm:"uniqueIndex:unique,composite:voterecord"`
-	MemberId   string `gorm:"uniqueIndex:unique,composite:voterecord"`
-	VoteStatus string
+	VoteID     uint   `gorm:"index;index:idx_vote_records_vote_member_status,priority:1;uniqueIndex:unique,composite:voterecord"`
+	MemberId   string `gorm:"index;index:idx_vote_records_vote_member_status,priority:2;uniqueIndex:unique,composite:voterecord"`
+	VoteStatus string `gorm:"index:idx_vote_records_vote_member_status,priority:3"`
 
 	Vote   Vote
 	Member m.DB_CongressMember

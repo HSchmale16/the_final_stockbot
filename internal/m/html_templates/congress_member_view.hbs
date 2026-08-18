@@ -70,6 +70,12 @@
         </div>
     </div>
 
+    <div hx-get="/htmx/votes/member/{{ Member.BioGuideId }}" hx-trigger="load" class="row"></div>
+
+    <div class="row" hx-get="/htmx/congress-member/{{ Member.BioGuideId }}/travel" hx-trigger="load"></div>
+
+    {{!-- <div class="row" hx-get="/congress-member/{{ Member.BioGuideId }}/finances" hx-trigger="load"></div> --}}
+
     <div class="row">
         <h2>Committees</h2>
         {{#if Member.Committees }}
@@ -92,47 +98,6 @@
         <p>This Congressperson is not on any committees at the moment.</p>
         {{/if}}
     </div>
-    <div class="row" hx-get="/htmx/congress-member/{{ Member.BioGuideId }}/travel" hx-trigger="load"></div>
-
-    {{!-- <div class="row" hx-get="/congress-member/{{ Member.BioGuideId }}/finances" hx-trigger="load"></div> --}}
-
-    {{!-- <div class="prose-xl">
-        <h3>Sponsored Bills</h3>
-        <p class="text-sm text-red-600 font-bold">The Law and Bill tracking modules are currently disabled for maintenance.</p>
-        {{#if Member.Sponsored }}
-        {{#each Member.Sponsored }}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{{ Title }}}</h5>
-                {{> 'partials/sponsorship-bar' Law=this }}
-                <p class="card-text">{{{ Metadata.OfficialTitle }}}
-
-                    <a href="/law/{{ ID }}">Read More</a>
-                </p>
-                </p>
-            </div>
-        </div>
-        {{/each}}
-        {{else}}
-        <p>At the moment we haven't indexed any bills sponsored by this member. Check back later to see what they are up
-            to.</p>
-        {{/if}}
-    </div> --}}
-
-    <div class="prose-xl border-2 border-red-500 p-4 rounded-lg my-8">
-        <h3 class="text-red-700">Module Disabled</h3>
-        <p>The <strong>LAW</strong> and <strong>BILL</strong> modules are currently disabled. Sponsorship and bill tracking data is unavailable at this time.</p>
-    </div>
-
-    {{!-- <div hx-get="/htmx/votes/{{ Member.BioGuideId }}" hx-trigger="load">
-        <h3>Voting Record</h3>
-    </div> --}}
-
-    {{#if Member.Sponsored}}
-    <div class="row" hx-get="/htmx/congress_member/{{ Member.BioGuideId }}/works_with" hx-trigger="load">
-        <h3>Works With</h3>
-    </div>
-    {{/if}}
 
     <div class="row" hx-get="/htmx/congress-member/{{ Member.BioGuideId }}/other-from-state" hx-trigger="load"></div>
 

@@ -135,6 +135,7 @@ func configureDefaultTemplateVars(db *gorm.DB) func(c *fiber.Ctx) error {
 			"Description": "DirtyCongress.com provides a searchable database of congress members with advanced visualizations of lobbying and other contributions to congress.",
 			"Url":         DOMAIN + c.OriginalURL(),
 			"Url2":        c.OriginalURL(),
+			"CurrentYear": time.Now().Year(),
 		})
 		return c.Next()
 	}
@@ -478,8 +479,13 @@ func CongressMemberList(c *fiber.Ctx) error {
 
 	type memberWithTravel struct {
 		DB_CongressMember
-		TravelCount    int `gorm:"column:travel_count"`
-		CommitteeCount int `gorm:"column:committee_count"`
+		TravelCount    int        `gorm:"column:travel_count"`
+		CommitteeCount int        `gorm:"column:committee_count"`
+		LastVoteDate   *time.Time `gorm:"column:last_vote_date"`
+		LastVoteStatus string     `gorm:"column:last_vote_status"`
+		// View helpers
+		LastSeenDisplay string `gorm:"-"`
+		LastSeenSortKey string `gorm:"-"`
 	}
 
 	var members []memberWithTravel
@@ -496,6 +502,16 @@ func CongressMemberList(c *fiber.Ctx) error {
 	}
 
 	query.Find(&members)
+
+	for i := range members {
+		if members[i].LastVoteDate != nil {
+			members[i].LastSeenDisplay = members[i].LastVoteDate.Format("Jan 02, 2006")
+			members[i].LastSeenSortKey = fmt.Sprintf("%d", members[i].LastVoteDate.Unix())
+		} else {
+			members[i].LastSeenDisplay = "N/A"
+			members[i].LastSeenSortKey = "0"
+		}
+	}
 
 	// Sort each by state
 	sort.Slice(members, func(i, j int) bool {

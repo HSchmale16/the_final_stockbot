@@ -54,5 +54,12 @@ module.exports = {
     require('@tailwindcss/typography'),
     // require('tailwindcss-children'),
   ],
+  safelist: [
+    // Timeline vote tiles - assembled dynamically in Go (routes.go), never seen by Tailwind's scanner
+    'bg-slate-500',
+    'bg-red-500',
+    'bg-green-500',
+    'bg-gray-400',
+  ],
 }
 

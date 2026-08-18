@@ -36,8 +36,11 @@
         }
 
         function sortNumbers(a, b) {
-            a = parseFloat(strip(a)) || 0;
-            b = parseFloat(strip(b)) || 0;
+            // Support 'sortValue|||display' prefix from data-sort attribute
+            const rawA = (a && a.indexOf('|||') >= 0) ? a.split('|||')[0] : strip(a);
+            const rawB = (b && b.indexOf('|||') >= 0) ? b.split('|||')[0] : strip(b);
+            a = parseFloat(rawA) || 0;
+            b = parseFloat(rawB) || 0;
             return a - b;
         }
 
@@ -56,13 +59,17 @@
                 }
                 return {
                     name: th.textContent,
-                    formatter: (cell) => gridjs.html(cell),
+                    formatter: (cell) => {
+                        // Strip the hidden sort prefix if present
+                        const sepIdx = cell ? cell.indexOf('|||') : -1;
+                        return gridjs.html(sepIdx >= 0 ? cell.slice(sepIdx + 3) : cell);
+                    },
                     sort: {
                         compare: compareFunc
                     }
                 };
             }),
-            data: Array.from(source.querySelectorAll('tbody tr')).map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.innerHTML)),
+            data: Array.from(source.querySelectorAll('tbody tr')).map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.dataset.sort !== undefined ? td.dataset.sort + '|||' + td.innerHTML : td.innerHTML)),
         }).render(target);
 
         // Set source to be display none

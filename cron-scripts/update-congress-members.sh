@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # This script updates the congress members from the unitedstates/congress-legislators GitHub repository.
+# Both the current and historical legislator feeds are fetched automatically by the binary.
 
 # Navigate to the application directory
 cd "$(dirname "$0")/../"
@@ -20,28 +21,10 @@ if [[ ! -x "$BINARY" ]]; then
     fi
 fi
 
-echo "Updating congress members..."
+echo "Updating congress members (current + historical)..."
 
-# Define the URL for the JSON data
-JSON_URL="https://unitedstates.github.io/congress-legislators/legislators-current.json"
-
-# Create a temporary file to store the downloaded JSON
-TEMP_FILE=$(mktemp /tmp/congress_members_XXXXXX.json)
-
-# Download the JSON file using wget
-echo "Downloading JSON from $JSON_URL to $TEMP_FILE..."
-wget -q -O "$TEMP_FILE" "$JSON_URL"
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to download JSON file from $JSON_URL"
-    rm -f "$TEMP_FILE"
-    exit 1
-fi
-
-echo "JSON file downloaded successfully."
-
-# Execute the Go program to load congress members from the downloaded file
-"$BINARY" -load-congress-members -congress-members-file "$TEMP_FILE"
+# The binary fetches both legislators-current.json and legislators-historical.json internally.
+"$BINARY" -load-congress-members
 
 if [ $? -eq 0 ]; then
     echo "Congress members updated successfully."
@@ -49,6 +32,3 @@ else
     echo "Error: Failed to update congress members."
     exit 1
 fi
-
-# Clean up the temporary file
-rm -f "$TEMP_FILE"

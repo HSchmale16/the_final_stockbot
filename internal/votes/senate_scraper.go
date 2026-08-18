@@ -23,8 +23,12 @@ func LoadSenateRollCallXml(url string, db *gorm.DB) error {
 
 	return ProcessSenateRollCall(url, senateRollCall, db)
 }
-
 func ProcessSenateRollCall(url string, senateRollCall SenateRollCall, db *gorm.DB) error {
+	legisName := ""
+	if len(senateRollCall.VoteDetails) > 0 {
+		legisName = senateRollCall.VoteDetails[0]
+	}
+
 	vote := Vote{
 		Url:         url,
 		RollCallNum: senateRollCall.VoteNumber,
@@ -33,12 +37,17 @@ func ProcessSenateRollCall(url string, senateRollCall SenateRollCall, db *gorm.D
 		Chamber:     "Senate",
 		ActionAt:    senateRollCall.VoteDate,
 		VoteResult:  senateRollCall.VoteResult,
-		LegisName:   senateRollCall.VoteDetails[0],
+		LegisName:   legisName,
 	}
 
 	err := db.Transaction(func(tx *gorm.DB) error {
 
-		tx2 := tx.Create(&vote)
+		tx2 := tx.Where(Vote{
+			RollCallNum: vote.RollCallNum,
+			CongressNum: vote.CongressNum,
+			Session:     vote.Session,
+			Chamber:     vote.Chamber,
+		}).Attrs(vote).FirstOrCreate(&vote)
 		if tx2.Error != nil {
 			return tx2.Error
 		}
@@ -53,12 +62,16 @@ func ProcessSenateRollCall(url string, senateRollCall SenateRollCall, db *gorm.D
 			}
 
 			voteRecord := VoteRecord{
-				VoteID:     vote.ID,
-				MemberId:   senator.BioGuideId,
-				VoteStatus: member.VoteCast,
+				VoteID:   vote.ID,
+				MemberId: senator.BioGuideId,
 			}
 
-			tx2 = tx.Create(&voteRecord)
+			tx2 = tx.Where(VoteRecord{
+				VoteID:   vote.ID,
+				MemberId: senator.BioGuideId,
+			}).Attrs(VoteRecord{
+				VoteStatus: member.VoteCast,
+			}).FirstOrCreate(&voteRecord)
 			if tx2.Error != nil {
 				return tx2.Error
 			}

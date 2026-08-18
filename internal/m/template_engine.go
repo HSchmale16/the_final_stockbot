@@ -118,6 +118,9 @@ func GetTemplateEngine() fiber.Views {
 	})
 
 	engine.AddFunc("firstChar", func(s string) string {
+		if len(s) == 0 {
+			return ""
+		}
 		return string(s[0])
 	})
 

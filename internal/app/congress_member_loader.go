@@ -27,14 +27,13 @@ type US_CongressLegislator = m.US_CongressLegislator
  * Legislators can be pulled from this github repo. The data is available from this json file:
  */
 
-func GetCurrentLegislatorJson() []US_CongressLegislator {
-	resp, err := http.Get("https://unitedstates.github.io/congress-legislators/legislators-current.json")
+func fetchLegislatorJson(url string) []US_CongressLegislator {
+	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
 
-	// Read the body of the response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
@@ -47,6 +46,14 @@ func GetCurrentLegislatorJson() []US_CongressLegislator {
 	}
 
 	return congMembers
+}
+
+func GetCurrentLegislatorJson() []US_CongressLegislator {
+	return fetchLegislatorJson("https://unitedstates.github.io/congress-legislators/legislators-current.json")
+}
+
+func GetHistoricalLegislatorJson() []US_CongressLegislator {
+	return fetchLegislatorJson("https://unitedstates.github.io/congress-legislators/legislators-historical.json")
 }
 
 func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) (int, int) {
@@ -91,7 +98,39 @@ func MangleLegislatorsAndMerge(db *gorm.DB, memberData []US_CongressLegislator) 
 func LOAD_MEMBERS_JSON(db *gorm.DB, file string) {
 	var tCur []US_CongressLegislator
 	if file == "" {
-		tCur = GetCurrentLegislatorJson()
+		// Fetch current and historical feeds concurrently
+		type result struct {
+			members []US_CongressLegislator
+			err     error
+		}
+		ch := make(chan result, 2)
+
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					ch <- result{err: fmt.Errorf("current feed panic: %v", r)}
+				}
+			}()
+			ch <- result{members: GetCurrentLegislatorJson()}
+		}()
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					ch <- result{err: fmt.Errorf("historical feed panic: %v", r)}
+				}
+			}()
+			ch <- result{members: GetHistoricalLegislatorJson()}
+		}()
+
+		for i := 0; i < 2; i++ {
+			r := <-ch
+			if r.err != nil {
+				log.Printf("WARNING: %v", r.err)
+				continue
+			}
+			tCur = append(tCur, r.members...)
+		}
+		log.Printf("Loaded %d total legislators (current + historical)", len(tCur))
 	} else {
 		// open file by name
 		jsonFile, err := os.Open(file)
@@ -99,7 +138,6 @@ func LOAD_MEMBERS_JSON(db *gorm.DB, file string) {
 			log.Fatal(err)
 		}
 		defer jsonFile.Close()
-		// read file
 
 		byteValue, _ := io.ReadAll(jsonFile)
 		json.Unmarshal(byteValue, &tCur)

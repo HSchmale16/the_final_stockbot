@@ -1,0 +1,50 @@
+---
+- name: Reload Congress Members and Votes
+  hosts: all
+  remote_user: linuxuser
+  gather_facts: false
+  vars:
+    service_user_name: final_stockbot
+    congress_numbers:
+      - 115
+      - 116
+      - 117
+      - 118
+      - 119
+
+  tasks:
+    - name: Drop vote tables in database
+      become: true
+      become_user: postgres
+      community.postgresql.postgresql_query:
+        db: congress
+        query: "DROP TABLE IF EXISTS vote_records, votes CASCADE;"
+
+    - name: Restart final-stockbot service
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: final-stockbot
+        state: restarted
+
+    - name: Load all congress members
+      become: true
+      become_user: "{{ service_user_name }}"
+      ansible.builtin.command:
+        cmd: "./the_final_stockbot -load-congress-members"
+        chdir: "~{{ service_user_name }}/the_final_stockbot"
+
+    - name: Load votes for the last 4 congresses
+      become: true
+      become_user: "{{ service_user_name }}"
+      ansible.builtin.command:
+        cmd: "./the_final_stockbot -script load-voteview {{ item }}"
+        chdir: "~{{ service_user_name }}/the_final_stockbot"
+      loop: "{{ congress_numbers }}"
+
+    - name: Backfill last vote date for congress members
+      become: true
+      become_user: "{{ service_user_name }}"
+      ansible.builtin.command:
+        cmd: "./the_final_stockbot -script backfill-last-vote-date"
+        chdir: "~{{ service_user_name }}/the_final_stockbot"

@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"runtime/pprof"
 	"time"
 
@@ -79,6 +80,19 @@ func main() {
 
 		fmt.Println("Target file is ", file)
 		switch script {
+		case "load-voteview":
+			congress := 119
+			if len(flag.Args()) > 0 {
+				fmt.Sscanf(flag.Arg(0), "%d", &congress)
+			} else if len(os.Args) > 3 {
+				fmt.Sscanf(os.Args[3], "%d", &congress)
+			} else if len(os.Args) > 2 {
+				fmt.Sscanf(os.Args[2], "%d", &congress)
+			}
+			err := votes.LoadVotesFromVoteview(db, congress)
+			if err != nil {
+				log.Fatalf("Voteview load failed: %v", err)
+			}
 		case "house-travel":
 			var createdCount int
 			utils.FindFileInZipUseCallback(file, func(rc io.ReadCloser) {
@@ -92,19 +106,91 @@ func main() {
 			})
 			m.LogCronJobRun(db, "senate-travel", "success", createdCount, fmt.Sprintf("Successfully imported %d new Senate travel disclosures", createdCount))
 		case "house-votes":
-			var scrape = map[int]int{
-				2021: 449,
-				2022: 549,
-				2023: 724,
-				2024: 400,
-			}
+			var createdCount int
+			currentYear := time.Now().Year()
+			for year := 2021; year <= currentYear; year++ {
+				// Query database to find the maximum roll call number already imported for this year
+				start := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
+				end := time.Date(year, 12, 31, 23, 59, 59, 0, time.UTC)
 
-			for year, maxRollCall := range scrape {
-				for i := 1; i <= maxRollCall; i++ {
+				var maxRollCall int
+				db.Model(&votes.Vote{}).
+					Where("chamber = ? AND action_at BETWEEN ? AND ?", "U.S. House of Representatives", start, end).
+					Select("COALESCE(MAX(roll_call_num), 0)").
+					Row().Scan(&maxRollCall)
+
+				log.Printf("Resuming House votes for year %d from roll %d\n", year, maxRollCall+1)
+
+				consecutiveErrors := 0
+				for i := maxRollCall + 1; ; i++ {
 					url := fmt.Sprintf("https://clerk.house.gov/evs/%d/roll%03d.xml", year, i)
-					votes.LoadHouseRollCallXml(url, db)
+					err := votes.LoadHouseRollCallXml(url, db)
+					if err != nil {
+						log.Printf("Stopped House scraping for year %d at roll %d: %v\n", year, i, err)
+						consecutiveErrors++
+						if consecutiveErrors >= 3 {
+							break
+						}
+					} else {
+						createdCount++
+						consecutiveErrors = 0
+					}
 				}
 			}
+			m.LogCronJobRun(db, "house-votes", "success", createdCount, fmt.Sprintf("Successfully processed %d House roll calls", createdCount))
+		case "senate-votes":
+			var createdCount int
+			currentYear := time.Now().Year()
+
+			for year := 2021; year <= currentYear; year++ {
+				congress, session := getCongressSession(year)
+				if congress == 0 {
+					continue
+				}
+
+				// Find the highest roll call number for this congress and session in the database
+				var maxRollCall int
+				db.Model(&votes.Vote{}).
+					Where("chamber = ? AND congress_num = ? AND session = ?", "Senate", congress, fmt.Sprintf("%d", session)).
+					Select("COALESCE(MAX(roll_call_num), 0)").
+					Row().Scan(&maxRollCall)
+
+				log.Printf("Resuming Senate votes for Congress %d, Session %d (Year %d) from roll %d\n", congress, session, year, maxRollCall+1)
+
+				consecutiveErrors := 0
+				for i := maxRollCall + 1; ; i++ {
+					url := fmt.Sprintf("https://www.senate.gov/legislative/LIS/roll_call_votes/vote%d%d/vote_%d_%d_%05d.xml", congress, session, congress, session, i)
+					err := votes.LoadSenateRollCallXml(url, db)
+					if err != nil {
+						log.Printf("Stopped Senate scraping for Congress %d, Session %d at vote %d: %v\n", congress, session, i, err)
+						consecutiveErrors++
+						if consecutiveErrors >= 3 {
+							break
+						}
+					} else {
+						createdCount++
+						consecutiveErrors = 0
+					}
+				}
+			}
+			m.LogCronJobRun(db, "senate-votes", "success", createdCount, fmt.Sprintf("Successfully processed %d Senate roll calls", createdCount))
+		case "backfill-last-vote-date":
+			log.Println("Backfilling last vote date for all congress members...")
+			// Using COALESCE to keep existing dates if they have no votes, or set to subquery max.
+			// This updates the denormalized column on the congress_member table.
+			err := db.Exec(`
+				UPDATE congress_member
+				SET last_vote_date = (
+					SELECT MAX(votes.action_at)
+					FROM vote_records
+					INNER JOIN votes ON votes.id = vote_records.vote_id
+					WHERE vote_records.member_id = congress_member.bio_guide_id
+				)
+			`).Error
+			if err != nil {
+				log.Fatalf("Failed to backfill last vote date: %v\n", err)
+			}
+			log.Println("Backfill completed successfully.")
 		}
 
 		return
@@ -205,4 +291,14 @@ func runProfilerServer() {
 	if err := http.ListenAndServe("127.0.0.1:6060", nil); err != nil {
 		log.Println("pprof server error:", err)
 	}
+}
+
+func getCongressSession(year int) (int, int) {
+	if year < 1789 {
+		return 0, 0
+	}
+	yearsSince1789 := year - 1789
+	congress := 1 + (yearsSince1789 / 2)
+	session := 1 + (yearsSince1789 % 2)
+	return congress, session
 }

@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"sync"
+
 	"github.com/hschmale16/the_final_stockbot/internal/m"
 	"github.com/pgvector/pgvector-go"
 	"golang.org/x/text/cases"
@@ -61,7 +63,7 @@ type DB_TravelDisclosure struct {
 	MemberName    string
 	Year          string `gorm:"index"`
 	FilingType    string
-	DepartureDate time.Time
+	DepartureDate time.Time `gorm:"index"`
 	ReturnDate    time.Time
 	Destination   string
 	TravelSponsor string
@@ -320,7 +322,21 @@ func LoadSenateXml(rc io.ReadCloser, db *gorm.DB) int {
 	return createdCount
 }
 
+var (
+	senatorCache   = make(map[string]m.DB_CongressMember)
+	senatorCacheMu sync.RWMutex
+)
+
 func FuzzyFindSenator(db *gorm.DB, last, first, state string) (m.DB_CongressMember, error) {
+	key := fmt.Sprintf("%s|%s|%s", strings.ToUpper(last), strings.ToUpper(first), strings.ToUpper(state))
+
+	senatorCacheMu.RLock()
+	cached, found := senatorCache[key]
+	senatorCacheMu.RUnlock()
+	if found {
+		return cached, nil
+	}
+
 	first = strings.Trim(first, ".")
 	last = strings.Trim(last, ".")
 	senator := last + ", " + first
@@ -344,12 +360,9 @@ func FuzzyFindSenator(db *gorm.DB, last, first, state string) (m.DB_CongressMemb
 		both.Count(&cnt)
 		fmt.Println(cnt)
 		if cnt > 1 {
-			// Print all records found
 			var members []m.DB_CongressMember
 			both.Find(&members)
 			for _, m := range members {
-				// Scan manually to see if we can find a year between them
-				// We are only looking back at most 6 years for senators.
 				if m.CongressMemberInfo.ServedDuringYear(2021) || m.CongressMemberInfo.ServedDuringYear(2023) {
 					member = m
 					break
@@ -369,6 +382,10 @@ func FuzzyFindSenator(db *gorm.DB, last, first, state string) (m.DB_CongressMemb
 	if member.BioGuideId == "" {
 		return m.DB_CongressMember{}, fmt.Errorf("could not find member %s", senator)
 	}
+
+	senatorCacheMu.Lock()
+	senatorCache[key] = member
+	senatorCacheMu.Unlock()
 
 	return member, nil
 }

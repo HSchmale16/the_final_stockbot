@@ -22,10 +22,16 @@ type US_CongressLegislator struct {
 }
 
 func (l US_CongressLegislator) LastTerm() Terms {
+	if len(l.Terms) == 0 {
+		return Terms{}
+	}
 	return l.Terms[len(l.Terms)-1]
 }
 
 func (l US_CongressLegislator) FirstTerm() Terms {
+	if len(l.Terms) == 0 {
+		return Terms{}
+	}
 	return l.Terms[0]
 }
 

@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/hschmale16/the_final_stockbot/internal/m"
 	senatelobbying "github.com/hschmale16/the_final_stockbot/pkg/senate-lobbying"
 	"gorm.io/gorm"
 )
@@ -124,18 +125,18 @@ func ProcessHouseRollCallXml(data []byte) HouseRollCallXml {
 	return result
 }
 
-func LoadHouseRollCallXml(url string, db *gorm.DB) {
+func LoadHouseRollCallXml(url string, db *gorm.DB) error {
 	fmt.Println("Loading", url)
 	data, err := senatelobbying.SendRequest(url)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	res := ProcessHouseRollCallXml(data)
 	// get the real time instance
 
 	actionAt, err := time.Parse("2-Jan-2006 3:04 PM", res.ActionDate+" "+res.ActionTime)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	vote := Vote{
@@ -164,26 +165,42 @@ func LoadHouseRollCallXml(url string, db *gorm.DB) {
 		log.Fatal(x.Error)
 	}
 
-	var voteRecords = make([]VoteRecord, len(res.Votes))
+	var existingIds []string
+	if err := db.Model(&m.DB_CongressMember{}).Pluck("bio_guide_id", &existingIds).Error; err != nil {
+		return err
+	}
+	existingMap := make(map[string]bool)
+	for _, id := range existingIds {
+		existingMap[id] = true
+	}
+
+	var voteRecords []VoteRecord
 	memberIdFixer := map[string]string{
 		"L000555": "L000595",
 	}
 
-	for i, v := range res.Votes {
-		if memberIdFixer[v.Legislator.NameId] != "" {
-			v.Legislator.NameId = memberIdFixer[v.Legislator.NameId]
+	for _, v := range res.Votes {
+		id := v.Legislator.NameId
+		if memberIdFixer[id] != "" {
+			id = memberIdFixer[id]
 		}
 
-		voteRecords[i] = VoteRecord{
-			MemberId:   v.Legislator.NameId,
+		if !existingMap[id] {
+			log.Printf("Warning: Legislator with ID %s does not exist in database, skipping vote record\n", id)
+			continue
+		}
+
+		voteRecords = append(voteRecords, VoteRecord{
+			MemberId:   id,
 			VoteStatus: v.Vote,
 			VoteID:     vote.ID,
-		}
+		})
 	}
 
 	x = db.CreateInBatches(&voteRecords, 50)
 	if x.Error != nil {
-		log.Fatalln(x.Error)
+		return x.Error
 	}
 
+	return nil
 }

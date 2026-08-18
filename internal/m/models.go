@@ -225,6 +225,7 @@ type DB_CongressMember struct {
 	IsActive           bool                     `gorm:"index"`
 	Sponsored          []GovtRssItem            `gorm:"many2many:congress_member_sponsored;"`
 	Committees         []DB_CommitteeMembership `gorm:"foreignKey:CongressMemberId"`
+	LastVoteDate       *time.Time
 }
 
 func (d DB_CongressMember) TableName() string {
@@ -232,6 +233,9 @@ func (d DB_CongressMember) TableName() string {
 }
 
 func (d DB_CongressMember) TookOfficeOn() string {
+	if len(d.CongressMemberInfo.Terms) == 0 {
+		return ""
+	}
 	return d.CongressMemberInfo.Terms[0].Start
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 const BASE_URL = "https://lda.senate.gov/api/v1/"
@@ -18,8 +19,10 @@ func SendRequest(url string) ([]byte, error) {
 		return nil, err
 	}
 
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
 	// This is an anon api but it's a hell of a lot faster with a token
-	if senate_token != "" {
+	if senate_token != "" && strings.Contains(url, "lda.senate.gov") {
 		req.Header.Set("Authorization", fmt.Sprintf("Token %s", senate_token))
 	}
 
