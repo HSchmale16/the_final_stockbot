@@ -27,7 +27,7 @@
         <select
           id="year-selector"
           name="year"
-          onchange="location.href='/attendance/' + this.value"
+          onchange="location.href='/attendance/' + this.value + window.location.search"
           class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-3 pr-10 py-1.5 text-sm font-medium text-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         >
           {{#each AvailableYears}}
@@ -91,7 +91,6 @@
     hx-target="#scoreboard-container"
     hx-swap="innerHTML"
     hx-trigger="change"
-    hx-push-url="/attendance/{{SelectedYear}}"
     class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-6"
   >
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

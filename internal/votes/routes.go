@@ -24,6 +24,10 @@ func SetupRoutes(app *fiber.App) {
 
 func RedirectToCurrentYearAttendance(c *fiber.Ctx) error {
 	currentYear := time.Now().Year()
+	qs := string(c.Request().URI().QueryString())
+	if qs != "" {
+		return c.Redirect(fmt.Sprintf("/attendance/%d?%s", currentYear, qs), fiber.StatusFound)
+	}
 	return c.Redirect(fmt.Sprintf("/attendance/%d", currentYear), fiber.StatusFound)
 }
 
@@ -460,6 +464,7 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 		"HouseAvg":    fmt.Sprintf("%.1f", houseAvg),
 		"TopLeader":   topLeaderVal,
 		"WorstLeader": worstLeaderVal,
+		"TotalCount":  len(allScores),
 	}
 
 	var filtered []ScoreboardItem
@@ -608,6 +613,8 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 		{"Value": "over65", "Label": "> 65"},
 	}
 
+	hasFilters := chamber != "All" || tenure != "All" || age != "All"
+
 	bindMap := fiber.Map{
 		"Title":          fmt.Sprintf("Attendance Scoreboard (%d)", year),
 		"SelectedYear":   selectedYearStr,
@@ -622,6 +629,9 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 		"WorstStreaks":   worst5,
 		"RecentMissers":  recentlyMissing,
 		"AllScores":      allScoresTable,
+		"HasFilters":     hasFilters,
+		"TotalCount":     metadata["TotalCount"],
+		"FilteredCount":  len(filtered),
 		"ActiveChamber":  chamber,
 		"ActiveTenure":   tenure,
 		"ActiveAge":      age,
@@ -644,11 +654,18 @@ func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
 		year = currentYear
 	}
 
+	qs := string(c.Request().URI().QueryString())
+	if qs != "" {
+		c.Set("HX-Replace-Url", fmt.Sprintf("/attendance/%d?%s", year, qs))
+	} else {
+		c.Set("HX-Replace-Url", fmt.Sprintf("/attendance/%d", year))
+	}
+
 	chamber := c.Query("chamber", "All")
 	tenure := c.Query("tenure", "All")
 	age := c.Query("age", "All")
 
-	filtered, _, err := computeAttendanceScores(db, year, chamber, tenure, age)
+	filtered, metadata, err := computeAttendanceScores(db, year, chamber, tenure, age)
 	if err != nil {
 		return c.Status(500).SendString(fmt.Sprintf("Database error: %v", err))
 	}
@@ -709,6 +726,8 @@ func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
 		return allScoresTable[i].AttendanceRate < allScoresTable[j].AttendanceRate
 	})
 
+	hasFilters := chamber != "All" || tenure != "All" || age != "All"
+
 	return c.Render("attendance_rows", fiber.Map{
 		"SelectedYear":  year,
 		"IsCurrentYear": year == currentYear,
@@ -716,5 +735,8 @@ func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
 		"WorstStreaks":  worst5,
 		"RecentMissers": recentlyMissing,
 		"AllScores":     allScoresTable,
+		"HasFilters":    hasFilters,
+		"TotalCount":    metadata["TotalCount"],
+		"FilteredCount": len(filtered),
 	})
 }
