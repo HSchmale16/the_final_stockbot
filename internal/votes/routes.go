@@ -223,8 +223,8 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 	start := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(year, 12, 31, 23, 59, 59, 0, time.UTC)
 
-	var activeMembers []m.DB_CongressMember
-	if err := db.Where("is_active = ?", true).Find(&activeMembers).Error; err != nil {
+	var allMembers []m.DB_CongressMember
+	if err := db.Find(&allMembers).Error; err != nil {
 		return nil, nil, err
 	}
 
@@ -282,7 +282,7 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 		return nil, nil, err
 	}
 
-	memberRecords := make(map[string][]VoteQueryRow, len(activeMembers))
+	memberRecords := make(map[string][]VoteQueryRow, len(allMembers))
 	for _, r := range records {
 		memberRecords[r.MemberId] = append(memberRecords[r.MemberId], VoteQueryRow{
 			VoteId:     r.VoteId,
@@ -296,8 +296,13 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 	var allScores []ScoreboardItem
 	now := time.Now()
 
-	for _, member := range activeMembers {
-		state := member.CongressMemberInfo.LastTerm().State
+	for _, member := range allMembers {
+		term, inOffice := member.CongressMemberInfo.TermForYear(year)
+		if !inOffice {
+			continue
+		}
+
+		state := term.State
 		// Exclude non-voting delegates and territory members (American Samoa, DC, Guam, Northern Mariana Islands, Puerto Rico, Virgin Islands)
 		if state == "AS" || state == "DC" || state == "GU" || state == "MP" || state == "PR" || state == "VI" {
 			continue
@@ -313,15 +318,16 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 		}
 
 		yearsServed := member.YearsServed()
-		tookOffice, err := time.Parse("2006-01-02", member.TookOfficeOn())
-		hasTookOffice := err == nil
 		mRecords := memberRecords[member.BioGuideId]
 		var eligibleRecords []VoteQueryRow
 		for _, r := range mRecords {
-			if hasTookOffice && r.ActionAt.Before(tookOffice) {
-				continue
+			if member.CongressMemberInfo.WasInOfficeOn(r.ActionAt) {
+				eligibleRecords = append(eligibleRecords, r)
 			}
-			eligibleRecords = append(eligibleRecords, r)
+		}
+
+		if len(eligibleRecords) == 0 {
+			continue
 		}
 
 		sort.Slice(eligibleRecords, func(i, j int) bool {
@@ -372,12 +378,12 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 		}
 
 		chamber := "Senate"
-		if member.CongressMemberInfo.LastTerm().Type == "rep" {
+		if term.Type == "rep" {
 			chamber = "House"
 		}
 
 		partyName := "Independent"
-		partyClean := strings.ToUpper(member.CongressMemberInfo.LastTerm().Party)
+		partyClean := strings.ToUpper(term.Party)
 		if strings.HasPrefix(partyClean, "D") {
 			partyName = "Democrat"
 		} else if strings.HasPrefix(partyClean, "R") {
@@ -388,7 +394,7 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 			BioGuideId:          member.BioGuideId,
 			Name:                member.Name,
 			Party:               partyName,
-			State:               member.CongressMemberInfo.LastTerm().State,
+			State:               state,
 			Chamber:             chamber,
 			IsSenator:           chamber == "Senate",
 			TotalVotes:          totalVotes,

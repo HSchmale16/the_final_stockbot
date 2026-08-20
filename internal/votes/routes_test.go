@@ -104,3 +104,59 @@ func TestHtmxAttendanceReplaceUrlHeaderAndFilterNotice(t *testing.T) {
 		}
 	})
 }
+
+func TestTermForYearAndWasInOfficeOn(t *testing.T) {
+	leg := m.US_CongressLegislator{
+		Terms: []m.Terms{
+			{
+				Type:  "rep",
+				State: "CA",
+				Start: "2019-01-03",
+				End:   "2023-01-03",
+				Party: "Democrat",
+			},
+			{
+				Type:  "sen",
+				State: "CA",
+				Start: "2023-01-03",
+				End:   "2029-01-03",
+				Party: "Democrat",
+			},
+		},
+	}
+
+	// 2021 was Rep
+	term2021, ok := leg.TermForYear(2021)
+	if !ok {
+		t.Fatalf("Expected TermForYear(2021) to return true")
+	}
+	if term2021.Type != "rep" {
+		t.Errorf("Expected term type 'rep' for 2021, got '%s'", term2021.Type)
+	}
+
+	// 2024 was Sen
+	term2024, ok := leg.TermForYear(2024)
+	if !ok {
+		t.Fatalf("Expected TermForYear(2024) to return true")
+	}
+	if term2024.Type != "sen" {
+		t.Errorf("Expected term type 'sen' for 2024, got '%s'", term2024.Type)
+	}
+
+	// 2015 was not in office
+	_, ok = leg.TermForYear(2015)
+	if ok {
+		t.Errorf("Expected TermForYear(2015) to return false")
+	}
+
+	// WasInOfficeOn
+	t1 := time.Date(2021, 6, 15, 12, 0, 0, 0, time.UTC)
+	if !leg.WasInOfficeOn(t1) {
+		t.Errorf("Expected WasInOfficeOn to be true on %v", t1)
+	}
+
+	t2 := time.Date(2018, 12, 31, 0, 0, 0, 0, time.UTC)
+	if leg.WasInOfficeOn(t2) {
+		t.Errorf("Expected WasInOfficeOn to be false on %v", t2)
+	}
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+	"time"
 )
 
 type US_CongressLegislator struct {
@@ -64,6 +65,36 @@ func (l US_CongressLegislator) ServedAsDuringYear(role string, year int) bool {
 		}
 		if start <= year && year <= end && term.Type == role {
 			return true
+		}
+	}
+	return false
+}
+
+func (l US_CongressLegislator) TermForYear(year int) (Terms, bool) {
+	for i := len(l.Terms) - 1; i >= 0; i-- {
+		term := l.Terms[i]
+		start, err1 := parseYear(term.Start)
+		end, err2 := parseYear(term.End)
+		if err1 == nil && err2 == nil {
+			if start <= year && year <= end {
+				return term, true
+			}
+		}
+	}
+	return Terms{}, false
+}
+
+func (l US_CongressLegislator) WasInOfficeOn(t time.Time) bool {
+	dateStr := t.Format("2006-01-02")
+	for _, term := range l.Terms {
+		if term.Start != "" && term.End != "" {
+			if term.Start <= dateStr && dateStr <= term.End {
+				return true
+			}
+		} else if term.Start != "" {
+			if term.Start <= dateStr {
+				return true
+			}
 		}
 	}
 	return false
