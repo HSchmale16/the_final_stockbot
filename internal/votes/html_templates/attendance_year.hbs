@@ -18,6 +18,7 @@
       </h1>
       <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-3xl">
         A non-partisan view of voting attendance, participation rates, and consecutive missed vote streaks across the U.S. Congress.
+        You elect them to represent you, and they're very well paid. They should be there to represent you the people.
       </p>
     </div>
     <div class="mt-4 md:mt-0">
@@ -41,7 +42,7 @@
   <div class="bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-900/60 shadow-sm">
     <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-200">About this Scoreboard</h3>
     <p class="mt-2 text-sm text-indigo-700 dark:text-indigo-300 leading-relaxed">
-      This board calculates voting attendance using official U.S. House of Representatives and U.S. Senate roll call XML data. 
+      This board calculates voting attendance using data pulled from <a href="https://voteview.com">VoteView by UCLA</a>. 
       To ensure fairness, a member's attendance rate is evaluated <strong>only for votes cast after they took office</strong>.
       Streaks and metrics require a minimum of 15 eligible votes in the selected year to qualify.
     </p>
@@ -61,23 +62,6 @@
       <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
         {{#if WorstLeader}}
           {{> 'partials/member_pill' Member=WorstLeader }}
-        {{else}}
-          <span class="text-xs text-gray-400">No data available</span>
-        {{/if}}
-      </div>
-    </div>
-    {{else}}
-    <!-- Best Attendance Rate Card (Prior Years) -->
-    <div class="overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-      <div>
-        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Top Attendance Rate</span>
-        <div class="mt-2 flex items-baseline text-3xl font-extrabold text-green-600 dark:text-green-400">
-          {{#if TopLeader}}{{TopLeader.AttendanceRate}}%{{else}}N/A{{/if}}
-        </div>
-      </div>
-      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-        {{#if TopLeader}}
-          {{> 'partials/member_pill' Member=TopLeader }}
         {{else}}
           <span class="text-xs text-gray-400">No data available</span>
         {{/if}}
