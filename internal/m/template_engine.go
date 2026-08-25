@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
-
+	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -53,6 +53,10 @@ func RegisterEmbededFS(embededFS embed.FS) {
 }
 
 var templatesFS = make([]fs.FS, 0, 10)
+var (
+	engineOnce     sync.Once
+	templateEngine *handlebars.Engine
+)
 
 func getEngine() *handlebars.Engine {
 	fmt.Println(templatesFS)
@@ -67,15 +71,16 @@ func getEngine() *handlebars.Engine {
 }
 
 func GetTemplateEngine() fiber.Views {
-	engine := getEngine()
+	engineOnce.Do(func() {
+		engine := getEngine()
 
-	// register an isEquals helper or else
-	engine.AddFunc("isEqualApplyClass", func(a, b, class string) string {
-		if a == b {
-			return class
-		}
-		return ""
-	})
+		// register an isEquals helper or else
+		engine.AddFunc("isEqualApplyClass", func(a, b, class string) string {
+			if a == b {
+				return class
+			}
+			return ""
+		})
 
 	engine.AddFunc("eq", func(a, b string) bool {
 		return a == b
@@ -164,7 +169,10 @@ func GetTemplateEngine() fiber.Views {
 		return x
 	})
 
-	return engine
+	templateEngine = engine
+	})
+
+	return templateEngine
 }
 
 /**

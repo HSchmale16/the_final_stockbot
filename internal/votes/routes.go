@@ -112,6 +112,7 @@ func GetVotesForMember(c *fiber.Ctx) error {
 	}
 	var recentVotes []VoteTableItem
 
+	thirtyDaysAgo := time.Now().AddDate(0, 0, -30)
 	for _, r := range records {
 		statusClean := strings.TrimSpace(strings.ToLower(r.VoteStatus))
 		isMissed := statusClean == "not voting" || statusClean == "absent"
@@ -156,8 +157,8 @@ func GetVotesForMember(c *fiber.Ctx) error {
 			})
 		}
 
-		// Table items up to 10
-		if len(recentVotes) < 10 {
+		// Table items for votes in the last 30 days
+		if r.Vote.ActionAt.After(thirtyDaysAgo) {
 			amdtInfo := ""
 			if r.Vote.AmmendmentAuthor != "" {
 				amdtInfo = fmt.Sprintf("Amdt %d (%s)", r.Vote.AmmendmentNum, r.Vote.AmmendmentAuthor)
@@ -223,8 +224,14 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 	start := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(year, 12, 31, 23, 59, 59, 0, time.UTC)
 
+	yearStart := fmt.Sprintf("%d-01-01", year)
+	yearEnd := fmt.Sprintf("%d-12-31", year)
+
 	var allMembers []m.DB_CongressMember
-	if err := db.Find(&allMembers).Error; err != nil {
+	err := db.Select("bio_guide_id, name, is_active, congress_member_info").
+		Where("EXISTS (SELECT 1 FROM jsonb_array_elements(congress_member_info->'terms') AS t WHERE (t->>'end') >= ? AND (t->>'start') <= ?)", yearStart, yearEnd).
+		Find(&allMembers).Error
+	if err != nil {
 		return nil, nil, err
 	}
 
@@ -240,7 +247,7 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 		ActionAt time.Time
 	}
 	var yearVotes []VoteItem
-	err := db.Table("votes").
+	err = db.Table("votes").
 		Select("id, action_at").
 		Where("action_at BETWEEN ? AND ?", start, end).
 		Order("action_at ASC, id ASC").
@@ -356,14 +363,10 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 
 		recentMissed := 0
 		recentEligible := 0
-		if totalVotes > 0 {
-			startRecent := totalVotes - 50
-			if startRecent < 0 {
-				startRecent = 0
-			}
-			recentSlice := eligibleRecords[startRecent:]
-			recentEligible = len(recentSlice)
-			for _, r := range recentSlice {
+		thirtyDaysAgo := now.AddDate(0, 0, -30)
+		for _, r := range eligibleRecords {
+			if r.ActionAt.After(thirtyDaysAgo) {
+				recentEligible++
 				statusClean := strings.TrimSpace(strings.ToLower(r.VoteStatus))
 				if statusClean == "not voting" || statusClean == "absent" {
 					recentMissed++
@@ -621,6 +624,8 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 
 	hasFilters := chamber != "All" || tenure != "All" || age != "All"
 
+	voteFreq := computeYearVoteFrequency(db, year, chamber)
+
 	bindMap := fiber.Map{
 		"Title":          fmt.Sprintf("Attendance Scoreboard (%d)", year),
 		"SelectedYear":   selectedYearStr,
@@ -644,6 +649,7 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 		"Chambers":       chambers,
 		"Tenures":        tenures,
 		"Ages":           ages,
+		"VoteFrequency":  voteFreq,
 	}
 
 	return c.Render("attendance_year", bindMap, "layouts/main")

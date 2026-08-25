@@ -1,0 +1,76 @@
+<div class="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+  <!-- Header / Legend & Metrics -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-700/80 gap-2">
+    <div class="flex items-center space-x-2">
+      <span class="text-xl">📈</span>
+      <div>
+        <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+          Annual Voting Timeline ({{VoteFrequency.Year}})
+        </h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Daily roll call vote frequency across all 12 months. Hover over any bar to inspect daily vote counts.
+        </p>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400 font-medium">
+      <div>
+        <span class="text-gray-400">Total:</span>
+        <strong class="text-gray-900 dark:text-white font-bold ml-1">{{VoteFrequency.TotalVotes}}</strong> votes
+      </div>
+      <div>
+        <span class="text-gray-400">Active Days:</span>
+        <strong class="text-gray-900 dark:text-white font-bold ml-1">{{VoteFrequency.VotingDays}}</strong>
+      </div>
+      {{#if VoteFrequency.BusiestDate}}
+        <div>
+          <span class="text-gray-400">Peak Day:</span>
+          <strong class="text-indigo-600 dark:text-indigo-400 font-bold ml-1">{{VoteFrequency.BusiestDate}}</strong> ({{VoteFrequency.BusiestCount}} votes)
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <!-- Unified Continuous Sparkline Strip -->
+  <div class="overflow-x-auto pb-1">
+    <div class="min-w-[700px] bg-gray-50/80 dark:bg-gray-850/60 rounded-xl p-3 border border-gray-200/80 dark:border-gray-700/70">
+      <!-- Continuous Vector Sparkline -->
+      <svg viewBox="0 0 1000 60" class="w-full h-16 block" preserveAspectRatio="none">
+        <!-- Month Dividers -->
+        {{#each VoteFrequency.Months}}
+          {{#if this.DividerX}}
+            <line x1="{{this.DividerX}}" y1="2" x2="{{this.DividerX}}" y2="58" stroke="currentColor" class="text-gray-300 dark:text-gray-700" stroke-width="1" stroke-dasharray="2 2" />
+          {{/if}}
+        {{/each}}
+
+        <!-- Daily Bars -->
+        {{#each VoteFrequency.Months}}
+          {{#each this.Days}}
+            <rect
+              x="{{this.SvgX}}"
+              y="{{this.SvgY}}"
+              width="{{this.SvgWidth}}"
+              height="{{this.SvgHeight}}"
+              rx="0.75"
+              fill="currentColor"
+              class="{{#if this.HasVotes}}text-indigo-600 dark:text-indigo-400 hover:text-indigo-400 dark:hover:text-indigo-200 cursor-pointer transition-colors{{else}}text-gray-300 dark:text-gray-700 opacity-60{{/if}}"
+            >
+              <title>{{this.Tooltip}}</title>
+            </rect>
+          {{/each}}
+        {{/each}}
+      </svg>
+
+      <!-- Month Labels & Total Votes Bar Underneath -->
+      <div class="flex w-full mt-2 pt-2 border-t border-gray-200/60 dark:border-gray-700/60 text-xs">
+        {{#each VoteFrequency.Months}}
+          <div class="flex-1 text-center px-0.5 {{#unless @last}}border-r border-gray-200/50 dark:border-gray-700/40{{/unless}}">
+            <div class="font-bold text-gray-700 dark:text-gray-300 text-[11px]">{{this.MonthName}}</div>
+            <div class="text-[10px] font-semibold {{#if this.TotalVotes}}text-indigo-600 dark:text-indigo-400{{else}}text-gray-400 dark:text-gray-500 font-normal{{/if}}">
+              {{this.TotalVotes}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

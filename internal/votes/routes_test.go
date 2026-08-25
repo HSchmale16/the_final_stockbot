@@ -160,3 +160,79 @@ func TestTermForYearAndWasInOfficeOn(t *testing.T) {
 		t.Errorf("Expected WasInOfficeOn to be false on %v", t2)
 	}
 }
+
+func TestGetVotesForMember_Last30Days(t *testing.T) {
+	app := fiber.New(fiber.Config{
+		Views: m.GetTemplateEngine(),
+	})
+
+	db, _ := m.SetupDB()
+	app.Use(func(c *fiber.Ctx) error {
+		c.Locals("db", db)
+		return c.Next()
+	})
+	SetupRoutes(app)
+
+	// Clean and create test member
+	testMemberId := "TEST_MEMBER_30D"
+	db.Unscoped().Where("bio_guide_id = ?", testMemberId).Delete(&m.DB_CongressMember{})
+	db.Create(&m.DB_CongressMember{
+		BioGuideId: testMemberId,
+		Name:       "Test Senator 30D",
+		IsActive:   true,
+	})
+	defer func() {
+		db.Unscoped().Where("bio_guide_id = ?", testMemberId).Delete(&m.DB_CongressMember{})
+	}()
+
+	// Create a vote 10 days ago (within 30 days) and 45 days ago (outside 30 days)
+	voteRecent := Vote{
+		ActionAt:    time.Now().AddDate(0, 0, -10),
+		Chamber:     "Senate",
+		RollCallNum: 8801,
+		CongressNum: 118,
+		Session:     "2",
+		VoteResult:  "Passed",
+		LegisName:   "S. 3001 (Recent)",
+		Url:         "test-url-recent-30d",
+	}
+	voteOld := Vote{
+		ActionAt:    time.Now().AddDate(0, 0, -45),
+		Chamber:     "Senate",
+		RollCallNum: 8802,
+		CongressNum: 118,
+		Session:     "2",
+		VoteResult:  "Passed",
+		LegisName:   "S. 3002 (Old)",
+		Url:         "test-url-old-30d",
+	}
+	db.Unscoped().Where("url IN ?", []string{voteRecent.Url, voteOld.Url}).Delete(&Vote{})
+	db.Create(&voteRecent)
+	db.Create(&voteOld)
+	defer func() {
+		db.Unscoped().Where("member_id = ?", testMemberId).Delete(&VoteRecord{})
+		db.Unscoped().Where("url IN ?", []string{voteRecent.Url, voteOld.Url}).Delete(&Vote{})
+	}()
+
+	db.Create(&VoteRecord{VoteID: voteRecent.ID, MemberId: testMemberId, VoteStatus: "Yea"})
+	db.Create(&VoteRecord{VoteID: voteOld.ID, MemberId: testMemberId, VoteStatus: "Yea"})
+
+	req := httptest.NewRequest(http.MethodGet, "/htmx/votes/member/"+testMemberId, nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	body := string(bodyBytes)
+
+	if !strings.Contains(body, "Recent Votes Cast (Last 30 Days)") {
+		t.Errorf("Expected body to contain 'Recent Votes Cast (Last 30 Days)', got: %s", body)
+	}
+	if !strings.Contains(body, "S. 3001 (Recent)") {
+		t.Errorf("Expected body to contain recent vote S. 3001 (Recent)")
+	}
+	if strings.Contains(body, "S. 3002 (Old)") {
+		t.Errorf("Expected body NOT to contain old vote S. 3002 (Old) in the recent 30-day table")
+	}
+}

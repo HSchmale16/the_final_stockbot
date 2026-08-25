@@ -43,7 +43,7 @@
         <span class="text-xl">🚨</span>
         <div>
           <h2 class="text-lg font-bold text-gray-900 dark:text-white">Recently Missing Votes (Top 20)</h2>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Members with the most missed roll call votes across their last 50 eligible votes in {{SelectedYear}}.</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Members with the most missed roll call votes in the last 30 days.</p>
         </div>
       </div>
     </div>
@@ -63,14 +63,14 @@
           </div>
           <div class="text-right">
             <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/40 px-2.5 py-1 text-xs font-bold text-red-700 dark:text-red-300">
-              {{this.RecentMissedVotes}} of last {{this.RecentEligibleVotes}} missed
+              {{this.RecentMissedVotes}} of {{this.RecentEligibleVotes}} missed (last 30 days)
             </span>
             <p class="text-[10px] text-gray-400 mt-1">Year-to-date attendance: {{this.AttendanceRate}}%</p>
           </div>
         </li>
       {{else}}
         <li class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          🎉 No members matching the filters have missed votes recently!
+          🎉 No members matching the filters have missed votes in the last 30 days!
         </li>
       {{/each}}
     </ul>
