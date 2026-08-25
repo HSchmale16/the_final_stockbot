@@ -136,10 +136,43 @@ func TestGetAttendanceYearPage_RendersSparkline(t *testing.T) {
 	bodyBytes, _ := io.ReadAll(resp.Body)
 	body := string(bodyBytes)
 
-	if !strings.Contains(body, "Annual Voting Frequency") {
-		t.Errorf("Expected rendered page to contain 'Annual Voting Frequency', got: %s", body)
+	if !strings.Contains(body, "sparkline-container") {
+		t.Errorf("Expected rendered page to contain 'sparkline-container', got: %s", body)
+	}
+	if !strings.Contains(body, "/htmx/attendance/2026/sparkline") {
+		t.Errorf("Expected rendered page to contain HTMX sparkline endpoint URL")
+	}
+}
+
+func TestGetHtmxAttendanceSparkline(t *testing.T) {
+	app := fiber.New(fiber.Config{
+		Views: m.GetTemplateEngine(),
+	})
+
+	db, _ := m.SetupDB()
+	app.Use(func(c *fiber.Ctx) error {
+		c.Locals("db", db)
+		return c.Next()
+	})
+	SetupRoutes(app)
+
+	req := httptest.NewRequest(http.MethodGet, "/htmx/attendance/2026/sparkline", nil)
+	resp, err := app.Test(req, 10000)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", resp.StatusCode)
+	}
+
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	body := string(bodyBytes)
+
+	if !strings.Contains(body, "Annual Voting Timeline") {
+		t.Errorf("Expected rendered partial to contain 'Annual Voting Timeline', got: %s", body)
 	}
 	if !strings.Contains(body, "Jan") || !strings.Contains(body, "Dec") {
-		t.Errorf("Expected rendered page to contain month segments Jan..Dec")
+		t.Errorf("Expected rendered partial to contain month segments Jan..Dec")
 	}
 }

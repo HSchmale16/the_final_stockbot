@@ -20,6 +20,8 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/attendance", RedirectToCurrentYearAttendance)
 	app.Get("/attendance/:year", GetAttendanceYearPage)
 	app.Get("/htmx/attendance/:year", GetHtmxAttendanceScoreboard)
+	app.Get("/htmx/attendance/:year/stats", GetHtmxAttendanceStats)
+	app.Get("/htmx/attendance/:year/sparkline", GetHtmxAttendanceSparkline)
 }
 
 func RedirectToCurrentYearAttendance(c *fiber.Ctx) error {
@@ -518,8 +520,6 @@ func computeAttendanceScores(db *gorm.DB, year int, chamberFilter, tenureFilter,
 }
 
 func GetAttendanceYearPage(c *fiber.Ctx) error {
-	db := c.Locals("db").(*gorm.DB)
-
 	yearStr := c.Params("year")
 	var year int
 	if yearStr == "" {
@@ -535,67 +535,6 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 	chamber := c.Query("chamber", "All")
 	tenure := c.Query("tenure", "All")
 	age := c.Query("age", "All")
-
-	filtered, metadata, err := computeAttendanceScores(db, year, chamber, tenure, age)
-	if err != nil {
-		return c.Status(500).SendString(fmt.Sprintf("Database error: %v", err))
-	}
-
-	topAttendees := make([]ScoreboardItem, len(filtered))
-	copy(topAttendees, filtered)
-	sort.Slice(topAttendees, func(i, j int) bool {
-		if topAttendees[i].AttendanceRate == topAttendees[j].AttendanceRate {
-			return topAttendees[i].TotalVotes > topAttendees[j].TotalVotes
-		}
-		return topAttendees[i].AttendanceRate > topAttendees[j].AttendanceRate
-	})
-	limitTop := 5
-	if len(topAttendees) < limitTop {
-		limitTop = len(topAttendees)
-	}
-	top5 := topAttendees[:limitTop]
-	worstStreaks := make([]ScoreboardItem, len(filtered))
-	copy(worstStreaks, filtered)
-	sort.Slice(worstStreaks, func(i, j int) bool {
-		if worstStreaks[i].MaxMissedStreak == worstStreaks[j].MaxMissedStreak {
-			return worstStreaks[i].AttendanceRate < worstStreaks[j].AttendanceRate
-		}
-		return worstStreaks[i].MaxMissedStreak > worstStreaks[j].MaxMissedStreak
-	})
-	limitWorst := 5
-	if len(worstStreaks) < limitWorst {
-		limitWorst = len(worstStreaks)
-	}
-	worst5 := worstStreaks[:limitWorst]
-
-	limitRecent := 20
-	var recentlyMissing []ScoreboardItem
-	if year == currentYear {
-		for _, s := range filtered {
-			if s.RecentMissedVotes > 0 {
-				recentlyMissing = append(recentlyMissing, s)
-			}
-		}
-		sort.Slice(recentlyMissing, func(i, j int) bool {
-			if recentlyMissing[i].RecentMissedVotes == recentlyMissing[j].RecentMissedVotes {
-				return recentlyMissing[i].AttendanceRate < recentlyMissing[j].AttendanceRate
-			}
-			return recentlyMissing[i].RecentMissedVotes > recentlyMissing[j].RecentMissedVotes
-		})
-		if len(recentlyMissing) > limitRecent {
-			recentlyMissing = recentlyMissing[:limitRecent]
-		}
-	}
-
-	// Sort full roster for the by-year table
-	allScoresTable := make([]ScoreboardItem, len(filtered))
-	copy(allScoresTable, filtered)
-	sort.Slice(allScoresTable, func(i, j int) bool {
-		if allScoresTable[i].AttendanceRate == allScoresTable[j].AttendanceRate {
-			return allScoresTable[i].TotalVotes < allScoresTable[j].TotalVotes
-		}
-		return allScoresTable[i].AttendanceRate < allScoresTable[j].AttendanceRate
-	})
 
 	availableYears := make([]string, 0, currentYear-2020)
 	for y := currentYear; y >= 2021; y-- {
@@ -622,37 +561,66 @@ func GetAttendanceYearPage(c *fiber.Ctx) error {
 		{"Value": "over65", "Label": "> 65"},
 	}
 
-	hasFilters := chamber != "All" || tenure != "All" || age != "All"
-
-	voteFreq := computeYearVoteFrequency(db, year, chamber)
-
 	bindMap := fiber.Map{
 		"Title":          fmt.Sprintf("Attendance Scoreboard (%d)", year),
 		"SelectedYear":   selectedYearStr,
 		"IsCurrentYear":  year == currentYear,
 		"AvailableYears": availableYears,
-		"OverallAvg":     metadata["OverallAvg"],
-		"SenateAvg":      metadata["SenateAvg"],
-		"HouseAvg":       metadata["HouseAvg"],
-		"TopLeader":      metadata["TopLeader"],
-		"WorstLeader":    metadata["WorstLeader"],
-		"TopAttendees":   top5,
-		"WorstStreaks":   worst5,
-		"RecentMissers":  recentlyMissing,
-		"AllScores":      allScoresTable,
-		"HasFilters":     hasFilters,
-		"TotalCount":     metadata["TotalCount"],
-		"FilteredCount":  len(filtered),
 		"ActiveChamber":  chamber,
 		"ActiveTenure":   tenure,
 		"ActiveAge":      age,
 		"Chambers":       chambers,
 		"Tenures":        tenures,
 		"Ages":           ages,
-		"VoteFrequency":  voteFreq,
 	}
 
 	return c.Render("attendance_year", bindMap, "layouts/main")
+}
+
+func GetHtmxAttendanceStats(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	yearStr := c.Params("year")
+	var year int
+	fmt.Sscanf(yearStr, "%d", &year)
+	currentYear := time.Now().Year()
+	if year < 2021 {
+		year = currentYear
+	}
+
+	_, metadata, err := computeAttendanceScores(db, year, "All", "All", "All")
+	if err != nil {
+		return c.Status(500).SendString(fmt.Sprintf("Database error: %v", err))
+	}
+
+	return c.Render("partials/attendance_stats", fiber.Map{
+		"SelectedYear":  year,
+		"IsCurrentYear": year == currentYear,
+		"OverallAvg":    metadata["OverallAvg"],
+		"SenateAvg":     metadata["SenateAvg"],
+		"HouseAvg":      metadata["HouseAvg"],
+		"TopLeader":     metadata["TopLeader"],
+		"WorstLeader":   metadata["WorstLeader"],
+	})
+}
+
+func GetHtmxAttendanceSparkline(c *fiber.Ctx) error {
+	db := c.Locals("db").(*gorm.DB)
+
+	yearStr := c.Params("year")
+	var year int
+	fmt.Sscanf(yearStr, "%d", &year)
+	currentYear := time.Now().Year()
+	if year < 2021 {
+		year = currentYear
+	}
+
+	chamber := c.Query("chamber", "All")
+	voteFreq := computeYearVoteFrequency(db, year, chamber)
+
+	return c.Render("partials/vote_frequency_sparkline", fiber.Map{
+		"VoteFrequency": voteFreq,
+	})
 }
 
 func GetHtmxAttendanceScoreboard(c *fiber.Ctx) error {
