@@ -1,3 +1,7 @@
+# Cache storage configuration
+# Keys zone allows up to ~80k keys in 10MB memory; max_size caps disk usage
+proxy_cache_path /var/cache/nginx/stockbot_cache levels=1:2 keys_zone=stockbot_cache:10m max_size=500m inactive=60m use_temp_path=off;
+
 # Default server configuration
 server {
 
@@ -7,9 +11,20 @@ server {
 
     server_name {{ server_name }};
 
+    # Expose cache HIT/MISS/BYPASS status header
+    add_header X-Cache-Status $upstream_cache_status;
+
     location / {
-    	# proxy_cache mycache;
-        # proxy_cache_background_update on;
+        proxy_cache stockbot_cache;
+        proxy_cache_valid 200 302 5m;
+        proxy_cache_valid 404 1m;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
+        proxy_cache_lock on;
+
+        # Allow bypassing cache during profiling or when explicitly requested
+        proxy_cache_bypass $http_cache_control $http_x_bypass_cache;
+        proxy_no_cache $http_cache_control $http_x_bypass_cache;
 
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
